@@ -1,0 +1,46 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/super_big_spacing"
+        android:layout_marginTop="@dimen/super_big_spacing"
+        android:layout_marginRight="@dimen/super_big_spacing"
+        android:gravity="center|left"
+        android:text="@string/title_enable" />
+
+    <Switch
+        android:id="@+id/dialog_task_set_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/super_big_spacing"
+        android:layout_marginTop="@dimen/sub_big_spacing"
+        android:layout_marginRight="@dimen/super_big_spacing"
+        android:text="@string/turn_on_automatic_task"
+        android:textSize="@dimen/medium_text" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/super_big_spacing"
+        android:layout_marginTop="@dimen/medium_spacing"
+        android:layout_marginRight="@dimen/super_big_spacing"
+        android:text="@string/title_set_time" />
+
+    <Spinner
+        android:id="@+id/dialog_task_set_start_time_sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/super_big_spacing"
+        android:layout_marginTop="@dimen/sub_big_spacing"
+        android:layout_marginRight="@dimen/super_big_spacing"
+        android:entries="@array/hour_of_day_array"
+        android:gravity="center|left"
+        android:textSize="@dimen/medium_text" />
+
+
+</LinearLayout>

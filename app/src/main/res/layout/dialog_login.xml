@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="onLongClickListener"
+            type="android.view.View.OnLongClickListener" />
+
+    </data>
+
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="562dp"
+        android:background="@drawable/bg_login"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/dialog_other_login_by_pwd_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center|right"
+                android:paddingEnd="80dp"
+                android:background="@color/transparent"
+                android:text="@string/login_by_pwd"
+                android:textColor="@color/black"
+                android:textSize="@dimen/super_big_more_text" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#9C9C9C" />
+
+        <LinearLayout
+            android:id="@+id/dialog_other_login_by_pwd_ll"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_weight="2">
+
+                    <ImageView
+                        android:background="@drawable/user"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:gravity="center"
+                        android:padding="@dimen/sub_small_spacing" />
+
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/dialog_other_login_account_edt"
+                    android:layout_width="0dp"
+                    android:layout_height="80dp"
+                    android:layout_margin="@dimen/super_big_spacing"
+                    android:layout_weight="7"
+                    android:background="@drawable/shape_edittext"
+                    android:hint="@string/account_hint"
+                    android:padding="@dimen/sub_medium_spacing"
+                    android:textColor="#2d304f"
+                    android:textColorHint="#2d304f" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#9C9C9C" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_weight="2">
+
+                    <ImageView
+                        android:background="@drawable/pwd"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:gravity="center"
+                        android:padding="@dimen/sub_small_spacing" />
+
+                </LinearLayout>
+
+
+                <EditText
+                    android:id="@+id/dialog_other_login_pwd_edt"
+                    android:layout_width="0dp"
+                    android:layout_height="80dp"
+                    android:layout_margin="@dimen/super_big_spacing"
+                    android:layout_weight="7"
+                    android:background="@drawable/shape_edittext"
+                    android:hint="@string/password_hint"
+                    android:inputType="textPassword"
+                    android:padding="@dimen/sub_medium_spacing"
+                    android:textColor="#2d304f"
+                    android:textColorHint="#2d304f" />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#9C9C9C" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/dialog_other_login_dismiss_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/transparent"
+                android:onClick="@{onClickListener}"
+                android:text="@string/cancel"
+                android:textColor="@color/gray_light"
+                android:textSize="@dimen/super_big_text" />
+
+            <TextView
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:background="#9C9C9C" />
+
+            <Button
+                android:id="@+id/dialog_other_login_sure_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/transparent"
+                android:onClick="@{onClickListener}"
+                android:onLongClick="@{onLongClickListener}"
+                android:text="@string/login"
+                android:textColor="@color/black"
+                android:textSize="@dimen/super_big_text" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

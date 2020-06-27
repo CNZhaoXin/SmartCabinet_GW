@@ -1,3 +1,377 @@
 <resources>
     <string name="app_name">FileManagementCabinet</string>
+    <string name="contractor">智能权证柜应用系统</string>
+    <string name="project_title">智能权证柜应用系统</string>
+
+    <!--常用按钮名称和提示 - start -->
+    <string name="no_keycode_back">禁止使用回退键！</string>
+    <string name="no_keycode_home">禁止使用HOME键！</string>
+    <string name="no_keycode_menu">禁止使用MENU键！</string>
+    <string name="delete">删除</string>
+    <string name="modify">修改</string>
+    <string name="opinion">查看</string>
+    <string name="go_back">返回</string>
+    <string name="air"></string>
+    <string name="null_prompt">您暂未设置该信息，请点击完成设置。</string>
+    <string name="set">设置</string>
+    <string name="cancel">取消</string>
+    <string name="sure">确定</string>
+    <string name="quit">退出</string>
+    <string name="query">查询</string>
+    <string name="open">打开</string>
+    <string name="click_ok_to_exit">点击确定退出</string>
+    <string name="fill_complete">请填写完整！</string>
+    <string name="misconfiguration">填写的配置有误</string>
+    <string name="update_completed">更新成功。</string>
+    <string name="no_permission">无权限</string>
+    <string name="modify_time">修改时间</string>
+    <string name="is_null">--</string>
+    <string name="login">登陆</string>
+    <!--常用按钮名称和提示 - end -->
+
+    <!--主界面 - start -->
+    <string name="fingerprint_entry_prompt">请将手指放于屏幕下方指纹传感器上</string>
+    <string name="face_entry_prompt">请正对屏幕右侧柜槽人脸识别摄像头</string>
+    <string name="face_device_offline"><![CDATA[<font color="#BF360C">人脸设备离线，请使用其他方式登录</font>]]></string>
+    <string name="fingerprint_device_offline"><![CDATA[<font color="#BF360C">指纹设备离线，请使用其他方式登录</font>]]></string>
+
+    <string name="other_login">其他方式登录</string>
+    <string name="other_login_prompt">点击屏幕任意位置使用密码登录</string>
+
+
+    <string name="admin_login">其他方式登录</string>
+    <string name="login_by_pwd">密码登录</string>
+    <string name="login_by_fingerprint">指纹登录</string>
+
+    <string name="account">账  号：</string>
+    <string name="password">密  码：</string>
+    <string name="account_hint">请输入您的账号(ID)</string>
+    <string name="password_hint">请输入您的密码</string>
+    <string name="pwd_error">您的密码错误！</string>
+    <string name="pwd_null">您的账号密码为null，请联系管理员，或者在平台修改密码。</string>
+    <string name="pwd_account_error">您的账户或密码错误！</string>
+    <string name="pwd_account_unavailable">您的账户已被限制不可用！</string>
+    <string name="account_null">无该警员记录！</string>
+    <string name="face_landing_successful">人脸识别成功，欢迎%1$s！</string>
+    <string name="loading_faces_title">APP启动</string>
+    <string name="loading_faces_msg">正在加载人脸算法库，请稍后。</string>
+
+    <string name="pwd_landing_successful">密码登录成功，欢迎%1$s！</string>
+
+    <string name="cabinet_online_box_name">%1$s ：</string>
+    <!--主界面 - end -->
+
+    <!--管理菜单-->
+    <string name="title_activity_main_menu">管理菜单</string>
+
+    <string name="access_operation">存取操作</string>
+    <string name="regional_positioning_management">档案管理</string>
+    <string name="personnel_management">人员管理</string>
+    <string name="change_password">密码修改</string>
+    <string name="system_settings">系统设置</string>
+    <string name="synchronize">同步</string>
+    <!--管理菜单-->
+
+    <!--存取操作-->
+    <string name="title_activity_access">存取操作</string>
+
+
+    <string name="title_activity_accessing">存取操作</string>
+    <string name="title_box_name">%1$s柜</string>
+    <string name="title_box_file_number">本柜共有：%1$d本档案</string>
+
+    <string name="box_offline">%1$s号柜体离线，请稍后重试。</string>
+    <string name="box_error">%1$s号柜体异常，请检查</string>
+    <string name="box_door_status_error">%1$s柜门未关，或者锁体损坏，请检查！</string>
+    <string name="box_received_open_door">%1$s号柜体收到开门指令。</string>
+    <string name="box_door_lock_on">%1$s号柜体门已开启。</string>
+    <string name="box_door_lock_on_error">%1$s号柜体门异常开启，请立马关闭。</string>
+    <string name="box_door_lock_off">%1$s号柜体门已关闭。</string>
+    <string name="box_door_lock_off_and_start_inventory">%1$s号柜体门已关闭，准备开始盘点。</string>
+    <string name="box_received_open_light">%1$s号柜体收到开灯指令。</string>
+    <string name="close_door_first">请先关闭%1$s号柜体的门。</string>
+    <string name="inventorying_one_box">正在盘点，请稍后......</string>
+    <string name="inventorying_all">正在整柜盘点，等待时间较久，请稍后......</string>
+    <string name="data_comparison">正在数据比对中......</string>
+
+    <string name="confirm_access_operation">请确认下方的卷宗是本次操作结果吗？</string>
+    <string name="close_dialog_count_down">%1$d秒后自动关闭</string>
+    <string name="no_access_operation_occurred">本次未发生存取操作。</string>
+    <string name="this_operation">本次操作：</string>
+    <string name="deposit_quantity">存入：%1$d本，</string>
+    <string name="deposit_quantity_1">存入：%1$d本。</string>
+    <string name="take_out_the_quantity">取出：%1$d本。</string>
+    <string name="automatically_shut_down">%1$d秒后自动关闭</string>
+    <string name="number_of_in_in_box">%1$d本</string>
+    <string name="inventory_time_out">盘点超时！</string>
+    <string name="inventory_end">盘点结束！</string>
+
+    <string name="main_screen">主\n屏\n幕</string>
+    <string name="too_many_files">卷宗过多</string>
+    <!--存取操作-->
+
+    <!--卷宗查询 - start -->
+    <string name="serial_number">序号↓</string>
+    <string name="cabinet_number">柜体号↓</string>
+
+    <string name="title_box_number">箱体号：</string>
+    <string name="box_number">箱体号</string>
+    <string name="box_number_up">箱体号↑</string>
+    <string name="box_number_down">箱体号↓</string>
+
+    <string name="file_state">状态</string>
+    <string name="file_state_up">状态↑</string>
+    <string name="file_state_down">状态↓</string>
+
+    <string name="title_file_number">卷宗编号：</string>
+
+    <string name="title_police_station_number">派出所编号：</string>
+    <string name="police_station_number">派出所编号</string>
+
+    <string name="title_file_status">卷宗状态：</string>
+
+    <string name="title_name_of_case">案件名称：</string>
+    <string name="name_of_case">案件名称</string>
+
+    <string name="title_case_number">案件编号：</string>
+    <string name="case_number">案件编号</string>
+    <string name="case_number_up">案件编号↑</string>
+    <string name="case_number_down">案件编号↓</string>
+
+    <string name="title_update_time">更新时间：</string>
+    <string name="update_time">更新时间</string>
+    <string name="update_time_up">更新时间↑</string>
+    <string name="update_time_down">更新时间↓</string>
+
+    <string name="number_of_files_queried">查询到的卷宗数量：%1$d</string>
+    <string name="offset">%1$d / %2$d</string>
+    <string name="is_first_page">已经是第一页了！</string>
+    <string name="is_last_page">已经是最后一页了！</string>
+
+    <string name="title_open_cabinet_where_the_file_is_located">开启柜门</string>
+    <string name="open_cabinet_where_the_file_is_located">该卷宗存放在%1$s，是否开启%1$s的柜门</string>
+    <string name="not_in_cabinet">该卷宗不在当前柜子！</string>
+    <string name="cabinet_not_exist">未查到该格子！</string>
+    <string name="no_permission_open_box">配置管理员，您无权限开启柜门！</string>
+    <!--卷宗查询 - end -->
+
+    <!--用户 - start -->
+    <string name="title_police_officer_number">警员编号：</string>
+    <string name="police_officer_number">警员编号</string>
+
+    <string name="title_police_officer_name">警员姓名：</string>
+    <string name="police_officer_name">警员姓名</string>
+
+    <string name="title_permissions">权限(箱号)：</string>
+    <string name="permissions">权限(箱号)</string>
+    <!--用户 - end -->
+
+
+    <!--系统设置-->
+    <string name="title_activity_system_settings">系统设置</string>
+    <string name="restart_now_for_set">您修改的设置需要重启生效，是否立即重启？</string>
+    <string name="click_settings">点击设置</string>
+
+    <!--本地参数- start-->
+    <string name="title_local_parameters">本地参数</string>
+    <string name="device_id">设备编号</string>
+    <string name="unit_number">单位编号</string>
+    <string name="unit_address">单位地址</string>
+    <!--本地参数- end-->
+
+    <!--服务参数- start-->
+    <string name="title_service_parameter">服务参数</string>
+    <string name="device_ethernet">设备以太网-外网（部分服务需设备重启生效）</string>
+    <string name="device_internal_ethernet">设备以太网-内网（部分服务需设备重启生效）</string>
+    <string name="web_api_service">平台服务(webAPI)</string>
+    <string name="cabinet_service_port">柜体服务端口（重启生效）</string>
+    <string name="title_ip">IP地址：</string>
+    <string name="title_subnet_mask">子网掩码：</string>
+    <string name="title_gateway">网关：</string>
+    <string name="title_dns">DNS：</string>
+    <string name="title_web_api_service_ip">平台服务IP：</string>
+    <string name="title_web_api_service_port">平台服务端口：</string>
+    <string name="eth_0_caption_text">IP地址：%1$s 子网掩码：%2$s 网关：%3$s DNS：%4$s</string>
+    <string name="eth_1_caption_text">IP地址：%1$s 子网掩码：%2$s</string>
+    <string name="web_api_caption_text">%1$s:%2$d</string>
+    <!--服务参数- end-->
+
+    <!--柜体参数- start-->
+    <string name="title_cabinet_parameters">柜体参数</string>
+    <string name="number_of_boxes">箱体数量（部分服务需设备重启生效）</string>
+    <string name="number_of_boxes_caption_text">箱体数量：%1$s 排列顺序：%2$s</string>
+    <string name="title_cabinet_in_order">柜体排列顺序</string>
+    <string name="cabinet_name">%1$s柜</string>
+    <string name="not_closed_door_alarm_time">未关门报警时间</string>
+    <string name="not_closed_door_alarm_time_caption_text">箱门未关%1$s发出声音警报</string>
+    <string name="title_too_many_files">卷宗数量过多提醒</string>
+    <string name="too_many_files_number">当卷宗数量超过%1$s本时,存取预览界面会文字提醒,并且在存取操作时语言提醒.</string>
+    <!--柜体参数- end-->
+
+    <!--常规管理- start-->
+    <string name="title_routine_management">常规管理</string>
+    <string name="synchronised_time">自动同步周期（设备重启后生效）</string>
+    <string name="synchronised_time_caption_text">每隔%1$s自动和服务同步数据</string>
+    <string name="countdown">自动返回主界面</string>
+    <string name="countdown_caption_text">无人操作%1$s后将自动返回主界面</string>
+    <string name="date_and_time">日期和时间</string>
+    <string name="automatic_restart">自动重启配置（设备重启后生效）</string>
+    <string name="title_automatic_restart">自动重启：</string>
+    <string name="automatic_restart_caption_text">自动重启时间：%1$d时</string>
+    <string name="turn_on_automatic_task">开启任务</string>
+    <string name="turn_off_automatic_task">关闭任务</string>
+    <string name="title_set_time">设置时间(单位：时)：</string>
+    <string name="enter_restart_time">请输入自动重启的小时（重启后生效）</string>
+    <string name="title_sound_switch">提示音</string>
+    <string name="sound_switch_on">提示音开启</string>
+    <string name="sound_switch_off">提示音关闭</string>
+    <string name="title_restart_now">立即重启</string>
+    <string name="restart_now">点击立即重启设备</string>
+    <string name="restart_now_sure">点击确认按钮立即重启设备。</string>
+    <string name="title_enable">是否启用：</string>
+    <string name="enable">是否启用</string>
+    <string name="automatic_task">任务配置（设备重启后生效）</string>
+    <!--常规管理- end-->
+
+    <!--高级管理- start-->
+    <string name="title_senior_management">高级管理</string>
+    <string name="title_biometrics">生物识别（重启后生效）</string>
+    <string name="biometrics_value">当前采用的生物识别方式是：%1$s</string>
+    <string name="sign_broken">对可能已损坏的箱体进行标定</string>
+    <string name="title_sign_broken">坏柜标定</string>
+    <string name="calibration">对本柜所有箱体进行盘点并根据盘点结果进行校准</string>
+    <string name="title_calibration">自动校准</string>
+    <string name="title_anti_theft_mechanism">防盗机制</string>
+    <string name="anti_theft_mechanism_on">防盗机制开启（非正常开门将会语音提醒。）</string>
+    <string name="anti_theft_mechanism_off">防盗机制关闭</string>
+    <string name="title_calibration_idler">闲时校准（设备重启后生效）</string>
+    <string name="calibration_idler">设置闲时校准时间</string>
+    <string name="calibration_idler_caption_text">闲时校准时间：%1$d时</string>
+
+    <!--高级管理- end-->
+
+    <!--设置界面 - Android设置- start-->
+    <string name="android_system">Android管理</string>
+    <string name="title_display_bar">Android系统设置</string>
+    <string name="display_bar">点击进入Android系统设置界面</string>
+    <string name="display_bar_prompt">警告！\n请不要在Android系统设置界面里卸载（删除）NewFileCabinet，一旦卸载（删除）设备将直接报废，需返厂维修！</string>
+    <string name="title_android_file_manager">文件管理器</string>
+    <string name="android_file_manager">点击进入文件管理器</string>
+    <string name="title_android_browser">浏览器</string>
+    <string name="android_browser">点击进入浏览器</string>
+    <!--设置界面 - Android设置- end-->
+
+    <!--设置界面 - 版本管理- start-->
+    <string name="version_management">版本管理</string>
+    <string name="app_version">APP版本</string>
+    <string name="title_file_manager">U盘更新APP</string>
+    <string name="file_manager">请先在U盘根文件夹里放入命名为：NewFileCabinet.apk的文件，把U盘插入靠下面的那个USB口之后点击更新。</string>
+    <string name="file_not_exist">未找到该文件，请检查文件命名和U盘插入的USB口</string>
+    <string name="title_uninstall_app">卸载程序</string>
+    <string name="uninstall_app">点击卸载本程序，卸载后1分钟内设备会自动重启！</string>
+    <string name="uninstall_app_prompt">点击卸载本程序，卸载后1分钟内设备会自动重启！\n期间会出现错误提示，属于正常现象，请点击确定按钮。</string>
+    <string name="uninstall_app_fail">设置默认桌面失败，停止卸载，请重新尝试卸载！</string>
+    <!--设置界面 - 版本管理- end-->
+
+    <!--设置界面 - 底层管理- start-->
+    <string name="low_level_management">底层管理</string>
+
+    <string name="title_debug">日志打印/DeBug模式</string>
+    <string name="debug_on">已开启日志打印/DeBug模式（部分日志会被开发商上传收集）</string>
+    <string name="debug_off">已关闭日志打印/DeBug模式</string>
+
+
+    <!--删除数据 - start-->
+    <string name="title_delete_sql_lite">清空数据(不删除配置信息)</string>
+    <string name="delete_sql_lite">点击删除数据</string>
+    <string name="delete_sql_lite_sure">点击确认按钮立即删除数据</string>
+    <string name="title_delete_sql_lite_police">删除人员信息数据库</string>
+    <string name="title_delete_sql_lite_dossier">删除卷宗信息数据库</string>
+    <!--删除数据 - end-->
+
+    <string name="show_shared_preferences_lite_sure">点击查看SharedPreferences数据</string>
+    <string name="title_show_shared_preferences_lite">查看SharedPreferences数据库</string>
+    <string name="query_cabinet_sql">点击查看Cabinet数据</string>
+    <string name="title_query_cabinet_sql">查看Cabinet数据库</string>
+
+
+    <string name="title_network_test">网络测试(Ping)</string>
+    <string name="network_test">点击开始测试</string>
+    <string name="ping_address">Ping的地址:</string>
+    <string name="ping_count">Ping的次数:</string>
+    <string name="ping_wait_time">ping超时时间:</string>
+    <string name="ping_message">正在尝试Ping：%1$s</string>
+
+
+    <string name="title_debug_storage_method">盘点日志存储方式</string>
+    <string name="title_debug_storage_client">测试工具配置</string>
+    <string name="antenna_configuration">天线配置</string>
+    <string name="title_antenna_power">天线功率：</string>
+    <string name="antenna_power">天线功率</string>
+    <string name="hint_antenna_power">天线功率是10 - 30 dBm (默认是28)</string>
+    <string name="title_dwell_time">驻留时间：</string>
+    <string name="dwell_time">驻留时间</string>
+    <string name="hint_dwell_time">驻留时间单位是毫秒（默认驻留时间是1500）</string>
+    <string name="title_communication_cycle">盘讯周期：</string>
+    <string name="communication_cycle">盘讯周期</string>
+    <string name="hint_communication_cycle">默认盘讯周期是0</string>
+
+    <string name="single_tagging_algorithm">单化标签算法</string>
+    <string name="title_single_algorithm">单化算法：</string>
+    <string name="hint_single_algorithm1">固定算法</string>
+    <string name="hint_single_algorithm2">动态算法</string>
+    <string name="single_algorithm">单化算法</string>
+    <string name="title_q_value">Q值：</string>
+    <string name="q_value">Q值</string>
+    <string name="hint_q_value">在配置为动态算法时，表示起始Q值（一般为5或6）</string>
+    <string name="title_flip">翻转：</string>
+    <string name="flip">翻转</string>
+    <string name="hint_flip1">不翻转（一般都是不翻转）</string>
+    <string name="hint_flip2">翻转（一般都是不翻转）</string>
+    <string name="title_retries">重试次数：</string>
+    <string name="retries">重试次数</string>
+    <string name="hint_retries">重试次数(一般是1)</string>
+    <string name="title_repeat_until_there_no_label">重复直至无标签：</string>
+    <string name="repeat_until_there_no_label">重复直至无标签</string>
+    <string name="hint_repeat_until_there_no_label1">不重复</string>
+    <string name="hint_repeat_until_there_no_label2">重复</string>
+    <string name="title_minimum_q_value">最小Q值：</string>
+    <string name="minimum_q_value">最小Q值</string>
+    <string name="hint_minimum_q_value">最小Q值（一般是0）</string>
+    <string name="title_maximum_q_value">最大Q值：</string>
+    <string name="maximum_q_value">最大Q值</string>
+    <string name="hint_maximum_q_value">最大Q值（一般是15）</string>
+    <string name="title_threshold">阀值：</string>
+    <string name="threshold">阀值</string>
+    <string name="hint_threshold">默认是4</string>
+    <string name="title_enter_inventory_test">盘点测试</string>
+    <string name="enter_inventory_test">点击进入盘点测试界面</string>
+    <string name="title_enter_calibration_test">闲时校准测试</string>
+    <string name="enter_calibration_test">点击进入闲时校准测试界面</string>
+
+    <string name="if_sure_effective">点击确定即生效</string>
+    <string name="set_time_ymd">点击选择年月日</string>
+    <string name="set_time_hms">点击选择时分</string>
+
+    <string name="reopen">重新操作</string>
+    <string name="abnormal_completion_operation">异常完成操作</string>
+
+    <!--设置界面 - 底层管理- end-->
+
+    <string name="title_face_activation">人脸识别激活（设备重启后生效）</string>
+    <string name="face_activation">点击后根据提示操作激活人脸识别</string>
+    <string name="face_activation_success">人脸识别已经激活，请勿再次激活。</string>
+    <string name="face_activation_success_end">人脸识别已经激活。</string>
+    <string name="face_activation_success_fail_01">人脸识别激活失败，请检查网络和KEY。</string>
+    <string name="face_activation_success_bai_du">人脸识别已经激活（基于BaiDu算法）</string>
+    <string name="face_activation_success_d_face">人脸识别已经激活（基于DFace算法）</string>
+    <string name="face_activation_prompt_01">请插入U盘</string>
+    <string name="face_activation_prompt_02">已经在U盘创建改设备唯一的文件夹，请拔出U盘。</string>
+    <string name="face_activation_prompt_03">U盘已拔出，请用该文件夹的名称去下载对应的License.zip，请把下载的License.zip放入此文件夹，然后在把U盘插入设备。</string>
+    <string name="face_activation_prompt_04">License.zip文件不存在</string>
+    <string name="face_activation_prompt_05">正在拷贝License.zip文件</string>
+    <string name="face_activation_prompt_06">License.zip有误，请拔出U盘重新下载。</string>
+    <string name="face_activation_prompt_07">正在激活中，请稍后...</string>
+
+    <!--系统设置-->
 </resources>

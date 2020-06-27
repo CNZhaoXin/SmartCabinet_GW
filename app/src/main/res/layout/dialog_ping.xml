@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/super_big_spacing"
+        android:layout_marginTop="@dimen/super_big_spacing"
+        android:layout_marginRight="@dimen/super_big_spacing"
+        android:gravity="center|left"
+        android:text="@string/ping_address" />
+
+    <EditText
+        android:id="@+id/dialog_ping_ip_address_edt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/super_big_spacing"
+        android:layout_marginRight="@dimen/super_big_spacing"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/super_big_spacing"
+        android:layout_marginTop="@dimen/medium_spacing"
+        android:layout_marginRight="@dimen/super_big_spacing"
+        android:gravity="center|left"
+        android:text="@string/ping_count" />
+
+    <EditText
+        android:id="@+id/dialog_ping_count_edt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/super_big_spacing"
+        android:layout_marginRight="@dimen/super_big_spacing"
+        android:inputType="number"
+        android:text="1" />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/super_big_spacing"
+        android:layout_marginTop="@dimen/medium_spacing"
+        android:layout_marginRight="@dimen/super_big_spacing"
+        android:gravity="center|left"
+        android:text="@string/ping_wait_time" />
+
+    <EditText
+        android:id="@+id/dialog_ping_wait_time_edt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/super_big_spacing"
+        android:layout_marginRight="@dimen/super_big_spacing"
+        android:inputType="number"
+        android:text="5" />
+
+
+</LinearLayout>

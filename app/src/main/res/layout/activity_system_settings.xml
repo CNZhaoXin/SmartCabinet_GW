@@ -1,0 +1,898 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activity.SystemSettingsActivity">
+
+    <data>
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/system_setting_abl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/system_setting_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:popupTheme="@style/AppTheme.PopupOverlay">
+
+                <TextView
+                    android:id="@+id/system_setting_countdown_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:paddingEnd="@dimen/super_big_spacing"
+                    android:text="60"
+                    android:textColor="@color/colorFontMain"
+                    android:textSize="@dimen/medium_text" />
+
+            </androidx.appcompat.widget.Toolbar>
+
+            <LinearLayout
+                android:id="@+id/system_setting_restart_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:padding="@dimen/super_big_spacing"
+                    android:text="@string/restart_now_for_set"
+                    android:textColor="@color/md_red_A700" />
+
+                <TextView
+                    android:id="@+id/system_setting_restart_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:onClick="@{onClickListener}"
+                    android:padding="@dimen/super_big_spacing"
+                    android:text="@string/title_restart_now"
+                    android:textColor="@color/md_red_A700"
+                    android:textSize="@dimen/sub_big_text" />
+
+            </LinearLayout>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/system_setting_abl">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/card_spacing"
+                    android:clickable="false"
+                    android:foreground="@drawable/ripple"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="@dimen/medium_spacing"
+                            android:paddingTop="@dimen/medium_spacing"
+                            android:text="@string/title_local_parameters"
+                            android:textColor="@color/md_blue_grey_900"
+                            android:textSize="@dimen/medium_text"
+                            android:textStyle="bold"
+                            tools:ignore="RtlSymmetry" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_device_code_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_device_id"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/device_id"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_unit_number_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_unit_number"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/unit_number"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_unit_address_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_unit_address"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/unit_address"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/card_spacing"
+                    android:clickable="false"
+                    android:foreground="@drawable/ripple"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="@dimen/medium_spacing"
+                            android:paddingTop="@dimen/medium_spacing"
+                            android:text="@string/title_service_parameter"
+                            android:textColor="@color/md_blue_grey_900"
+                            android:textSize="@dimen/medium_text"
+                            android:textStyle="bold"
+                            tools:ignore="RtlSymmetry" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_ethernet_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_ethernet"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/device_ethernet"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_internal_ethernet_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_internal_ethernet"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/device_internal_ethernet"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_web_api_service_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_platform_service_ip"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/web_api_service"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_cabinet_service_port_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_cabinet_service_port"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/cabinet_service_port"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!--柜体参数-->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/card_spacing"
+                    android:clickable="false"
+                    android:foreground="@drawable/ripple"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="@dimen/medium_spacing"
+                            android:paddingTop="@dimen/medium_spacing"
+                            android:text="@string/title_cabinet_parameters"
+                            android:textColor="@color/md_blue_grey_900"
+                            android:textSize="@dimen/medium_text"
+                            android:textStyle="bold"
+                            tools:ignore="RtlSymmetry" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_number_of_boxes_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_number_of_boxes"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/number_of_boxes"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_not_closed_door_alarm_time_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_not_closed_door_alarm_time"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/not_closed_door_alarm_time"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_too_many_files_number_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/too_many_files_number"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_too_many_files"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/title_too_many_files"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!--常规管理-->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/card_spacing"
+                    android:clickable="false"
+                    android:foreground="@drawable/ripple"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="@dimen/medium_spacing"
+                            android:paddingTop="@dimen/medium_spacing"
+                            android:text="@string/title_routine_management"
+                            android:textColor="@color/md_blue_grey_900"
+                            android:textSize="@dimen/medium_text"
+                            android:textStyle="bold"
+                            tools:ignore="RtlSymmetry" />
+
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_synchronised_time_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/click_settings"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_synchronised_time"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/synchronised_time"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_countdown_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/click_settings"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_countdown"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/countdown"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_date_and_time_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/click_settings"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_date_and_time"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/date_and_time"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_restart_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/click_settings"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_restart_set"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/automatic_restart"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_restart_device_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/restart_now"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_restart"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/title_restart_now"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingWithSwitchView
+                            android:id="@+id/system_setting_sound_switch_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/sound_switch_on"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingDefaultValue="true"
+                            app:settingIcon="@drawable/sys_sound"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/title_sound_switch"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/card_spacing"
+                    android:clickable="false"
+                    android:foreground="@drawable/ripple"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="@dimen/medium_spacing"
+                            android:paddingTop="@dimen/medium_spacing"
+                            android:text="@string/title_senior_management"
+                            android:textColor="@color/md_blue_grey_900"
+                            android:textSize="@dimen/medium_text"
+                            android:textStyle="bold"
+                            tools:ignore="RtlSymmetry" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_biometrics_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            android:visibility="gone"
+                            app:settingCaption="@string/biometrics_value"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_biometrics"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/title_biometrics"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_sign_broken_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            android:visibility="gone"
+                            app:settingCaption="@string/sign_broken"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_bad_cabinet"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/title_sign_broken"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingWithSwitchView
+                            android:id="@+id/system_setting_anti_theft_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/anti_theft_mechanism_on"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingDefaultValue="true"
+                            app:settingIcon="@drawable/sys_anti_theft"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/title_anti_theft_mechanism"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_calibration_idler_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/calibration_idler"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_free_time_calibration"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/title_calibration_idler"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_calibration_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            android:visibility="gone"
+                            app:settingCaption="@string/sign_broken"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_calibration"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/title_calibration"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="@dimen/card_spacing"
+                        android:clickable="false"
+                        android:foreground="@drawable/ripple"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
+                        app:cardElevation="@dimen/card_elevation">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingStart="@dimen/medium_spacing"
+                                android:paddingTop="@dimen/medium_spacing"
+                                android:text="@string/version_management"
+                                android:textColor="@color/md_blue_grey_900"
+                                android:textSize="@dimen/medium_text"
+                                android:textStyle="bold"
+                                tools:ignore="RtlSymmetry" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_app_version_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                app:settingCaption="@string/air"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_app_version"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/app_version"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_update_from_u_disk_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                app:settingCaption="@string/file_manager"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_update_from_u_disk"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_file_manager"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_uninstall_app_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                app:settingCaption="@string/uninstall_app"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_uninstall_app"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_uninstall_app"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+
+                <!--Android管理-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="@dimen/card_spacing"
+                        android:clickable="false"
+                        android:foreground="@drawable/ripple"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
+                        app:cardElevation="@dimen/card_elevation">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingStart="@dimen/medium_spacing"
+                                android:paddingTop="@dimen/medium_spacing"
+                                android:text="@string/android_system"
+                                android:textColor="@color/md_blue_grey_900"
+                                android:textSize="@dimen/medium_text"
+                                android:textStyle="bold"
+                                tools:ignore="RtlSymmetry" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_display_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                app:settingCaption="@string/display_bar"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_status_bar"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_display_bar"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_file_manager_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                app:settingCaption="@string/android_file_manager"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_file_manager"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_android_file_manager"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_browser_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                app:settingCaption="@string/android_browser"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_android_browser"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_android_browser"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+
+                <!--底层管理-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="@dimen/card_spacing"
+                        android:clickable="false"
+                        android:foreground="@drawable/ripple"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
+                        app:cardElevation="@dimen/card_elevation">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingStart="@dimen/medium_spacing"
+                                android:paddingTop="@dimen/medium_spacing"
+                                android:text="@string/low_level_management"
+                                android:textColor="@color/md_blue_grey_900"
+                                android:textSize="@dimen/medium_text"
+                                android:textStyle="bold"
+                                tools:ignore="RtlSymmetry" />
+
+                            <com.zk.common.view.setting.SettingWithSwitchView
+                                android:id="@+id/system_setting_debug_sv"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                app:settingCaption="@string/debug_off"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingDefaultValue="true"
+                                app:settingIcon="@drawable/sys_debug_off"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_debug"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_debug_storage_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                android:visibility="gone"
+                                app:settingCaption="@string/debug_on"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_log_file"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_debug_storage_method"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_antenna_configuration_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                android:visibility="gone"
+                                app:settingCaption="@string/air"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_antenna_configuration"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/antenna_configuration"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_single_tagging_algorithm_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                android:visibility="gone"
+                                app:settingCaption="@string/air"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_single_tagging_algorithm"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/single_tagging_algorithm"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_inventory_test_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                android:visibility="gone"
+                                app:settingCaption="@string/air"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_status_bar"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_enter_inventory_test"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_delete_sql_lite_police_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                android:visibility="gone"
+                                app:settingCaption="@string/delete_sql_lite"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_delete"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_delete_sql_lite_police"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_delete_sql_lite_dossier_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                android:visibility="gone"
+                                app:settingCaption="@string/delete_sql_lite"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_delete"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_delete_sql_lite_dossier"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_show_shared_preferences_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                android:visibility="gone"
+                                app:settingCaption="@string/show_shared_preferences_lite_sure"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_show"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_show_shared_preferences_lite"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_query_cabinet_sql_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                android:visibility="gone"
+                                app:settingCaption="@string/query_cabinet_sql"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_show"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_query_cabinet_sql"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_ping_test_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                app:settingCaption="@string/network_test"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_network_test"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_network_test"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_calibration_test_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                android:visibility="gone"
+                                app:settingCaption="@string/enter_calibration_test"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_calibration_test"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_enter_calibration_test"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+
+                <!--活动 end-->
+            </LinearLayout>
+        </ScrollView>
+
+    </LinearLayout>
+
+</layout>

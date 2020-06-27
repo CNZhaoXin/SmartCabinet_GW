@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+
+    </data>
+
+    <RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/guide_login_rl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg1"
+        android:onClick="@{onClickListener}"
+        tools:context=".activity.MainActivity">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/guide_cabinet_online_status_rv"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="@dimen/medium_spacing"
+            android:layout_marginEnd="@dimen/medium_spacing"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextClock
+            android:id="@+id/main_time_h_tc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:format12Hour="aahh : mm"
+            android:format24Hour="HH : mm"
+            android:gravity="center"
+            android:paddingTop="@dimen/super_big_big_big_spacing"
+            android:text="222"
+            android:textColor="@android:color/background_light"
+            android:textSize="@dimen/super_super_super_big_big_more_text" />
+
+        <TextClock
+            android:id="@+id/main_time_d_tc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/main_time_h_tc"
+            android:format12Hour="yyyy-MM-dd EEEE"
+            android:format24Hour="yyyy-MM-dd EEEE"
+            android:gravity="center"
+            android:text="11111111"
+            android:textColor="@android:color/background_light"
+            android:textSize="@dimen/super_big_more_text" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/main_time_d_tc"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:paddingTop="@dimen/super_big_big_spacing"
+            android:visibility="gone"
+            app:srcCompat="@drawable/fingerprint" />
+
+        <TextView
+            android:id="@+id/guide_fingerprint_entry_prompt_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginBottom="200dp"
+            android:padding="@dimen/medium_spacing"
+            android:text="@string/other_login_prompt"
+            android:textColor="@color/gray_light"
+            android:textSize="@dimen/sub_big_text" />
+
+    </RelativeLayout>
+</layout>
