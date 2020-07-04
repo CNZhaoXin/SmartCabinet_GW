@@ -123,6 +123,7 @@ class SharedPreferencesUtil {
         UserNameTemp,              //警察名字 String
         CabinetTemp,               //警察权限箱号 String
         UserTypeTemp,              //警察类型 String
+        DeviceIdTemp,
 
         DeviceCode,                //设备编号 String
         UnitNumber,                //单位编号 String

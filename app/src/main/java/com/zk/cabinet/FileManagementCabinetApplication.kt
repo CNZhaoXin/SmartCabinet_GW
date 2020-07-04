@@ -1,6 +1,7 @@
 package com.zk.cabinet
 
 import android.app.Application
+import com.zk.cabinet.db.CabinetService
 import com.zk.cabinet.db.DBHelper
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
@@ -24,5 +25,8 @@ class FileManagementCabinetApplication: Application() {
             "FileCabinetApplication onCreate：执行一系列的初始化操作。",
             true
         )
+        if (CabinetService.getInstance().count() == 0.toLong()){
+            CabinetService.getInstance().mainBuild()
+        }
     }
 }

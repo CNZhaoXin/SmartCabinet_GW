@@ -17,6 +17,7 @@ import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.CabinetOnlineInfo
 import com.zk.cabinet.databinding.ActivityGuideBinding
 import com.zk.cabinet.databinding.DialogLoginBinding
+import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
 import com.zk.common.utils.LogUtil
 import com.zk.rfid.callback.DeviceInformationListener
@@ -57,6 +58,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                 }
                 if (!isExit){
                     mCabinetOnlineList.add(CabinetOnlineInfo(0, deviceID, msg.what == DEVICE_REGISTERED))
+                    mSpUtil.applyValue(SharedPreferencesUtil.Record(Key.DeviceIdTemp, deviceID))
                 }
                 mCabinetOnlineAdapter.notifyDataSetChanged()
             }

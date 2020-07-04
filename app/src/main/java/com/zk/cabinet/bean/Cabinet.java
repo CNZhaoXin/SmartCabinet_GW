@@ -1,5 +1,7 @@
 package com.zk.cabinet.bean;
 
+import com.zk.rfid.bean.LabelInfo;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
@@ -8,51 +10,43 @@ import org.greenrobot.greendao.annotation.Property;
 import org.greenrobot.greendao.annotation.Transient;
 import org.greenrobot.greendao.annotation.Unique;
 
+import java.util.ArrayList;
+
 @Entity(nameInDb = "Cabinet")
 public class Cabinet {
     @Property(nameInDb = "ID")
     @Id
     private Long id;
 
-    //整个柜体的唯一值
-    @Property(nameInDb = "CellID")
-    @NotNull
-    @Unique
-    private int cellId;
+    @Property(nameInDb = "DeviceId")
+    private String deviceId;
 
-    //A,B,C
-    @Property(nameInDb = "CellName")
+    @Property(nameInDb = "Floor")
     @NotNull
-    private String cellName;
+    private int floor;
 
-    //1-12
-    @Property(nameInDb = "CellCode")
+    @Property(nameInDb = "Position")
     @NotNull
-    private int cellCode;
+    private int position;
 
     @Property(nameInDb = "Proportion")
     @NotNull
     private int proportion;
 
-    //0：正常 1：损坏
-    @Property(nameInDb = "SignBroken")
-    @NotNull
-    private int signBroken;
+    @Transient
+    private ArrayList<LabelInfo> labelInfoList;
 
-    // 箱体内部元素计数，不用于数据库对应生成
-    // 初始值-1表示无权限
     @Transient
     private long elementCount;
 
-    @Generated(hash = 845378057)
-    public Cabinet(Long id, int cellId, @NotNull String cellName, int cellCode,
-                   int proportion, int signBroken) {
+    @Generated(hash = 1062215190)
+    public Cabinet(Long id, String deviceId, int floor, int position,
+            int proportion) {
         this.id = id;
-        this.cellId = cellId;
-        this.cellName = cellName;
-        this.cellCode = cellCode;
+        this.deviceId = deviceId;
+        this.floor = floor;
+        this.position = position;
         this.proportion = proportion;
-        this.signBroken = signBroken;
     }
 
     @Generated(hash = 456667810)
@@ -67,28 +61,28 @@ public class Cabinet {
         this.id = id;
     }
 
-    public int getCellId() {
-        return this.cellId;
+    public String getDeviceId() {
+        return this.deviceId;
     }
 
-    public void setCellId(int cellId) {
-        this.cellId = cellId;
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
-    public String getCellName() {
-        return this.cellName;
+    public int getFloor() {
+        return this.floor;
     }
 
-    public void setCellName(String cellName) {
-        this.cellName = cellName;
+    public void setFloor(int floor) {
+        this.floor = floor;
     }
 
-    public int getCellCode() {
-        return this.cellCode;
+    public int getPosition() {
+        return this.position;
     }
 
-    public void setCellCode(int cellCode) {
-        this.cellCode = cellCode;
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     public int getProportion() {
@@ -99,12 +93,12 @@ public class Cabinet {
         this.proportion = proportion;
     }
 
-    public int getSignBroken() {
-        return this.signBroken;
+    public ArrayList<LabelInfo> getLabelInfoList() {
+        return labelInfoList;
     }
 
-    public void setSignBroken(int signBroken) {
-        this.signBroken = signBroken;
+    public void setLabelInfoList(ArrayList<LabelInfo> labelInfoList) {
+        this.labelInfoList = labelInfoList;
     }
 
     public long getElementCount() {

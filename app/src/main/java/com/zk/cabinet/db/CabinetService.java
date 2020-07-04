@@ -2,6 +2,7 @@ package com.zk.cabinet.db;
 
 import com.zk.cabinet.bean.Cabinet;
 import com.zk.cabinet.dao.CabinetDao;
+import com.zk.cabinet.dao.DossierDao;
 
 import java.util.List;
 
@@ -19,8 +20,10 @@ public class CabinetService extends BaseService<Cabinet, Long> {
         return instance;
     }
 
-    public Cabinet queryEqCellID (int cellID) {
-        List<Cabinet> list = query(CabinetDao.Properties.CellId.eq(cellID));
+    public Cabinet queryEqFloorAndPosition(int floor, int position) {
+        List<Cabinet> list = queryBuilder().where(
+                CabinetDao.Properties.Floor.eq(floor),
+                CabinetDao.Properties.Position.eq(position)).list();
         Cabinet cabinet = null;
         if (list != null && list.size() > 0) {
             cabinet = list.get(0);
@@ -28,62 +31,15 @@ public class CabinetService extends BaseService<Cabinet, Long> {
         return cabinet;
     }
 
-    public List<Cabinet> queryEqCellName (String cellName) {
-        return query(CabinetDao.Properties.CellName.eq(cellName));
-    }
-
-
-    /**
-     * 新建列表
-     * @param cellNames "A,B,D,C"
-     */
-    public void buildCabinet(String cellNames) {
-        String[] cellNameList = cellNames.split(",");
-        for (String cellName : cellNameList) {
-            if (cellName.equals("A")) {
-                buildMain();
-            } else {
-                buildDeputy(cellName);
-            }
-        }
-    }
-
-    private void buildMain() {
-        Cabinet[] cabinets = new Cabinet[11];
-        for (int i = 0; i < 11; i++) {
-            cabinets[i] = new Cabinet();
-            cabinets[i].setId(null);
-            cabinets[i].setCellName("A");
-            cabinets[i].setSignBroken(0);
-            if (i < 1) {
-                cabinets[i].setCellId(i + 1);
-                cabinets[i].setCellCode(i + 1);
-                cabinets[i].setProportion(1);
-            } else if (i == 1) {
-                cabinets[i].setCellId(0);
-                cabinets[i].setCellCode(0);
-                cabinets[i].setProportion(2);
-            } else {
-                cabinets[i].setCellId(i);
-                cabinets[i].setCellCode(i);
-                cabinets[i].setProportion(1);
-            }
-        }
-        insert(cabinets);
-    }
-
-    private void buildDeputy(String cellName) {
-        int firstCellId = cellName.toCharArray()[0];
-        firstCellId = (firstCellId - 66) * 12 + 10 + 1;
-        Cabinet[] cabinets = new Cabinet[12];
-        for (int i = 0; i < 12; i++) {
-            cabinets[i] = new Cabinet();
-            cabinets[i].setId(null);
-            cabinets[i].setCellId(firstCellId + i);
-            cabinets[i].setCellName(cellName);
-            cabinets[i].setCellCode(i + 1);
-            cabinets[i].setProportion(1);
-            cabinets[i].setSignBroken(0);
+    public void mainBuild() {
+        Cabinet[] cabinets = new Cabinet[120];
+        for (int i = 1; i < 121; i++) {
+            cabinets[i - 1] = new Cabinet();
+            cabinets[i - 1].setId(null);
+            cabinets[i - 1].setDeviceId(null);
+            cabinets[i - 1].setFloor(i % 5 == 0 ? (4) : (i % 5 - 1));
+            cabinets[i - 1].setPosition(i % 5 == 0 ? (i / 5 - 1) : (i / 5));
+            cabinets[i - 1].setProportion(1);
         }
         insert(cabinets);
     }

@@ -57,7 +57,6 @@
             android:format12Hour="yyyy-MM-dd EEEE"
             android:format24Hour="yyyy-MM-dd EEEE"
             android:gravity="center"
-            android:text="11111111"
             android:textColor="@android:color/background_light"
             android:textSize="@dimen/super_big_more_text" />
 
