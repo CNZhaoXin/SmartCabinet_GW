@@ -18,6 +18,7 @@ import com.zk.cabinet.bean.CabinetOnlineInfo
 import com.zk.cabinet.databinding.ActivityGuideBinding
 import com.zk.cabinet.databinding.DialogLoginBinding
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
+import com.zk.common.utils.LogUtil
 import com.zk.rfid.callback.DeviceInformationListener
 import com.zk.rfid.ur880.UR880Entrance
 import java.lang.ref.WeakReference
@@ -45,13 +46,19 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         when (msg.what) {
             DEVICE_REGISTERED, DEVICE_REMOVED -> {
                 val deviceID = msg.obj.toString()
+                var isExit = false
                 for (cabinetOnlineInfo in mCabinetOnlineList) {
                     if (cabinetOnlineInfo.mCodeName == deviceID) {
+                        isExit = true
                         cabinetOnlineInfo.isOnLine = msg.what == DEVICE_REGISTERED
                         mCabinetOnlineAdapter.notifyDataSetChanged()
                         break
                     }
                 }
+                if (!isExit){
+                    mCabinetOnlineList.add(CabinetOnlineInfo(0, deviceID, msg.what == DEVICE_REGISTERED))
+                }
+                mCabinetOnlineAdapter.notifyDataSetChanged()
             }
         }
     }
@@ -67,11 +74,11 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
     }
 
     private fun init() {
-        val cabinets: Array<String> =
-            mSpUtil.getString(Key.NumberOfBoxes, "A")!!.split(",").toTypedArray()
-        for (codeName in cabinets) {
-            mCabinetOnlineList.add(CabinetOnlineInfo(0, codeName, false))
-        }
+//        val cabinets: Array<String> =
+//            mSpUtil.getString(Key.NumberOfBoxes, "A")!!.split(",").toTypedArray()
+//        for (codeName in cabinets) {
+//            mCabinetOnlineList.add(CabinetOnlineInfo(0, codeName, false))
+//        }
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = LinearLayoutManager.HORIZONTAL
         mGuideBinding.guideCabinetOnlineStatusRv.layoutManager = layoutManager
@@ -139,19 +146,23 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     private val mDeviceInformationListener = object : DeviceInformationListener {
         override fun heartbeat(p0: String?) {
-
+            LogUtil.instance.d("heartbeat -----p0: $p0")
         }
 
         override fun versionInformation(p0: String?, p1: String?, p2: String?) {
-
+            LogUtil.instance.d("versionInformation -----p0: $p0 ---p1: $p1 ---p2: $p2")
         }
 
         override fun registered(p0: String?, p1: String?, p2: String?) {
-
+            LogUtil.instance.d("registered -----p0: $p0 ---p1: $p1 ---p2: $p2")
+            val message = Message.obtain()
+            message.what = DEVICE_REGISTERED
+            message.obj = p0
+            mHandler.sendMessage(message)
         }
 
         override fun removed(p0: String?) {
-
+            LogUtil.instance.d("removed -----p0: $p0 ")
         }
 
 
@@ -187,9 +198,5 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    private fun initAllCamera(){
-
     }
 }

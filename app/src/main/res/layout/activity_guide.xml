@@ -21,12 +21,22 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/guide_cabinet_online_status_rv"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginStart="@dimen/medium_spacing"
             android:layout_marginEnd="@dimen/medium_spacing"
             android:orientation="horizontal"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:letterSpacing="0.3"
+            android:paddingTop="250dp"
+            android:text="RFID智慧档案管理系统"
+            android:textColor="@android:color/background_light"
+            android:textSize="@dimen/super_super_super_big_more_text" />
 
         <TextClock
             android:id="@+id/main_time_h_tc"
@@ -35,8 +45,7 @@
             android:format12Hour="aahh : mm"
             android:format24Hour="HH : mm"
             android:gravity="center"
-            android:paddingTop="@dimen/super_big_big_big_spacing"
-            android:text="222"
+            android:paddingTop="570dp"
             android:textColor="@android:color/background_light"
             android:textSize="@dimen/super_super_super_big_big_more_text" />
 
@@ -69,8 +78,8 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center"
-            android:gravity="center"
             android:layout_marginBottom="200dp"
+            android:gravity="center"
             android:padding="@dimen/medium_spacing"
             android:text="@string/other_login_prompt"
             android:textColor="@color/gray_light"

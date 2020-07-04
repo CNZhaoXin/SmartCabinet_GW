@@ -58,7 +58,7 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when(mMenuList[position].mImageUrl){
             R.drawable.menu_cabinet ->{
-//                intentActivity(AccessActivity.newIntent(this))
+                intentActivity(DemoInterfaceActivity.newIntent(this))
             }
             R.drawable.menu_system_settings ->{
                 intentActivity(SystemSettingsActivity.newIntent(this))
