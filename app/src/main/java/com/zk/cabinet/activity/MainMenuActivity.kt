@@ -29,8 +29,6 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mMainMenuBinding = DataBindingUtil.setContentView(this, R.layout.activity_main_menu)
-        setSupportActionBar(mMainMenuBinding.mainMenuToolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         mMainMenuBinding.onItemClickListener = this
         init()
     }
@@ -50,6 +48,7 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
     private fun init(){
         mMenuList.add(MainMenuInfo(R.drawable.menu_cabinet, getString(R.string.access_operation)))
         mMenuList.add(MainMenuInfo(R.drawable.menu_system_settings, getString(R.string.system_settings)))
+        mMenuList.add(MainMenuInfo(R.drawable.menu_back, getString(R.string.go_back)))
         mMenuAdapter = MainMenuAdapter(this, mMenuList)
         mMainMenuBinding.mainMenuGv.adapter = mMenuAdapter
 
@@ -62,6 +61,9 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
             }
             R.drawable.menu_system_settings ->{
                 intentActivity(SystemSettingsActivity.newIntent(this))
+            }
+            R.drawable.menu_back ->{
+                finish()
             }
         }
     }

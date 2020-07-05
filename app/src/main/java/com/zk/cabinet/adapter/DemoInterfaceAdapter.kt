@@ -22,6 +22,7 @@ class DemoInterfaceAdapter(
     public var mOnItemClickListener: OnItemClickListener? = null
 
     class ViewHolder(arg0: View) : RecyclerView.ViewHolder(arg0) {
+        lateinit var mDemoInterfaceLl: LinearLayout
         lateinit var mDemoInterfaceTv: TextView
     }
 
@@ -32,6 +33,8 @@ class DemoInterfaceAdapter(
         val viewHolder = ViewHolder(view)
         viewHolder.mDemoInterfaceTv =
             view.findViewById(R.id.adapter_demo_interface_tv)
+        viewHolder.mDemoInterfaceLl =
+            view.findViewById(R.id.adapter_demo_interface_ll)
         return viewHolder
     }
 
@@ -42,8 +45,13 @@ class DemoInterfaceAdapter(
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val cabinet = mCabinetList[position]
-        holder.mDemoInterfaceTv.text =
-            if (cabinet.labelInfoList != null &&  cabinet.labelInfoList.size > 0) "${cabinet.labelInfoList.size}本档案" else "空格"
+        if (cabinet.labelInfoList != null &&  cabinet.labelInfoList.size > 0){
+            holder.mDemoInterfaceLl.setBackgroundColor(mContext.resources.getColor(R.color.md_light_blue_300))
+            holder.mDemoInterfaceTv.text = "${cabinet.labelInfoList.size}本档案"
+        } else {
+            holder.mDemoInterfaceLl.setBackgroundColor(mContext.resources.getColor(R.color.md_grey_500))
+            holder.mDemoInterfaceTv.text = "空格"
+        }
         if (mOnItemClickListener != null) {
             holder.itemView.setOnClickListener {
                 val positionTemp: Int = holder.adapterPosition
