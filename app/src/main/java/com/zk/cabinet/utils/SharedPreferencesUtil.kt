@@ -115,14 +115,20 @@ class SharedPreferencesUtil {
     enum class Key {
         FileManagementCabinet,
 
-        OpenForTheFirstTime,       //是否首次开启APP bool
-
         Root,                      //配置管理员账户 String
         RootPwd,                   //配置管理员密码 String
-        UserCodeTemp,              //警察ID String
-        UserNameTemp,              //警察名字 String
-        CabinetTemp,               //警察权限箱号 String
-        UserTypeTemp,              //警察类型 String
+
+        IdTemp,
+        NameTemp,
+        GenderTemp,
+        PhoneNumberTemp,
+        LoginCodeTemp,
+        RoleIdTemp,
+        RoleNameTemp,
+        RootMemberTemp,
+        OrgCodeTemp,
+        OrgNameTemp,
+
         DeviceIdTemp,
 
         DeviceCode,                //设备编号 String
@@ -141,7 +147,6 @@ class SharedPreferencesUtil {
 
         SoundSwitch,               //盘点结束后读出盘点的本数 bool
 
-
         NumberOfBoxes,             //箱体数量 String like [A] OR [B,A] OR [A,B,C]
         NumberOfBoxesSelected,     //箱体数量 ATest = 0, A = 1, A,B = 2
         NotClosedDoorAlarmTime,    //未关门报警时间 Int
@@ -158,22 +163,7 @@ class SharedPreferencesUtil {
         Calibration,               //是否闲时盘点 bool
         CalibrationTimeHourOfDay,  //闲时盘点开始时间 Int
 
-        AntennaPower,              //天线功率 Int  默认：28
-        DwellTime,                 //驻留时间 Int  默认：2500
-        CommunicationCycle,        //盘讯周期 Int  默认：0
-        SingleAlgorithm,           //单化算法 Int  默认：1
-        QValue,                    //Q值 Int  默认：5
-        Flip,                      //翻转 Int  默认：0
-        Retries,                   //重试次数 Int  默认：1
-        RepeatUntilThereNoLabel,   //重复直至无标签 Int  默认：0
-        MinimumQValue,             //最小Q值 Int  默认：0
-        MaximumQValue,             //最大Q值 Int  默认：15
-        Threshold,                 //阀值 Int  默认：4
-
         RestartNowForSet,          //是否做了需要重启的设置 bool
         Debug,                     //debug bool
-
-        BiometricsType,            //生物识别类型 默认 0：指纹 1：威视人脸
-        DebugStorageMethod,        //盘点日志存储方式 默认 0：不存储 1：存到本地 2：连接调试工具 3：上传服务器
     }
 }

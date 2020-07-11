@@ -55,13 +55,14 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview-selection:1.1.0-rc01"
     implementation 'com.android.support:design:29.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation files('libs/rfid-release.aar')
+    implementation files('libs/rfid-release_V1.0.4.aar')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     implementation 'org.greenrobot:greendao:3.3.0'
     implementation 'io.netty:netty-all:5.0.0.Alpha2'
-    implementation 'com.zk.common:common:1.0.9'
+    implementation 'com.zk.common:common:1.1.0'
     implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.mcxiaoke.volley:library:1.0.19'
 }

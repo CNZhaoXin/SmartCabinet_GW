@@ -1,6 +1,7 @@
 package com.zk.cabinet.activity
 
 import android.app.AlertDialog
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -9,25 +10,37 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.android.volley.DefaultRetryPolicy
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.JsonObjectRequest
 import com.zk.cabinet.R
 import com.zk.cabinet.adapter.CabinetOnlineAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.CabinetOnlineInfo
 import com.zk.cabinet.databinding.ActivityGuideBinding
 import com.zk.cabinet.databinding.DialogLoginBinding
+import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.utils.SharedPreferencesUtil
+import com.zk.cabinet.utils.SharedPreferencesUtil.Record
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
 import com.zk.common.utils.LogUtil
 import com.zk.rfid.callback.DeviceInformationListener
 import com.zk.rfid.ur880.UR880Entrance
+import org.json.JSONException
+import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 
 private const val DEVICE_REGISTERED = 0x02
 private const val DEVICE_HEARTBEAT = 0x03
 private const val DEVICE_REMOVED = 0x04
+private const val LOGIN_BY_PWD_SUCCESS = 0x05
+private const val LOGIN_BY_PWD_FAIL = 0x06
 
 class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongClickListener {
     private lateinit var mGuideBinding: ActivityGuideBinding
@@ -38,6 +51,8 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     private var mDialogLoginBinding: DialogLoginBinding? = null
     private var mDialogLogin: AlertDialog? = null
+
+    private lateinit var mProgressSyncUserDialog: ProgressDialog
 
     companion object {
 
@@ -56,11 +71,26 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                         break
                     }
                 }
-                if (!isExit){
-                    mCabinetOnlineList.add(CabinetOnlineInfo(0, deviceID, msg.what == DEVICE_REGISTERED))
+                if (!isExit) {
+                    mCabinetOnlineList.add(
+                        CabinetOnlineInfo(
+                            0,
+                            deviceID,
+                            msg.what == DEVICE_REGISTERED
+                        )
+                    )
                     mSpUtil.applyValue(SharedPreferencesUtil.Record(Key.DeviceIdTemp, deviceID))
                 }
                 mCabinetOnlineAdapter.notifyDataSetChanged()
+            }
+            LOGIN_BY_PWD_SUCCESS -> {
+                mProgressSyncUserDialog.dismiss()
+                Toast.makeText(this, "登录成功，欢迎：${msg.obj}", Toast.LENGTH_SHORT).show()
+                intentActivity(MainMenuActivity.newIntent(this))
+            }
+            LOGIN_BY_PWD_FAIL -> {
+                mProgressSyncUserDialog.dismiss()
+                Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -76,11 +106,8 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
     }
 
     private fun init() {
-//        val cabinets: Array<String> =
-//            mSpUtil.getString(Key.NumberOfBoxes, "A")!!.split(",").toTypedArray()
-//        for (codeName in cabinets) {
-//            mCabinetOnlineList.add(CabinetOnlineInfo(0, codeName, false))
-//        }
+        mProgressSyncUserDialog = ProgressDialog(this)
+
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = LinearLayoutManager.HORIZONTAL
         mGuideBinding.guideCabinetOnlineStatusRv.layoutManager = layoutManager
@@ -107,8 +134,12 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                     mDialogLoginBinding!!.dialogOtherLoginAccountEdt.text.toString().trim()
                 val pwd = mDialogLoginBinding!!.dialogOtherLoginPwdEdt.text.toString().trim()
                 if (!TextUtils.isEmpty(userCode) && !TextUtils.isEmpty(pwd)) {
-                    //todo 登陆
-                    intentActivity(MainMenuActivity.newIntent(this))
+                    mProgressSyncUserDialog.setTitle("登录")
+                    mProgressSyncUserDialog.setMessage("正在登录，请稍后......")
+                    mProgressSyncUserDialog.setCancelable(false)
+                    mProgressSyncUserDialog.show()
+                    login(userCode, pwd)
+
                 } else {
                     showToast(resources.getString(R.string.fill_complete))
                 }
@@ -120,7 +151,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         when (v?.id) {
             //登录弹窗的确认按钮
             R.id.dialog_other_login_sure_btn -> {
-//                intentActivity(MainMenuActivity.newIntent(this))
+                intentActivity(SystemSettingsActivity.newIntent(this))
             }
         }
         return false
@@ -200,5 +231,72 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun login(user: String, pwd: String) {
+        val jsonObject = JSONObject()
+        try {
+            jsonObject.put("username", user)
+            jsonObject.put("password", pwd)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+        val jsonObjectRequest = JsonObjectRequest(
+            Request.Method.POST, NetworkRequest.instance.mClientLogin,
+            jsonObject, Response.Listener { response ->
+                try {
+                    val success = response!!.getBoolean("success")
+                    if (success) {
+                        val data = response.getJSONObject("data")
+                        val recordList = ArrayList<Record>()
+                        recordList.add(Record(Key.IdTemp, data.getString("id")))
+                        recordList.add(Record(Key.NameTemp, data.getString("name")))
+                        recordList.add(Record(Key.GenderTemp, data.getString("gender")))
+                        recordList.add(Record(Key.PhoneNumberTemp, data.getString("phoneNumber")))
+                        recordList.add(Record(Key.LoginCodeTemp, data.getString("loginCode")))
+                        recordList.add(Record(Key.RoleIdTemp, data.getString("roleId")))
+                        recordList.add(Record(Key.RoleNameTemp, data.getString("roleName")))
+                        recordList.add(Record(Key.RootMemberTemp, data.getString("rootMember")))
+                        recordList.add(Record(Key.OrgCodeTemp, data.getString("orgCode")))
+                        recordList.add(Record(Key.OrgNameTemp, data.getString("orgName")))
+                        mSpUtil.applyValue(recordList)
+
+                        val msg = Message.obtain()
+                        msg.what = LOGIN_BY_PWD_SUCCESS
+                        msg.obj = data.getString("name")
+                        mHandler.sendMessage(msg)
+                    } else {
+                        val msg = Message.obtain()
+                        msg.what = LOGIN_BY_PWD_FAIL
+                        msg.obj = "用户名或密码错误"
+                        mHandler.sendMessage(msg)
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    val msg = Message.obtain()
+                    msg.what = LOGIN_BY_PWD_FAIL
+                    msg.obj = "数据解析失败。"
+                    mHandler.sendMessage(msg)
+                }
+            }, Response.ErrorListener { error ->
+                val msg = if (error != null)
+                    if (error.networkResponse != null)
+                        "errorCode: ${error.networkResponse.statusCode} VolleyError: $error"
+                    else
+                        "errorCode: -1 VolleyError: $error"
+                else {
+                    "errorCode: -1 VolleyError: 未知"
+                }
+                val message = Message.obtain()
+                message.what = LOGIN_BY_PWD_FAIL
+                message.obj = msg
+                mHandler.sendMessage(message)
+            })
+        jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
+            10000,
+            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
+        NetworkRequest.instance.add(jsonObjectRequest)
     }
 }

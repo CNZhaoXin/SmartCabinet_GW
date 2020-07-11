@@ -3,6 +3,7 @@ package com.zk.cabinet
 import android.app.Application
 import com.zk.cabinet.db.CabinetService
 import com.zk.cabinet.db.DBHelper
+import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
 import com.zk.common.utils.LogUtil
@@ -28,5 +29,6 @@ class FileManagementCabinetApplication: Application() {
         if (CabinetService.getInstance().count() == 0.toLong()){
             CabinetService.getInstance().mainBuild()
         }
+        NetworkRequest.instance.init(this)
     }
 }

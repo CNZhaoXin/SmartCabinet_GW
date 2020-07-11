@@ -25,6 +25,7 @@ import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.constant.SelfComm
 import com.zk.cabinet.databinding.ActivitySystemSettingsBinding
 import com.zk.cabinet.dialog.*
+import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.utils.MediaPlayerUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
@@ -509,6 +510,7 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                                 ) {
                                     mWebApiServiceIp = webApiServiceIp
                                     mWebApiServicePort = webApiServicePort
+                                    NetworkRequest.instance.configModify(mWebApiServiceIp, mWebApiServicePort)
                                     val webApiServiceList = ArrayList<Record>()
                                     webApiServiceList.add(
                                         Record(
@@ -821,17 +823,17 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
 
             }
             R.id.system_setting_update_from_u_disk_sb -> {
-                val file = File("/mnt/usb_storage/USB_DISK2/udisk0/NewFileCabinet.apk")
-                if (file.exists()) {
-                    object : Thread() {
-                        override fun run() {
-//                            SmdtUtil.instance.silentInstall(
-//                                "/mnt/usb_storage/USB_DISK2/udisk0/FileCabinet.apk",
-//                                applicationContext
-//                            )
-                        }
-                    }.start()
-                } else showToast(getText(R.string.file_not_exist))
+//                val file = File("/mnt/usb_storage/USB_DISK2/udisk0/NewFileCabinet.apk")
+//                if (file.exists()) {
+//                    object : Thread() {
+//                        override fun run() {
+////                            SmdtUtil.instance.silentInstall(
+////                                "/mnt/usb_storage/USB_DISK2/udisk0/FileCabinet.apk",
+////                                applicationContext
+////                            )
+//                        }
+//                    }.start()
+//                } else showToast(getText(R.string.file_not_exist))
             }
             R.id.system_setting_uninstall_app_sb -> {
                 AlertDialog.Builder(this)
@@ -847,7 +849,7 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                         ) {
                             //todo 关闭看门狗
                             ActivityUtil.uninstallApk(
-                                this@SystemSettingsActivity, "com.hik.filecabinet"
+                                this@SystemSettingsActivity, "com.zk.cabinet"
                             )
                         } else {
                             showToast(
