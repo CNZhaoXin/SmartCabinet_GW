@@ -64,6 +64,8 @@
     <!--管理菜单-->
     <string name="title_activity_main_menu">管理菜单</string>
 
+    <string name="outbound">出库</string>
+    <string name="warehousing">入库</string>
     <string name="access_operation">存取操作</string>
     <string name="regional_positioning_management">档案管理</string>
     <string name="personnel_management">人员管理</string>

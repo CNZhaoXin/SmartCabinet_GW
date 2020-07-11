@@ -22,6 +22,7 @@ import com.zk.cabinet.R
 import com.zk.cabinet.adapter.CabinetOnlineAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.CabinetOnlineInfo
+import com.zk.cabinet.constant.SelfComm
 import com.zk.cabinet.databinding.ActivityGuideBinding
 import com.zk.cabinet.databinding.DialogLoginBinding
 import com.zk.cabinet.net.NetworkRequest
@@ -62,6 +63,13 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         when (msg.what) {
             DEVICE_REGISTERED, DEVICE_REMOVED -> {
                 val deviceID = msg.obj.toString()
+
+                if (SelfComm.ONLINE_DEVICE.contains(deviceID)){
+                    if (msg.what == DEVICE_REMOVED) SelfComm.ONLINE_DEVICE.remove(deviceID)
+                } else {
+                    if (msg.what == DEVICE_REGISTERED) SelfComm.ONLINE_DEVICE.add(deviceID)
+                }
+
                 var isExit = false
                 for (cabinetOnlineInfo in mCabinetOnlineList) {
                     if (cabinetOnlineInfo.mCodeName == deviceID) {
@@ -79,7 +87,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                             msg.what == DEVICE_REGISTERED
                         )
                     )
-                    mSpUtil.applyValue(SharedPreferencesUtil.Record(Key.DeviceIdTemp, deviceID))
+                    mSpUtil.applyValue(Record(Key.DeviceIdTemp, deviceID))
                 }
                 mCabinetOnlineAdapter.notifyDataSetChanged()
             }

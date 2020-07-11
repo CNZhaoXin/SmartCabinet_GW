@@ -46,6 +46,8 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
     }
 
     private fun init(){
+        mMenuList.add(MainMenuInfo(R.drawable.menu_get, getString(R.string.warehousing)))
+        mMenuList.add(MainMenuInfo(R.drawable.menu_out, getString(R.string.outbound)))
         mMenuList.add(MainMenuInfo(R.drawable.menu_cabinet, getString(R.string.access_operation)))
         mMenuList.add(MainMenuInfo(R.drawable.menu_system_settings, getString(R.string.system_settings)))
         mMenuList.add(MainMenuInfo(R.drawable.menu_back, getString(R.string.go_back)))
@@ -56,6 +58,12 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when(mMenuList[position].mImageUrl){
+            R.drawable.menu_get ->{
+                intentActivity(WarehousingActivity.newIntent(this))
+            }
+            R.drawable.menu_out ->{
+                intentActivity(OutboundActivity.newIntent(this))
+            }
             R.drawable.menu_cabinet ->{
                 intentActivity(DemoInterfaceActivity.newIntent(this))
             }
