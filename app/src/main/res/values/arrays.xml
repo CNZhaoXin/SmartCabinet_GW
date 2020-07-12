@@ -2,34 +2,11 @@
 <resources>
 
     <string-array name="dialog_number_of_boxes_array">
-        <item>A柜TEST</item>
         <item>A柜</item>
         <item>A柜+1个副柜</item>
         <item>A柜+2个副柜</item>
         <item>A柜+3个副柜</item>
         <item>A柜+4个副柜</item>
-        <item>A柜+5个副柜</item>
-        <item>A柜+6个副柜</item>
-        <item>A柜+7个副柜</item>
-        <item>A柜+8个副柜</item>
-        <item>A柜+9个副柜</item>
-        <item>A柜+10个副柜</item>
-        <item>A柜+11个副柜</item>
-        <item>A柜+12个副柜</item>
-        <item>A柜+13个副柜</item>
-        <item>A柜+14个副柜</item>
-        <item>A柜+15个副柜</item>
-        <item>A柜+16个副柜</item>
-        <item>A柜+17个副柜</item>
-        <item>A柜+18个副柜</item>
-        <item>A柜+19个副柜</item>
-        <item>A柜+20个副柜</item>
-        <item>A柜+12个副柜</item>
-        <item>A柜+22个副柜</item>
-        <item>A柜+23个副柜</item>
-        <item>A柜+24个副柜</item>
-        <item>A柜+25个副柜</item>
-        <item>A柜+26个副柜</item>
     </string-array>
 
     <string-array name="dialog_not_closed_door_alarm_time_array">

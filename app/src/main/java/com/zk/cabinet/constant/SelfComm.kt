@@ -24,8 +24,19 @@ object SelfComm {
 
     val ONLINE_DEVICE =  Collections.synchronizedList(ArrayList<String>())
 
+    val OPERATING_TYPE = HashMap<Int, String>()
+
     init {
         FILE_STATUS[FILE_STATUS_LEAVE_THE_CABINET] = "离柜"
         FILE_STATUS[FILE_STATUS_IN_THE_CABINET] = "在柜"
+
+        OPERATING_TYPE[1] =  "正常入库"
+        OPERATING_TYPE[2] =  "借用归还"
+        OPERATING_TYPE[3] =  "置换入库"
+        OPERATING_TYPE[4] =  "正常出库"
+        OPERATING_TYPE[5] =  "置换出库"
+        OPERATING_TYPE[6] =  "提前出库"
+        OPERATING_TYPE[7] =  "借用出库"
+
     }
 }

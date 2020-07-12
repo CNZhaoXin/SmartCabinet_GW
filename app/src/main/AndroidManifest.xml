@@ -63,10 +63,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.OutboundActivity"
+        <activity android:name=".activity.WarehousingOperatingActivity"
+            android:label="@string/warehousing"
+            android:theme="@style/NoActionBarAppTheme"/>
+        <activity
+            android:name=".activity.OutboundActivity"
             android:label="@string/outbound"
             android:theme="@style/NoActionBarAppTheme" />
-        <activity android:name=".activity.WarehousingActivity"
+        <activity
+            android:name=".activity.WarehousingActivity"
             android:label="@string/warehousing"
             android:theme="@style/NoActionBarAppTheme" />
         <activity

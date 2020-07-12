@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/adapter_warehousing_ll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/card_spacing"
+    android:paddingBottom="@dimen/card_spacing">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="@dimen/title_medium_l_spacing"
+            android:layout_weight="4"
+            android:gravity="center"
+            android:text="权证编号："
+            android:textColor="@color/gray_deep"
+            android:textSize="@dimen/sub_medium_text" />
+
+        <TextView
+            android:id="@+id/adapter_warehousing_number_tv"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/title_medium_spacing"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="warrantNum"
+            android:textColor="@color/gray_deep"
+            android:textSize="@dimen/sub_medium_text" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="@dimen/title_medium_spacing"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="RFID标签号："
+            android:textColor="@color/gray_deep"
+            android:textSize="@dimen/sub_medium_text" />
+
+
+        <TextView
+            android:id="@+id/adapter_warehousing_rfid_tv"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/title_medium_l_spacing"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="rfidNum"
+            android:textColor="@color/gray_deep"
+            android:textSize="@dimen/sub_medium_text" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="@dimen/title_medium_l_spacing"
+            android:layout_weight="4"
+            android:gravity="center"
+            android:text="权证名称："
+            android:textColor="@color/gray_deep"
+            android:textSize="@dimen/sub_medium_text" />
+
+        <TextView
+            android:id="@+id/adapter_warehousing_name_tv"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/title_medium_spacing"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="warrantName"
+            android:textColor="@color/gray_deep"
+            android:textSize="@dimen/sub_medium_text" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="@dimen/title_medium_spacing"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="权证号码："
+            android:textColor="@color/gray_deep"
+            android:textSize="@dimen/sub_medium_text" />
+
+
+        <TextView
+            android:id="@+id/adapter_warehousing_no_tv"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/title_medium_l_spacing"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="warrantNo"
+            android:textColor="@color/gray_deep"
+            android:textSize="@dimen/sub_medium_text" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="@dimen/title_medium_l_spacing"
+            android:layout_weight="4"
+            android:gravity="center"
+            android:text="权证类别："
+            android:textColor="@color/gray_deep"
+            android:textSize="@dimen/sub_medium_text" />
+
+        <TextView
+            android:id="@+id/adapter_warehousing_cate_tv"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/title_medium_spacing"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="warranCate"
+            android:textColor="@color/gray_deep"
+            android:textSize="@dimen/sub_medium_text" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="@dimen/title_medium_spacing"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="入库类型："
+            android:textColor="@color/gray_deep"
+            android:textSize="@dimen/sub_medium_text" />
+
+
+        <TextView
+            android:id="@+id/adapter_warehousing_type_tv"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/title_medium_l_spacing"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:text="inStorageType"
+            android:textColor="@color/gray_deep"
+            android:textSize="@dimen/sub_medium_text" />
+
+    </LinearLayout>
+
+
+</LinearLayout>
