@@ -40,7 +40,7 @@
 
                 <TextView
                     android:gravity="center"
-                    android:id="@+id/warehousing_out_btn"
+                    android:id="@+id/outbound_out_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
