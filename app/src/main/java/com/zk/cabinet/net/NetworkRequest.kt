@@ -17,7 +17,9 @@ import kotlin.collections.MutableMap as MutableMap1
 class NetworkRequest : VolleyRequest() {
     private val mGson: Gson = GsonBuilder().create()
 
-    public lateinit var mClientLogin: String
+    lateinit var mClientLogin: String
+    lateinit var mWarehousingList: String
+    lateinit var mOutboundList: String
 
     private lateinit var mUrlRepInventory: String
 
@@ -28,18 +30,12 @@ class NetworkRequest : VolleyRequest() {
         private const val DEFAULT_PORT = 7777
 
         private const val CLIENT_LOGIN = "/cabinet/client/login"
+        private const val WAREHOUSING = "/cabinet/godown/entry/page"
+        private const val OUTBOUND = "/cabinet/delivery/order/page"
 
 
         private const val REP_INVENTORY = "/api/v1/repInventory"
 
-        // 分页同步默认单页数据量
-        const val DEFAULT_PAGE_SIZE = 200
-
-        // 默认同步时间
-        const val DEFAULT_SYNC_TIME = "2017-01-01 00:00:00"
-
-        const val DEFAULT_AUTHORIZATION =
-            "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTU5NDE2ODY2NywiaWF0IjoxNTkzOTk2NjY3fQ.MHT3VBp1O3HVudJONw-lwwDQ8-XmPHj8z5-tr65HEIRyEtCKFi6ytEA4Kady2TadEsiNrBWVXtYTec0cbOLvkw"
 
         val instance: NetworkRequest by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
             NetworkRequest()
@@ -58,6 +54,8 @@ class NetworkRequest : VolleyRequest() {
 
     fun configModify(url: String, port: Int) {
         mClientLogin = URL_HEAD + url + URL_COLON + port + CLIENT_LOGIN
+        mWarehousingList = URL_HEAD + url + URL_COLON + port + WAREHOUSING
+        mOutboundList = URL_HEAD + url + URL_COLON + port + OUTBOUND
         mUrlRepInventory = URL_HEAD + url + URL_COLON + port + REP_INVENTORY
 
     }

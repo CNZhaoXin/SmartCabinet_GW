@@ -7,6 +7,8 @@
         <item>A柜+2个副柜</item>
         <item>A柜+3个副柜</item>
         <item>A柜+4个副柜</item>
+        <item>A柜+5个副柜</item>
+        <item>A柜+6个副柜</item>
     </string-array>
 
     <string-array name="dialog_not_closed_door_alarm_time_array">

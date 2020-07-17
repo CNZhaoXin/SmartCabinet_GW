@@ -17,9 +17,9 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.zk.cabinet.R
 import com.zk.cabinet.adapter.WarehousingAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
-import com.zk.cabinet.bean.WarehousingInfo
+import com.zk.cabinet.bean.DossierOperating
 import com.zk.cabinet.databinding.ActivityWarehousingBinding
-import com.zk.cabinet.db.WarehousingService
+import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.net.NetworkRequest
 import org.json.JSONException
 import org.json.JSONObject
@@ -33,7 +33,7 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private lateinit var mHandler: WarehousingHandler
     private lateinit var mProgressSyncUserDialog: ProgressDialog
 
-    private var mWarehousingList = ArrayList<WarehousingInfo>()
+    private var mWarehousingList = ArrayList<DossierOperating>()
     private lateinit var mWarehousingAdapter: WarehousingAdapter
 
     companion object {
@@ -46,7 +46,8 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         when (msg.what) {
             GET_WAREHOUSING_SUCCESS -> {
                 mProgressSyncUserDialog.dismiss()
-                mWarehousingList = msg.obj as ArrayList<WarehousingInfo>
+                mWarehousingList = msg.obj as ArrayList<DossierOperating>
+                mWarehousingAdapter.setList(mWarehousingList)
                 mWarehousingAdapter.notifyDataSetChanged()
             }
             GET_WAREHOUSING_FAIL -> {
@@ -65,17 +66,6 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         mWarehousingBinding.onClickListener = this
 
         mHandler = WarehousingHandler(this)
-
-
-        val tools = WarehousingInfo()
-        tools.warrantNum = "warrantNum"
-        tools.rfidNum = "rfidNum"
-        tools.warrantName = "warrantName"
-        tools.warrantNo = "warrantNo"
-        tools.warranCate = "warranCate"
-        tools.inStorageType = 1
-        tools.warranType = 1
-        mWarehousingList.add(tools)
 
         mWarehousingAdapter = WarehousingAdapter(this, mWarehousingList)
         mWarehousingBinding.warehousingLv.adapter = mWarehousingAdapter
@@ -114,29 +104,29 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
 
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET,
-            NetworkRequest.instance.mClientLogin,
+            NetworkRequest.instance.mWarehousingList,
             Response.Listener { response ->
                 try {
-                    WarehousingService.getInstance().deleteAll()
+                    DossierOperatingService.getInstance().deleteAll()
 
-                    val werehousingList = WarehousingService.getInstance().nullList
+                    val werehousingList = DossierOperatingService.getInstance().nullList
                     val success = response.getBoolean("success")
                     if (success) {
                         val dataJsonArray = response.getJSONArray("data")
                         for (i in 0 until dataJsonArray.length()) {
                             val jsonObject: JSONObject = dataJsonArray.getJSONObject(i)
-                            val tools = WarehousingInfo()
+                            val tools = DossierOperating()
                             tools.warrantNum = jsonObject.getString("warrantNum")
                             tools.rfidNum = jsonObject.getString("rfidNum")
                             tools.warrantName = jsonObject.getString("warrantName")
                             tools.warrantNo = jsonObject.getString("warrantNo")
                             tools.warranCate = jsonObject.getString("warranCate")
-                            tools.inStorageType = jsonObject.getInt("inStorageType")
+                            tools.operatingType = jsonObject.getInt("inStorageType")
                             tools.warranType = jsonObject.getInt("warranType")
 
                             werehousingList.add(tools)
                         }
-                        WarehousingService.getInstance().insertOrReplace(werehousingList)
+                        DossierOperatingService.getInstance().insertOrReplace(werehousingList)
                         val msg = Message.obtain()
                         msg.what = GET_WAREHOUSING_SUCCESS
                         msg.obj = werehousingList

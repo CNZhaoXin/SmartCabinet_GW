@@ -1,15 +1,16 @@
 package com.zk.cabinet.bean;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Property;
-import org.greenrobot.greendao.annotation.Generated;
 
-@Entity(nameInDb = "Warehousing")
-public class WarehousingInfo {
+@Entity(nameInDb = "DossierOperating")
+public class DossierOperating {
+    //本地id
     @Property(nameInDb = "ID")
     @Id
-    private long id;
+    private Long id;
 
     @Property(nameInDb = "WarrantNum")
     private String warrantNum;
@@ -26,35 +27,52 @@ public class WarehousingInfo {
     @Property(nameInDb = "WarranCate")
     private String warranCate;
 
-    @Property(nameInDb = "InStorageType")
-    private int inStorageType;
+    @Property(nameInDb = "OperatingType")
+    private int operatingType;
 
     @Property(nameInDb = "WarranType")
     private int warranType;
 
-    @Generated(hash = 379715415)
-    public WarehousingInfo(long id, String warrantNum, String rfidNum,
+    @Property(nameInDb = "CabinetId")
+    private String cabinetId;
+
+    @Property(nameInDb = "Floor")
+    private int floor;
+
+    @Property(nameInDb = "Light")
+    private int light;
+
+    @Property(nameInDb = "Selected")
+    private boolean selected;
+
+    @Generated(hash = 1839932352)
+    public DossierOperating(Long id, String warrantNum, String rfidNum,
             String warrantName, String warrantNo, String warranCate,
-            int inStorageType, int warranType) {
+            int operatingType, int warranType, String cabinetId, int floor,
+            int light, boolean selected) {
         this.id = id;
         this.warrantNum = warrantNum;
         this.rfidNum = rfidNum;
         this.warrantName = warrantName;
         this.warrantNo = warrantNo;
         this.warranCate = warranCate;
-        this.inStorageType = inStorageType;
+        this.operatingType = operatingType;
         this.warranType = warranType;
+        this.cabinetId = cabinetId;
+        this.floor = floor;
+        this.light = light;
+        this.selected = selected;
     }
 
-    @Generated(hash = 166881216)
-    public WarehousingInfo() {
+    @Generated(hash = 1883903289)
+    public DossierOperating() {
     }
 
-    public long getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -98,12 +116,12 @@ public class WarehousingInfo {
         this.warranCate = warranCate;
     }
 
-    public int getInStorageType() {
-        return this.inStorageType;
+    public int getOperatingType() {
+        return this.operatingType;
     }
 
-    public void setInStorageType(int inStorageType) {
-        this.inStorageType = inStorageType;
+    public void setOperatingType(int operatingType) {
+        this.operatingType = operatingType;
     }
 
     public int getWarranType() {
@@ -112,5 +130,37 @@ public class WarehousingInfo {
 
     public void setWarranType(int warranType) {
         this.warranType = warranType;
+    }
+
+    public String getCabinetId() {
+        return this.cabinetId;
+    }
+
+    public void setCabinetId(String cabinetId) {
+        this.cabinetId = cabinetId;
+    }
+
+    public int getFloor() {
+        return this.floor;
+    }
+
+    public void setFloor(int floor) {
+        this.floor = floor;
+    }
+
+    public int getLight() {
+        return this.light;
+    }
+
+    public void setLight(int light) {
+        this.light = light;
+    }
+
+    public boolean getSelected() {
+        return this.selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

@@ -17,8 +17,6 @@ import com.zk.cabinet.R
 import com.zk.cabinet.adapter.DemoInterfaceAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.Cabinet
-import com.zk.cabinet.bean.CabinetOnlineInfo
-import com.zk.cabinet.bean.DemoInterfaceLabelInfo
 import com.zk.cabinet.databinding.ActivityDemoInterfaceBinding
 import com.zk.cabinet.db.CabinetService
 import com.zk.cabinet.utils.SharedPreferencesUtil

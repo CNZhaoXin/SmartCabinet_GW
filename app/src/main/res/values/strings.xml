@@ -112,62 +112,6 @@
     <string name="too_many_files">卷宗过多</string>
     <!--存取操作-->
 
-    <!--卷宗查询 - start -->
-    <string name="serial_number">序号↓</string>
-    <string name="cabinet_number">柜体号↓</string>
-
-    <string name="title_box_number">箱体号：</string>
-    <string name="box_number">箱体号</string>
-    <string name="box_number_up">箱体号↑</string>
-    <string name="box_number_down">箱体号↓</string>
-
-    <string name="file_state">状态</string>
-    <string name="file_state_up">状态↑</string>
-    <string name="file_state_down">状态↓</string>
-
-    <string name="title_file_number">卷宗编号：</string>
-
-    <string name="title_police_station_number">派出所编号：</string>
-    <string name="police_station_number">派出所编号</string>
-
-    <string name="title_file_status">卷宗状态：</string>
-
-    <string name="title_name_of_case">案件名称：</string>
-    <string name="name_of_case">案件名称</string>
-
-    <string name="title_case_number">案件编号：</string>
-    <string name="case_number">案件编号</string>
-    <string name="case_number_up">案件编号↑</string>
-    <string name="case_number_down">案件编号↓</string>
-
-    <string name="title_update_time">更新时间：</string>
-    <string name="update_time">更新时间</string>
-    <string name="update_time_up">更新时间↑</string>
-    <string name="update_time_down">更新时间↓</string>
-
-    <string name="number_of_files_queried">查询到的卷宗数量：%1$d</string>
-    <string name="offset">%1$d / %2$d</string>
-    <string name="is_first_page">已经是第一页了！</string>
-    <string name="is_last_page">已经是最后一页了！</string>
-
-    <string name="title_open_cabinet_where_the_file_is_located">开启柜门</string>
-    <string name="open_cabinet_where_the_file_is_located">该卷宗存放在%1$s，是否开启%1$s的柜门</string>
-    <string name="not_in_cabinet">该卷宗不在当前柜子！</string>
-    <string name="cabinet_not_exist">未查到该格子！</string>
-    <string name="no_permission_open_box">配置管理员，您无权限开启柜门！</string>
-    <!--卷宗查询 - end -->
-
-    <!--用户 - start -->
-    <string name="title_police_officer_number">警员编号：</string>
-    <string name="police_officer_number">警员编号</string>
-
-    <string name="title_police_officer_name">警员姓名：</string>
-    <string name="police_officer_name">警员姓名</string>
-
-    <string name="title_permissions">权限(箱号)：</string>
-    <string name="permissions">权限(箱号)</string>
-    <!--用户 - end -->
-
 
     <!--系统设置-->
     <string name="title_activity_system_settings">系统设置</string>
@@ -201,7 +145,7 @@
     <!--柜体参数- start-->
     <string name="title_cabinet_parameters">柜体参数</string>
     <string name="number_of_boxes">箱体数量（部分服务需设备重启生效）</string>
-    <string name="number_of_boxes_caption_text">箱体数量：%1$s 排列顺序：%2$s</string>
+    <string name="number_of_boxes_caption_text">箱体数量：%1$s</string>
     <string name="title_cabinet_in_order">柜体排列顺序</string>
     <string name="cabinet_name">%1$s柜</string>
     <string name="not_closed_door_alarm_time">未关门报警时间</string>
@@ -267,7 +211,7 @@
     <string name="version_management">版本管理</string>
     <string name="app_version">APP版本</string>
     <string name="title_file_manager">U盘更新APP</string>
-    <string name="file_manager">请先在U盘根文件夹里放入命名为：NewFileCabinet.apk的文件，把U盘插入靠下面的那个USB口之后点击更新。</string>
+    <string name="file_manager">请先在U盘根文件夹里放入命名为：FileManagementCabinet.apk的文件，把U盘插入靠下面的那个USB口之后点击更新。</string>
     <string name="file_not_exist">未找到该文件，请检查文件命名和U盘插入的USB口</string>
     <string name="title_uninstall_app">卸载程序</string>
     <string name="uninstall_app">点击卸载本程序，卸载后1分钟内设备会自动重启！</string>

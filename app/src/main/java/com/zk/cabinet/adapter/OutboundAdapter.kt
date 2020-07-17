@@ -8,11 +8,10 @@ import android.widget.BaseAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.zk.cabinet.R
-import com.zk.cabinet.bean.OutboundInfo
-import com.zk.cabinet.bean.WarehousingInfo
+import com.zk.cabinet.bean.DossierOperating
 import com.zk.cabinet.constant.SelfComm
 
-class OutboundAdapter(context: Context, dossierList: List<OutboundInfo>) :
+class OutboundAdapter(context: Context, dossierList: List<DossierOperating>) :
     BaseAdapter() {
     private val mContext = context
     private var mDossierList = dossierList
@@ -43,7 +42,7 @@ class OutboundAdapter(context: Context, dossierList: List<OutboundInfo>) :
         viewHolder.mAdapterOutboundNameTv.text = dossier.warrantName
         viewHolder.mAdapterOutboundNoTv.text = dossier.warrantNo
         viewHolder.mAdapterOutboundCateTv.text = dossier.warranCate
-        viewHolder.mAdapterOutboundTypeTv.text = SelfComm.OPERATING_TYPE[dossier.outStorageType]
+        viewHolder.mAdapterOutboundTypeTv.text = SelfComm.OPERATING_TYPE[dossier.operatingType]
         viewHolder.mAdapterOutboundPositionTv.text = "${dossier.cabinetId} - ${dossier.floor} -${dossier.light}"
 
         return view!!
@@ -72,7 +71,7 @@ class OutboundAdapter(context: Context, dossierList: List<OutboundInfo>) :
         var mAdapterOutboundPositionTv: TextView
     )
 
-    fun setList(dossierList: List<OutboundInfo>) {
+    fun setList(dossierList: List<DossierOperating>) {
         mDossierList = dossierList
     }
 }

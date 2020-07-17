@@ -3,7 +3,6 @@ package com.zk.cabinet.activity
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -17,12 +16,10 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.zk.cabinet.R
 import com.zk.cabinet.adapter.OutboundAdapter
-import com.zk.cabinet.adapter.WarehousingAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
-import com.zk.cabinet.bean.OutboundInfo
-import com.zk.cabinet.bean.WarehousingInfo
+import com.zk.cabinet.bean.DossierOperating
 import com.zk.cabinet.databinding.ActivityOutboundBinding
-import com.zk.cabinet.db.WarehousingService
+import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.net.NetworkRequest
 import org.json.JSONException
 import org.json.JSONObject
@@ -34,7 +31,7 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private lateinit var mHandler: OutboundHandler
     private lateinit var mProgressSyncUserDialog: ProgressDialog
 
-    private var mOutboundList = ArrayList<OutboundInfo>()
+    private var mOutboundList = ArrayList<DossierOperating>()
     private lateinit var mOutboundAdapter: OutboundAdapter
 
     companion object {
@@ -50,7 +47,8 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         when (msg.what) {
             GET_OUTBOUND_SUCCESS -> {
                 mProgressSyncUserDialog.dismiss()
-                mOutboundList = msg.obj as ArrayList<OutboundInfo>
+                mOutboundList = msg.obj as ArrayList<DossierOperating>
+                mOutboundAdapter.setList(mOutboundList)
                 mOutboundAdapter.notifyDataSetChanged()
             }
             GET_OUTBOUND_FAIL -> {
@@ -70,19 +68,8 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener {
 
         mHandler = OutboundHandler(this)
 
-//
-//        val tools = WarehousingInfo()
-//        tools.warrantNum = "warrantNum"
-//        tools.rfidNum = "rfidNum"
-//        tools.warrantName = "warrantName"
-//        tools.warrantNo = "warrantNo"
-//        tools.warranCate = "warranCate"
-//        tools.inStorageType = 1
-//        tools.warranType = 1
-//        mWarehousingList.add(tools)
-//
-//        mWarehousingAdapter = WarehousingAdapter(this, mWarehousingList)
-//        mWarehousingBinding.warehousingLv.adapter = mWarehousingAdapter
+        mOutboundAdapter = OutboundAdapter(this, mOutboundList)
+        mOutboundBinding.outboundLv.adapter = mOutboundAdapter
 
         mProgressSyncUserDialog = ProgressDialog(this)
         getOutbound()
@@ -118,29 +105,33 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener {
 
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET,
-            NetworkRequest.instance.mClientLogin,
+            NetworkRequest.instance.mOutboundList,
             Response.Listener { response ->
                 try {
-                    WarehousingService.getInstance().deleteAll()
+                    DossierOperatingService.getInstance().deleteAll()
 
-                    val werehousingList = WarehousingService.getInstance().nullList
+                    val werehousingList = DossierOperatingService.getInstance().nullList
                     val success = response.getBoolean("success")
                     if (success) {
                         val dataJsonArray = response.getJSONArray("data")
                         for (i in 0 until dataJsonArray.length()) {
                             val jsonObject: JSONObject = dataJsonArray.getJSONObject(i)
-                            val tools = WarehousingInfo()
+                            val tools = DossierOperating()
                             tools.warrantNum = jsonObject.getString("warrantNum")
                             tools.rfidNum = jsonObject.getString("rfidNum")
                             tools.warrantName = jsonObject.getString("warrantName")
                             tools.warrantNo = jsonObject.getString("warrantNo")
                             tools.warranCate = jsonObject.getString("warranCate")
-                            tools.inStorageType = jsonObject.getInt("inStorageType")
+                            tools.operatingType = jsonObject.getInt("outStorageType")
                             tools.warranType = jsonObject.getInt("warranType")
+                            tools.cabinetId = jsonObject.getString("position")
+                            val light = jsonObject.getInt("light")
+                            tools.floor = light / 25
+                            tools.light = light % 24
 
                             werehousingList.add(tools)
                         }
-                        WarehousingService.getInstance().insertOrReplace(werehousingList)
+                        DossierOperatingService.getInstance().insertOrReplace(werehousingList)
                         val msg = Message.obtain()
                         msg.what = GET_OUTBOUND_SUCCESS
                         msg.obj = werehousingList

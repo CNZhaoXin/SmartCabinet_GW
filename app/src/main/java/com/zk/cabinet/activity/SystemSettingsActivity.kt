@@ -269,8 +269,7 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
         mSystemSettingsBinding.systemSettingNumberOfBoxesSb.setCaptionText(
             String.format(
                 resources.getString(R.string.number_of_boxes_caption_text),
-                mNumberBoxesItems[mNumberBoxesItemSelected],
-                mSpUtil.getString(Key.NumberOfBoxes, "A")
+                mNumberBoxesItems[mNumberBoxesItemSelected]
             )
         )
         mSystemSettingsBinding.systemSettingNotClosedDoorAlarmTimeSb.setCaptionText(
@@ -510,7 +509,10 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                                 ) {
                                     mWebApiServiceIp = webApiServiceIp
                                     mWebApiServicePort = webApiServicePort
-                                    NetworkRequest.instance.configModify(mWebApiServiceIp, mWebApiServicePort)
+                                    NetworkRequest.instance.configModify(
+                                        mWebApiServiceIp,
+                                        mWebApiServicePort
+                                    )
                                     val webApiServiceList = ArrayList<Record>()
                                     webApiServiceList.add(
                                         Record(
@@ -576,12 +578,25 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                         mNumberBoxesItemSelected = i
                         showRestartNowForSet()
                         dialogInterface.dismiss()
-//                        intentActivity(
-//                            CabinetConfigurationActivity.newInstance(
-//                                this,
-//                                mNumberBoxesItemSelected
-//                            )
-//                        )
+                        mSpUtil.applyValue(
+                            Record(
+                                Key.NumberOfBoxesSelected,
+                                mNumberBoxesItemSelected
+                            )
+                        )
+                        mSystemSettingsBinding.systemSettingNumberOfBoxesSb.setCaptionText(
+                            String.format(
+                                resources.getString(R.string.number_of_boxes_caption_text),
+                                mNumberBoxesItems[mNumberBoxesItemSelected]
+                            )
+                        )
+                        intentActivity(
+                            CabinetConfigurationActivity.newInstance(
+                                this,
+                                mDeviceCode,
+                                mNumberBoxesItemSelected + 1
+                            )
+                        )
                     }
                     .setNegativeButton(getString(R.string.cancel), null)
                     .show()
@@ -946,11 +961,11 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
     }
 
     private fun showRestartNowForSet() {
-        if (!isShowRestartNowForSet) {
-            isShowRestartNowForSet = true
-            mSpUtil.applyValue(Record(Key.RestartNowForSet, isShowRestartNowForSet))
-            mSystemSettingsBinding.systemSettingRestartLl.visibility = View.VISIBLE
-        }
+//        if (!isShowRestartNowForSet) {
+//            isShowRestartNowForSet = true
+//            mSpUtil.applyValue(Record(Key.RestartNowForSet, isShowRestartNowForSet))
+//            mSystemSettingsBinding.systemSettingRestartLl.visibility = View.VISIBLE
+//        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

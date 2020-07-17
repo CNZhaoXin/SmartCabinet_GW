@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.zk.cabinet.R
-import com.zk.cabinet.bean.WarehousingInfo
+import com.zk.cabinet.bean.Dossier
+import com.zk.cabinet.bean.DossierOperating
 import com.zk.cabinet.constant.SelfComm
 
-class WarehousingAdapter(context: Context, dossierList: List<WarehousingInfo>) :
+class WarehousingAdapter(context: Context, dossierList: List<DossierOperating>) :
     BaseAdapter() {
     private val mContext = context
     private var mDossierList = dossierList
@@ -40,7 +40,7 @@ class WarehousingAdapter(context: Context, dossierList: List<WarehousingInfo>) :
         viewHolder.mAdapterWarehousingNameTv.text = dossier.warrantName
         viewHolder.mAdapterWarehousingNoTv.text = dossier.warrantNo
         viewHolder.mAdapterWarehousingCateTv.text = dossier.warranCate
-        viewHolder.mAdapterWarehousingTypeTv.text = SelfComm.OPERATING_TYPE[dossier.inStorageType]
+        viewHolder.mAdapterWarehousingTypeTv.text = SelfComm.OPERATING_TYPE[dossier.operatingType]
 
         return view!!
     }
@@ -66,7 +66,7 @@ class WarehousingAdapter(context: Context, dossierList: List<WarehousingInfo>) :
         var mAdapterWarehousingTypeTv: TextView
     )
 
-    fun setList(dossierList: List<WarehousingInfo>) {
+    fun setList(dossierList: List<DossierOperating>) {
         mDossierList = dossierList
     }
 }

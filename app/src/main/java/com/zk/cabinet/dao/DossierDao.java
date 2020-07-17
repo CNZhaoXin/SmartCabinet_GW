@@ -25,22 +25,16 @@ public class DossierDao extends AbstractDao<Dossier, Long> {
      */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "ID");
-        public final static Property WebId = new Property(1, Long.class, "webId", false, "WebID");
-        public final static Property CaseCode = new Property(2, String.class, "caseCode", false, "CaseCode");
-        public final static Property CaseName = new Property(3, String.class, "caseName", false, "CaseName");
-        public final static Property UserID = new Property(4, Long.class, "userID", false, "UserID");
-        public final static Property UserCode = new Property(5, String.class, "userCode", false, "UserCode");
-        public final static Property UserName = new Property(6, String.class, "userName", false, "UserName");
-        public final static Property CorpCode = new Property(7, String.class, "corpCode", false, "CorpCode");
-        public final static Property CorpName = new Property(8, String.class, "corpName", false, "CorpName");
-        public final static Property ReceptionTime = new Property(9, String.class, "receptionTime", false, "ReceptionTime");
-        public final static Property ModifyTime = new Property(10, String.class, "modifyTime", false, "ModifyTime");
-        public final static Property Epc = new Property(11, String.class, "epc", false, "EPC");
-        public final static Property CaseState = new Property(12, String.class, "caseState", false, "CaseState");
-        public final static Property DeviceCode = new Property(13, String.class, "DeviceCode", false, "DeviceCode");
-        public final static Property CellId = new Property(14, int.class, "cellId", false, "CellID");
-        public final static Property CellName = new Property(15, String.class, "cellName", false, "CellName");
-        public final static Property CellCode = new Property(16, int.class, "cellCode", false, "CellCode");
+        public final static Property WarrantNum = new Property(1, String.class, "warrantNum", false, "WarrantNum");
+        public final static Property RfidNum = new Property(2, String.class, "rfidNum", false, "RfidNum");
+        public final static Property WarrantName = new Property(3, String.class, "warrantName", false, "WarrantName");
+        public final static Property WarrantNo = new Property(4, String.class, "warrantNo", false, "WarrantNo");
+        public final static Property WarranCate = new Property(5, String.class, "warranCate", false, "WarranCate");
+        public final static Property OperatingType = new Property(6, int.class, "operatingType", false, "OperatingType");
+        public final static Property WarranType = new Property(7, int.class, "warranType", false, "WarranType");
+        public final static Property CabinetId = new Property(8, String.class, "cabinetId", false, "CabinetId");
+        public final static Property Floor = new Property(9, int.class, "floor", false, "Floor");
+        public final static Property Light = new Property(10, int.class, "light", false, "Light");
     }
 
 
@@ -57,22 +51,16 @@ public class DossierDao extends AbstractDao<Dossier, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"Dossier\" (" + //
                 "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
-                "\"WebID\" INTEGER UNIQUE ," + // 1: webId
-                "\"CaseCode\" TEXT," + // 2: caseCode
-                "\"CaseName\" TEXT," + // 3: caseName
-                "\"UserID\" INTEGER," + // 4: userID
-                "\"UserCode\" TEXT," + // 5: userCode
-                "\"UserName\" TEXT," + // 6: userName
-                "\"CorpCode\" TEXT," + // 7: corpCode
-                "\"CorpName\" TEXT," + // 8: corpName
-                "\"ReceptionTime\" TEXT," + // 9: receptionTime
-                "\"ModifyTime\" TEXT," + // 10: modifyTime
-                "\"EPC\" TEXT," + // 11: epc
-                "\"CaseState\" TEXT," + // 12: caseState
-                "\"DeviceCode\" TEXT," + // 13: DeviceCode
-                "\"CellID\" INTEGER NOT NULL ," + // 14: cellId
-                "\"CellName\" TEXT," + // 15: cellName
-                "\"CellCode\" INTEGER NOT NULL );"); // 16: cellCode
+                "\"WarrantNum\" TEXT," + // 1: warrantNum
+                "\"RfidNum\" TEXT," + // 2: rfidNum
+                "\"WarrantName\" TEXT," + // 3: warrantName
+                "\"WarrantNo\" TEXT," + // 4: warrantNo
+                "\"WarranCate\" TEXT," + // 5: warranCate
+                "\"OperatingType\" INTEGER NOT NULL ," + // 6: operatingType
+                "\"WarranType\" INTEGER NOT NULL ," + // 7: warranType
+                "\"CabinetId\" TEXT," + // 8: cabinetId
+                "\"Floor\" INTEGER NOT NULL ," + // 9: floor
+                "\"Light\" INTEGER NOT NULL );"); // 10: light
     }
 
     /** Drops the underlying database table. */
@@ -90,77 +78,39 @@ public class DossierDao extends AbstractDao<Dossier, Long> {
             stmt.bindLong(1, id);
         }
  
-        Long webId = entity.getWebId();
-        if (webId != null) {
-            stmt.bindLong(2, webId);
+        String warrantNum = entity.getWarrantNum();
+        if (warrantNum != null) {
+            stmt.bindString(2, warrantNum);
         }
  
-        String caseCode = entity.getCaseCode();
-        if (caseCode != null) {
-            stmt.bindString(3, caseCode);
+        String rfidNum = entity.getRfidNum();
+        if (rfidNum != null) {
+            stmt.bindString(3, rfidNum);
         }
  
-        String caseName = entity.getCaseName();
-        if (caseName != null) {
-            stmt.bindString(4, caseName);
+        String warrantName = entity.getWarrantName();
+        if (warrantName != null) {
+            stmt.bindString(4, warrantName);
         }
  
-        Long userID = entity.getUserID();
-        if (userID != null) {
-            stmt.bindLong(5, userID);
+        String warrantNo = entity.getWarrantNo();
+        if (warrantNo != null) {
+            stmt.bindString(5, warrantNo);
         }
  
-        String userCode = entity.getUserCode();
-        if (userCode != null) {
-            stmt.bindString(6, userCode);
+        String warranCate = entity.getWarranCate();
+        if (warranCate != null) {
+            stmt.bindString(6, warranCate);
         }
+        stmt.bindLong(7, entity.getOperatingType());
+        stmt.bindLong(8, entity.getWarranType());
  
-        String userName = entity.getUserName();
-        if (userName != null) {
-            stmt.bindString(7, userName);
+        String cabinetId = entity.getCabinetId();
+        if (cabinetId != null) {
+            stmt.bindString(9, cabinetId);
         }
- 
-        String corpCode = entity.getCorpCode();
-        if (corpCode != null) {
-            stmt.bindString(8, corpCode);
-        }
- 
-        String corpName = entity.getCorpName();
-        if (corpName != null) {
-            stmt.bindString(9, corpName);
-        }
- 
-        String receptionTime = entity.getReceptionTime();
-        if (receptionTime != null) {
-            stmt.bindString(10, receptionTime);
-        }
- 
-        String modifyTime = entity.getModifyTime();
-        if (modifyTime != null) {
-            stmt.bindString(11, modifyTime);
-        }
- 
-        String epc = entity.getEpc();
-        if (epc != null) {
-            stmt.bindString(12, epc);
-        }
- 
-        String caseState = entity.getCaseState();
-        if (caseState != null) {
-            stmt.bindString(13, caseState);
-        }
- 
-        String DeviceCode = entity.getDeviceCode();
-        if (DeviceCode != null) {
-            stmt.bindString(14, DeviceCode);
-        }
-        stmt.bindLong(15, entity.getCellId());
- 
-        String cellName = entity.getCellName();
-        if (cellName != null) {
-            stmt.bindString(16, cellName);
-        }
-        stmt.bindLong(17, entity.getCellCode());
+        stmt.bindLong(10, entity.getFloor());
+        stmt.bindLong(11, entity.getLight());
     }
 
     @Override
@@ -172,77 +122,39 @@ public class DossierDao extends AbstractDao<Dossier, Long> {
             stmt.bindLong(1, id);
         }
  
-        Long webId = entity.getWebId();
-        if (webId != null) {
-            stmt.bindLong(2, webId);
+        String warrantNum = entity.getWarrantNum();
+        if (warrantNum != null) {
+            stmt.bindString(2, warrantNum);
         }
  
-        String caseCode = entity.getCaseCode();
-        if (caseCode != null) {
-            stmt.bindString(3, caseCode);
+        String rfidNum = entity.getRfidNum();
+        if (rfidNum != null) {
+            stmt.bindString(3, rfidNum);
         }
  
-        String caseName = entity.getCaseName();
-        if (caseName != null) {
-            stmt.bindString(4, caseName);
+        String warrantName = entity.getWarrantName();
+        if (warrantName != null) {
+            stmt.bindString(4, warrantName);
         }
  
-        Long userID = entity.getUserID();
-        if (userID != null) {
-            stmt.bindLong(5, userID);
+        String warrantNo = entity.getWarrantNo();
+        if (warrantNo != null) {
+            stmt.bindString(5, warrantNo);
         }
  
-        String userCode = entity.getUserCode();
-        if (userCode != null) {
-            stmt.bindString(6, userCode);
+        String warranCate = entity.getWarranCate();
+        if (warranCate != null) {
+            stmt.bindString(6, warranCate);
         }
+        stmt.bindLong(7, entity.getOperatingType());
+        stmt.bindLong(8, entity.getWarranType());
  
-        String userName = entity.getUserName();
-        if (userName != null) {
-            stmt.bindString(7, userName);
+        String cabinetId = entity.getCabinetId();
+        if (cabinetId != null) {
+            stmt.bindString(9, cabinetId);
         }
- 
-        String corpCode = entity.getCorpCode();
-        if (corpCode != null) {
-            stmt.bindString(8, corpCode);
-        }
- 
-        String corpName = entity.getCorpName();
-        if (corpName != null) {
-            stmt.bindString(9, corpName);
-        }
- 
-        String receptionTime = entity.getReceptionTime();
-        if (receptionTime != null) {
-            stmt.bindString(10, receptionTime);
-        }
- 
-        String modifyTime = entity.getModifyTime();
-        if (modifyTime != null) {
-            stmt.bindString(11, modifyTime);
-        }
- 
-        String epc = entity.getEpc();
-        if (epc != null) {
-            stmt.bindString(12, epc);
-        }
- 
-        String caseState = entity.getCaseState();
-        if (caseState != null) {
-            stmt.bindString(13, caseState);
-        }
- 
-        String DeviceCode = entity.getDeviceCode();
-        if (DeviceCode != null) {
-            stmt.bindString(14, DeviceCode);
-        }
-        stmt.bindLong(15, entity.getCellId());
- 
-        String cellName = entity.getCellName();
-        if (cellName != null) {
-            stmt.bindString(16, cellName);
-        }
-        stmt.bindLong(17, entity.getCellCode());
+        stmt.bindLong(10, entity.getFloor());
+        stmt.bindLong(11, entity.getLight());
     }
 
     @Override
@@ -254,22 +166,16 @@ public class DossierDao extends AbstractDao<Dossier, Long> {
     public Dossier readEntity(Cursor cursor, int offset) {
         Dossier entity = new Dossier( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // webId
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // caseCode
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // caseName
-            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4), // userID
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // userCode
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // userName
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // corpCode
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // corpName
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // receptionTime
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // modifyTime
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // epc
-            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // caseState
-            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // DeviceCode
-            cursor.getInt(offset + 14), // cellId
-            cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15), // cellName
-            cursor.getInt(offset + 16) // cellCode
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // warrantNum
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // rfidNum
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // warrantName
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // warrantNo
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // warranCate
+            cursor.getInt(offset + 6), // operatingType
+            cursor.getInt(offset + 7), // warranType
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // cabinetId
+            cursor.getInt(offset + 9), // floor
+            cursor.getInt(offset + 10) // light
         );
         return entity;
     }
@@ -277,22 +183,16 @@ public class DossierDao extends AbstractDao<Dossier, Long> {
     @Override
     public void readEntity(Cursor cursor, Dossier entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setWebId(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
-        entity.setCaseCode(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setCaseName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setUserID(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
-        entity.setUserCode(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
-        entity.setUserName(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
-        entity.setCorpCode(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setCorpName(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
-        entity.setReceptionTime(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setModifyTime(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setEpc(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setCaseState(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
-        entity.setDeviceCode(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
-        entity.setCellId(cursor.getInt(offset + 14));
-        entity.setCellName(cursor.isNull(offset + 15) ? null : cursor.getString(offset + 15));
-        entity.setCellCode(cursor.getInt(offset + 16));
+        entity.setWarrantNum(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setRfidNum(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setWarrantName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setWarrantNo(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setWarranCate(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setOperatingType(cursor.getInt(offset + 6));
+        entity.setWarranType(cursor.getInt(offset + 7));
+        entity.setCabinetId(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setFloor(cursor.getInt(offset + 9));
+        entity.setLight(cursor.getInt(offset + 10));
      }
     
     @Override

@@ -25,6 +25,7 @@ import com.zk.cabinet.bean.CabinetOnlineInfo
 import com.zk.cabinet.constant.SelfComm
 import com.zk.cabinet.databinding.ActivityGuideBinding
 import com.zk.cabinet.databinding.DialogLoginBinding
+import com.zk.cabinet.db.DeviceService
 import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil.Record
@@ -64,30 +65,17 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             DEVICE_REGISTERED, DEVICE_REMOVED -> {
                 val deviceID = msg.obj.toString()
 
-                if (SelfComm.ONLINE_DEVICE.contains(deviceID)){
-                    if (msg.what == DEVICE_REMOVED) SelfComm.ONLINE_DEVICE.remove(deviceID)
-                } else {
-                    if (msg.what == DEVICE_REGISTERED) SelfComm.ONLINE_DEVICE.add(deviceID)
-                }
+//                if (SelfComm.ONLINE_DEVICE.contains(deviceID)){
+//                    if (msg.what == DEVICE_REMOVED) SelfComm.ONLINE_DEVICE.remove(deviceID)
+//                } else {
+//                    if (msg.what == DEVICE_REGISTERED) SelfComm.ONLINE_DEVICE.add(deviceID)
+//                }
 
-                var isExit = false
                 for (cabinetOnlineInfo in mCabinetOnlineList) {
-                    if (cabinetOnlineInfo.mCodeName == deviceID) {
-                        isExit = true
+                    if (cabinetOnlineInfo.mCode == deviceID) {
                         cabinetOnlineInfo.isOnLine = msg.what == DEVICE_REGISTERED
-                        mCabinetOnlineAdapter.notifyDataSetChanged()
                         break
                     }
-                }
-                if (!isExit) {
-                    mCabinetOnlineList.add(
-                        CabinetOnlineInfo(
-                            0,
-                            deviceID,
-                            msg.what == DEVICE_REGISTERED
-                        )
-                    )
-                    mSpUtil.applyValue(Record(Key.DeviceIdTemp, deviceID))
                 }
                 mCabinetOnlineAdapter.notifyDataSetChanged()
             }
@@ -115,6 +103,15 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     private fun init() {
         mProgressSyncUserDialog = ProgressDialog(this)
+
+        val deviceList = DeviceService.getInstance().loadAll()
+        if(deviceList != null && deviceList.size > 0) {
+            for (device in deviceList) {
+                mCabinetOnlineList.add( CabinetOnlineInfo(
+                    device.deviceId,
+                    device.deviceName, false))
+            }
+        }
 
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = LinearLayoutManager.HORIZONTAL

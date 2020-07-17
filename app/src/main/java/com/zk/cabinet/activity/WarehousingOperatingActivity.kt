@@ -2,17 +2,13 @@ package com.zk.cabinet.activity
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.zk.cabinet.R
 import com.zk.cabinet.base.TimeOffAppCompatActivity
-import com.zk.cabinet.bean.WarehousingInfo
-import com.zk.cabinet.databinding.ActivityWarehousingBinding
 import com.zk.cabinet.databinding.ActivityWarehousingOperatingBinding
 import java.lang.ref.WeakReference
 

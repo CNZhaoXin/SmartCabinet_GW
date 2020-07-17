@@ -16,123 +16,51 @@ public class Dossier {
     @Id
     private Long id;
 
-    //平台id
-    @Expose
-    @SerializedName("ID")
-    @Property(nameInDb = "WebID")
-    @Unique
-    private Long webId;
+    @Property(nameInDb = "WarrantNum")
+    private String warrantNum;
 
-    //案件编号
-    @Expose
-    @SerializedName("CaseCode")
-    @Property(nameInDb = "CaseCode")
-    private String caseCode;
+    @Property(nameInDb = "RfidNum")
+    private String rfidNum;
 
-    //案件名称
-    @Expose
-    @SerializedName("CaseName")
-    @Property(nameInDb = "CaseName")
-    private String caseName;
+    @Property(nameInDb = "WarrantName")
+    private String warrantName;
 
-    //主办人ID
-    @Expose
-    @SerializedName("UserID")
-    @Property(nameInDb = "UserID")
-    private Long userID;
+    @Property(nameInDb = "WarrantNo")
+    private String warrantNo;
 
-    //主办人Code
-    @Expose
-    @SerializedName("UserCode")
-    @Property(nameInDb = "UserCode")
-    private String userCode;
+    @Property(nameInDb = "WarranCate")
+    private String warranCate;
 
-    //主办人名称
-    @Expose
-    @SerializedName("UserName")
-    @Property(nameInDb = "UserName")
-    private String userName;
+    @Property(nameInDb = "OperatingType")
+    private int operatingType;
 
-    //单位编号
-    @Expose
-    @SerializedName("CorpCode")
-    @Property(nameInDb = "CorpCode")
-    private String corpCode;
+    @Property(nameInDb = "WarranType")
+    private int warranType;
 
-    //单位名称
-    @Expose
-    @SerializedName("CorpName")
-    @Property(nameInDb = "CorpName")
-    private String corpName;
+    @Property(nameInDb = "CabinetId")
+    private String cabinetId;
 
-    //受理时间
-    @Expose
-    @SerializedName("ReceptionTime")
-    @Property(nameInDb = "ReceptionTime")
-    private String receptionTime;
+    @Property(nameInDb = "Floor")
+    private int floor;
 
-    //修改时间
-    @Expose
-    @SerializedName("ModifyTime")
-    @Property(nameInDb = "ModifyTime")
-    private String modifyTime;
+    @Property(nameInDb = "Light")
+    private int light;
 
-    //标签编号
-    @Expose
-    @SerializedName("EPC")
-    @Property(nameInDb = "EPC")
-    private String epc;
-
-    //案件状态
-    @Expose
-    @SerializedName("CaseState")
-    @Property(nameInDb = "CaseState")
-    private String caseState;
-
-    //柜子编号
-    @Expose
-    @SerializedName("DeviceCode")
-    @Property(nameInDb = "DeviceCode")
-    private String DeviceCode;
-
-    //整个柜体的唯一值
-    @SerializedName("CellID")
-    @Property(nameInDb = "CellID")
-    private int cellId;
-
-    //A,B,C
-    @SerializedName("CellName")
-    @Property(nameInDb = "CellName")
-    private String cellName;
-
-    //1-12
-    @SerializedName("CellCode")
-    @Property(nameInDb = "CellCode")
-    private int cellCode;
-
-    @Generated(hash = 1928736797)
-    public Dossier(Long id, Long webId, String caseCode, String caseName,
-            Long userID, String userCode, String userName, String corpCode,
-            String corpName, String receptionTime, String modifyTime, String epc,
-            String caseState, String DeviceCode, int cellId, String cellName,
-            int cellCode) {
+    @Generated(hash = 503006806)
+    public Dossier(Long id, String warrantNum, String rfidNum, String warrantName,
+            String warrantNo, String warranCate, int operatingType, int warranType,
+            String cabinetId, int floor, int light) {
         this.id = id;
-        this.webId = webId;
-        this.caseCode = caseCode;
-        this.caseName = caseName;
-        this.userID = userID;
-        this.userCode = userCode;
-        this.userName = userName;
-        this.corpCode = corpCode;
-        this.corpName = corpName;
-        this.receptionTime = receptionTime;
-        this.modifyTime = modifyTime;
-        this.epc = epc;
-        this.caseState = caseState;
-        this.DeviceCode = DeviceCode;
-        this.cellId = cellId;
-        this.cellName = cellName;
-        this.cellCode = cellCode;
+        this.warrantNum = warrantNum;
+        this.rfidNum = rfidNum;
+        this.warrantName = warrantName;
+        this.warrantNo = warrantNo;
+        this.warranCate = warranCate;
+        this.operatingType = operatingType;
+        this.warranType = warranType;
+        this.cabinetId = cabinetId;
+        this.floor = floor;
+        this.light = light;
     }
 
     @Generated(hash = 1494899943)
@@ -147,132 +75,84 @@ public class Dossier {
         this.id = id;
     }
 
-    public Long getWebId() {
-        return this.webId;
+    public String getWarrantNum() {
+        return this.warrantNum;
     }
 
-    public void setWebId(Long webId) {
-        this.webId = webId;
+    public void setWarrantNum(String warrantNum) {
+        this.warrantNum = warrantNum;
     }
 
-    public String getCaseCode() {
-        return this.caseCode;
+    public String getRfidNum() {
+        return this.rfidNum;
     }
 
-    public void setCaseCode(String caseCode) {
-        this.caseCode = caseCode;
+    public void setRfidNum(String rfidNum) {
+        this.rfidNum = rfidNum;
     }
 
-    public String getCaseName() {
-        return this.caseName;
+    public String getWarrantName() {
+        return this.warrantName;
     }
 
-    public void setCaseName(String caseName) {
-        this.caseName = caseName;
+    public void setWarrantName(String warrantName) {
+        this.warrantName = warrantName;
     }
 
-    public Long getUserID() {
-        return this.userID;
+    public String getWarrantNo() {
+        return this.warrantNo;
     }
 
-    public void setUserID(Long userID) {
-        this.userID = userID;
+    public void setWarrantNo(String warrantNo) {
+        this.warrantNo = warrantNo;
     }
 
-    public String getUserCode() {
-        return this.userCode;
+    public String getWarranCate() {
+        return this.warranCate;
     }
 
-    public void setUserCode(String userCode) {
-        this.userCode = userCode;
+    public void setWarranCate(String warranCate) {
+        this.warranCate = warranCate;
     }
 
-    public String getUserName() {
-        return this.userName;
+    public int getOperatingType() {
+        return this.operatingType;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setOperatingType(int operatingType) {
+        this.operatingType = operatingType;
     }
 
-    public String getCorpCode() {
-        return this.corpCode;
+    public int getWarranType() {
+        return this.warranType;
     }
 
-    public void setCorpCode(String corpCode) {
-        this.corpCode = corpCode;
+    public void setWarranType(int warranType) {
+        this.warranType = warranType;
     }
 
-    public String getCorpName() {
-        return this.corpName;
+    public String getCabinetId() {
+        return this.cabinetId;
     }
 
-    public void setCorpName(String corpName) {
-        this.corpName = corpName;
+    public void setCabinetId(String cabinetId) {
+        this.cabinetId = cabinetId;
     }
 
-    public String getReceptionTime() {
-        return this.receptionTime;
+    public int getFloor() {
+        return this.floor;
     }
 
-    public void setReceptionTime(String receptionTime) {
-        this.receptionTime = receptionTime;
+    public void setFloor(int floor) {
+        this.floor = floor;
     }
 
-    public String getModifyTime() {
-        return this.modifyTime;
+    public int getLight() {
+        return this.light;
     }
 
-    public void setModifyTime(String modifyTime) {
-        this.modifyTime = modifyTime;
-    }
-
-    public String getEpc() {
-        return this.epc;
-    }
-
-    public void setEpc(String epc) {
-        this.epc = epc;
-    }
-
-    public String getCaseState() {
-        return this.caseState;
-    }
-
-    public void setCaseState(String caseState) {
-        this.caseState = caseState;
-    }
-
-    public String getDeviceCode() {
-        return this.DeviceCode;
-    }
-
-    public void setDeviceCode(String DeviceCode) {
-        this.DeviceCode = DeviceCode;
-    }
-
-    public int getCellId() {
-        return this.cellId;
-    }
-
-    public void setCellId(int cellId) {
-        this.cellId = cellId;
-    }
-
-    public String getCellName() {
-        return this.cellName;
-    }
-
-    public void setCellName(String cellName) {
-        this.cellName = cellName;
-    }
-
-    public int getCellCode() {
-        return this.cellCode;
-    }
-
-    public void setCellCode(int cellCode) {
-        this.cellCode = cellCode;
+    public void setLight(int light) {
+        this.light = light;
     }
 
 }

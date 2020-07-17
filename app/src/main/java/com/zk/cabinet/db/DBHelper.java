@@ -2,6 +2,7 @@ package com.zk.cabinet.db;
 
 import android.content.Context;
 
+import com.zk.cabinet.bean.DossierOperating;
 import com.zk.cabinet.dao.DaoMaster;
 import com.zk.cabinet.dao.DaoSession;
 
@@ -55,6 +56,8 @@ public class DBHelper {
             CabinetService.getInstance().init(mDaoSession, mDaoSession.getCabinetDao());
             UserService.getInstance().init(mDaoSession, mDaoSession.getUserDao());
             DossierService.getInstance().init(mDaoSession, mDaoSession.getDossierDao());
+            DossierOperatingService.getInstance().init(mDaoSession, mDaoSession.getDossierOperatingDao());
+            DeviceService.getInstance().init(mDaoSession, mDaoSession.getDeviceDao());
         }
     }
 
