@@ -1,8 +1,7 @@
 package com.zk.cabinet.db;
 
-import com.zk.cabinet.bean.Cabinet;
 import com.zk.cabinet.bean.Device;
-import com.zk.cabinet.dao.CabinetDao;
+import com.zk.cabinet.dao.DeviceDao;
 
 import java.util.List;
 
@@ -19,4 +18,16 @@ public class DeviceService extends BaseService<Device, Long> {
         }
         return instance;
     }
+
+    public Device queryByDeviceName(String name) {
+        if (name == null) return null;
+
+        List<Device> list = query(DeviceDao.Properties.DeviceName.eq(name));
+        Device dossierOperating = null;
+        if (list != null && list.size() > 0) {
+            dossierOperating = list.get(0);
+        }
+        return dossierOperating;
+    }
+
 }

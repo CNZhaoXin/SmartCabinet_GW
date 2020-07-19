@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".activity.WarehousingOperatingActivity">
+    tools:context=".activity.OutboundOperatingActivity">
 
     <data>
 
@@ -18,7 +18,7 @@
         android:orientation="vertical">
 
         <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/warehousing_operating_abl"
+            android:id="@+id/outbound_operating_abl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/AppTheme.AppBarOverlay"
@@ -27,7 +27,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/warehousing_operating_toolbar"
+                android:id="@+id/outbound_operating_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
@@ -35,7 +35,7 @@
                 app:popupTheme="@style/AppTheme.PopupOverlay">
 
                 <TextView
-                    android:id="@+id/warehousing_operating_countdown_tv"
+                    android:id="@+id/outbound_operating_countdown_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
@@ -62,7 +62,7 @@
                 android:padding="@dimen/card_spacing">
 
                 <TextView
-                    android:id="@+id/accessing_box_number_tv"
+                    android:id="@+id/outbound_box_number_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -81,7 +81,7 @@
                 android:padding="@dimen/card_spacing">
 
                 <Button
-                    android:id="@+id/accessing_open_btn"
+                    android:id="@+id/outbound_open_btn"
                     android:layout_width="115dp"
                     android:layout_height="65dp"
                     android:layout_marginRight="@dimen/card_big_spacing"
@@ -102,7 +102,7 @@
             android:background="@color/md_blue_grey_100" />
 
         <ListView
-            android:id="@+id/warehousing_operating_lv"
+            android:id="@+id/outbound_operating_lv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

@@ -8,6 +8,7 @@ import android.os.Handler
 import android.os.Message
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.android.volley.DefaultRetryPolicy
@@ -25,7 +26,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener {
+class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener, AdapterView.OnItemClickListener {
     private lateinit var mOutboundBinding: ActivityOutboundBinding
 
     private lateinit var mHandler: OutboundHandler
@@ -65,6 +66,8 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener {
             DataBindingUtil.setContentView(this, R.layout.activity_outbound)
         setSupportActionBar(mOutboundBinding.outboundToolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        mOutboundBinding.onClickListener = this
+        mOutboundBinding.onItemClickListener = this
 
         mHandler = OutboundHandler(this)
 
@@ -99,8 +102,8 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     }
 
     private fun getOutbound() {
-        mProgressSyncUserDialog.setTitle("获取入库列表")
-        mProgressSyncUserDialog.setMessage("正在获取入库列表，请稍后......")
+        mProgressSyncUserDialog.setTitle("获取出库列表")
+        mProgressSyncUserDialog.setMessage("正在获取出库列表，请稍后......")
         if (!mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.show()
 
         val jsonObjectRequest = JsonObjectRequest(
@@ -124,10 +127,9 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                             tools.warranCate = jsonObject.getString("warranCate")
                             tools.operatingType = jsonObject.getInt("outStorageType")
                             tools.warranType = jsonObject.getInt("warranType")
-                            tools.cabinetId = jsonObject.getString("position")
-                            val light = jsonObject.getInt("light")
-                            tools.floor = light / 25
-                            tools.light = light % 24
+                            tools.cabinetId = jsonObject.getString("cabCode")
+                            tools.floor = jsonObject.getInt("position")
+                            tools.light = jsonObject.getInt("light")
 
                             werehousingList.add(tools)
                         }
@@ -176,9 +178,44 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when(v?.id){
             R.id.outbound_out_btn -> {
-                intentActivity(WarehousingOperatingActivity.newIntent(this))
+                var device : String? = null
+                var isOK = true
+                for (dossierOperating in mOutboundList){
+                    if (dossierOperating.selected){
+                        if(device == null){
+                            device = dossierOperating.cabinetId
+                        } else {
+                            if (device != dossierOperating.cabinetId){
+                                isOK = false
+                                break
+                            }
+
+                        }
+                    }
+                }
+                if (isOK) {
+                    if (device != null) {
+                        intentActivity(OutboundOperatingActivity.newIntent(this))
+                    } else {
+                        showToast("请选着出库档案！")
+                    }
+                } else {
+                    showToast("请选中相同的柜体档案操作！")
+                }
             }
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        getOutbound()
+    }
+
+    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        val dossierOperating = DossierOperatingService.getInstance().queryByEPC(mOutboundList[position].rfidNum)
+        dossierOperating.selected = !dossierOperating.selected
+        DossierOperatingService.getInstance().update(dossierOperating)
+        mOutboundList[position].selected = !mOutboundList[position].selected
+        mOutboundAdapter.notifyDataSetChanged()
+    }
 }

@@ -63,7 +63,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.CabinetConfigurationActivity"
+        <activity
+            android:name=".activity.OutboundOperatingActivity"
+            android:label="@string/outbound"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.CabinetConfigurationActivity"
             android:label="@string/title_cabinet_parameters"
             android:theme="@style/NoActionBarAppTheme" />
         <activity

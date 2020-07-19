@@ -8,10 +8,11 @@ import android.widget.BaseAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.zk.cabinet.R
+import com.zk.cabinet.bean.Dossier
 import com.zk.cabinet.bean.DossierOperating
 import com.zk.cabinet.constant.SelfComm
 
-class OutboundAdapter(context: Context, dossierList: List<DossierOperating>) :
+class DossierAdapter(context: Context, dossierList: List<Dossier>) :
     BaseAdapter() {
     private val mContext = context
     private var mDossierList = dossierList
@@ -45,11 +46,6 @@ class OutboundAdapter(context: Context, dossierList: List<DossierOperating>) :
         viewHolder.mAdapterOutboundTypeTv.text = SelfComm.OPERATING_TYPE[dossier.operatingType]
         viewHolder.mAdapterOutboundPositionTv.text = "${dossier.cabinetId} - ${dossier.floor} -${dossier.light}"
 
-        if (dossier.selected){
-            viewHolder.mAdapterOutboundLl.setBackgroundColor(mContext.getColor(R.color.md_blue_300))
-        } else {
-            viewHolder.mAdapterOutboundLl.setBackgroundColor(mContext.getColor(R.color.white))
-        }
         return view!!
     }
 
@@ -76,7 +72,7 @@ class OutboundAdapter(context: Context, dossierList: List<DossierOperating>) :
         var mAdapterOutboundPositionTv: TextView
     )
 
-    fun setList(dossierList: List<DossierOperating>) {
+    fun setList(dossierList: List<Dossier>) {
         mDossierList = dossierList
     }
 }
