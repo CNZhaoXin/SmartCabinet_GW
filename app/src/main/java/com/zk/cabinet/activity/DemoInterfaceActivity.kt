@@ -9,6 +9,7 @@ import android.os.Message
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
@@ -19,6 +20,7 @@ import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.Cabinet
 import com.zk.cabinet.databinding.ActivityDemoInterfaceBinding
 import com.zk.cabinet.db.CabinetService
+import com.zk.cabinet.db.DeviceService
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.common.utils.LogUtil
 import com.zk.rfid.bean.LabelInfo
@@ -103,6 +105,25 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
 
         mHandler = DemoInterfaceHandler(this)
 
+        val deviceList = DeviceService.getInstance().loadAll()
+        val singleChoiceItems = arrayOfNulls<String>(deviceList.size)
+        for (indices in deviceList.indices) {
+            singleChoiceItems[indices] = deviceList[indices].deviceName
+        }
+        val itemSelected = 0
+        mDeviceId = deviceList[itemSelected].deviceId
+        AlertDialog.Builder(this)
+            .setTitle("请选择您要操作的柜子")
+            .setSingleChoiceItems(
+                singleChoiceItems,
+                itemSelected
+            ) { dialog, which ->
+                mDeviceId = deviceList[which].deviceId
+                dialog.cancel()
+            }
+            .setCancelable(false)
+            .show()
+
         initView()
     }
 
@@ -126,7 +147,6 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
             }
         }
         UR880Entrance.getInstance().addOnInventoryListener(mInventoryListener)
-        mDeviceId = mSpUtil.getString(SharedPreferencesUtil.Key.DeviceIdTemp, "202048868")!!
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

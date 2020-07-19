@@ -1,37 +1,43 @@
 package com.zk.cabinet.activity
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import com.android.volley.DefaultRetryPolicy
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
 import com.zk.cabinet.R
-import com.zk.cabinet.adapter.DossierAdapter
 import com.zk.cabinet.adapter.OutboundAdapter
-import com.zk.cabinet.adapter.WarehousingAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.Device
-import com.zk.cabinet.bean.Dossier
 import com.zk.cabinet.bean.DossierOperating
-import com.zk.cabinet.databinding.ActivityOutboundBinding
 import com.zk.cabinet.databinding.ActivityOutboundOperatingBinding
 import com.zk.cabinet.db.DeviceService
 import com.zk.cabinet.db.DossierOperatingService
+import com.zk.cabinet.net.NetworkRequest
 import com.zk.common.utils.LogUtil
+import com.zk.common.utils.TimeUtil
 import com.zk.rfid.bean.LabelInfo
 import com.zk.rfid.bean.UR880SendInfo
 import com.zk.rfid.callback.CabinetInfoListener
 import com.zk.rfid.callback.InventoryListener
 import com.zk.rfid.ur880.UR880Entrance
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 class OutboundOperatingActivity : TimeOffAppCompatActivity() {
     private lateinit var mOutboundBinding: ActivityOutboundOperatingBinding
     private lateinit var mHandler: OutboundOperatingHandler
+    private lateinit var mProgressSyncUserDialog: ProgressDialog
     private lateinit var mDevice: Device
     private var dossierList = ArrayList<DossierOperating>()
     private lateinit var mDossierAdapter: OutboundAdapter
@@ -46,6 +52,8 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity() {
         private const val CANCEL_INVENTORY = 0x04
         private const val END_INVENTORY = 0x05
         private const val GET_INFRARED_AND_LOCK = 0x06
+        private const val SUBMITTED_SUCCESS = 0x07
+        private const val SUBMITTED_FAIL = 0x08
 
         fun newIntent(packageContext: Context?): Intent {
             return Intent(packageContext, OutboundOperatingActivity::class.java)
@@ -111,18 +119,31 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity() {
                 if (boxStateList!!.isEmpty()){
                     if (mDoorIsOpen) {
                         mDoorIsOpen = false
+                        isAutoFinish = true
+                        timerStart()
                         showToast("门关闭")
                     }
                 }
                 else {
                     if (!mDoorIsOpen) {
                         mDoorIsOpen = true
+                        isAutoFinish = false
+                        timerCancel()
                         showToast("门开启")
                     }
                 }
                 if (infraredStateList!!.isNotEmpty()) {
                     mFloor = infraredStateList[0]
                 }
+            }
+            SUBMITTED_SUCCESS -> {
+                Toast.makeText(this, "数据提交成功", Toast.LENGTH_SHORT).show()
+                mProgressSyncUserDialog.dismiss()
+                finish()
+            }
+            SUBMITTED_FAIL -> {
+                Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
+                mProgressSyncUserDialog.dismiss()
             }
         }
     }
@@ -138,6 +159,8 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity() {
 
         UR880Entrance.getInstance().addOnCabinetInfoListener(mCabinetInfoListener)
         UR880Entrance.getInstance().addOnInventoryListener(mInventoryListener)
+
+        mProgressSyncUserDialog = ProgressDialog(this)
 
         dossierList = DossierOperatingService.getInstance().queryBySelected() as ArrayList<DossierOperating>
         mDevice = DeviceService.getInstance().queryByDeviceName(dossierList[0].cabinetId)
@@ -242,5 +265,84 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity() {
         UR880Entrance.getInstance().removeInventoryListener(mInventoryListener)
 
         super.onDestroy()
+    }
+
+    private fun outboundSubmission() {
+        var isOK = false
+        for (dossier in dossierList){
+            if (!dossier.selected){
+                isOK = true
+                break
+            }
+        }
+        if (!isOK){
+            finish()
+            return
+        }
+        mProgressSyncUserDialog.setTitle("提交入库列表")
+        mProgressSyncUserDialog.setMessage("正在提交入库列表，请稍后......")
+        if (!mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.show()
+        val jsonObject = JSONObject()
+        try {
+            val orderItemsJsonArray = JSONArray()
+            for (dossierChanged in dossierList){
+                if (!dossierChanged.selected) {
+                    val changedObject = JSONObject()
+                    changedObject.put("warrantNum", dossierChanged.warrantNum)
+                    changedObject.put("rfidNum", dossierChanged.rfidNum)
+                    changedObject.put("cabCode", mDevice.deviceName)
+                    changedObject.put("inputDate", TimeUtil.nowTimeOfSeconds())
+                    changedObject.put("position", dossierChanged.floor)
+                    changedObject.put("light", dossierChanged.light)
+                    orderItemsJsonArray.put(changedObject)
+                }
+            }
+            jsonObject.put("orderItems", orderItemsJsonArray)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+        val jsonObjectRequest = JsonObjectRequest(
+            Request.Method.POST, NetworkRequest.instance.mOutboundSubmission,
+            jsonObject, Response.Listener { response ->
+                try {
+                    LogUtil.instance.d("----------------------------$response")
+                    val success = response!!.getBoolean("success")
+                    if (success) {
+                        val msg = Message.obtain()
+                        msg.what = SUBMITTED_SUCCESS
+                        mHandler.sendMessage(msg)
+                    } else {
+                        val msg = Message.obtain()
+                        msg.what = SUBMITTED_FAIL
+                        msg.obj = response.getString("message")
+                        mHandler.sendMessage(msg)
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    val msg = Message.obtain()
+                    msg.what = SUBMITTED_FAIL
+                    msg.obj = "数据解析失败。"
+                    mHandler.sendMessage(msg)
+                }
+            }, Response.ErrorListener { error ->
+                val msg = if (error != null)
+                    if (error.networkResponse != null)
+                        "errorCode: ${error.networkResponse.statusCode} VolleyError: $error"
+                    else
+                        "errorCode: -1 VolleyError: $error"
+                else {
+                    "errorCode: -1 VolleyError: 未知"
+                }
+                val message = Message.obtain()
+                message.what = SUBMITTED_FAIL
+                message.obj = msg
+                mHandler.sendMessage(message)
+            })
+        jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
+            10000,
+            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
+        NetworkRequest.instance.add(jsonObjectRequest)
     }
 }

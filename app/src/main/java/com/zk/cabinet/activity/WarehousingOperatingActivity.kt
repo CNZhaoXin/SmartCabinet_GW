@@ -2,7 +2,6 @@ package com.zk.cabinet.activity
 
 import android.app.ProgressDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -17,17 +16,13 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.zk.cabinet.R
 import com.zk.cabinet.adapter.DossierAdapter
-import com.zk.cabinet.adapter.OutboundAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.Device
 import com.zk.cabinet.bean.Dossier
-import com.zk.cabinet.bean.DossierOperating
 import com.zk.cabinet.databinding.ActivityWarehousingOperatingBinding
 import com.zk.cabinet.db.DeviceService
 import com.zk.cabinet.db.DossierOperatingService
-import com.zk.cabinet.db.DossierService
 import com.zk.cabinet.net.NetworkRequest
-import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.common.utils.LogUtil
 import com.zk.common.utils.TimeUtil
 import com.zk.rfid.bean.LabelInfo
@@ -47,6 +42,7 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
     private lateinit var mDevice: Device
     private val dossierList = ArrayList<Dossier>()
     private lateinit var mDossierAdapter: DossierAdapter
+    private var mDoorIsOpen = false
 
     companion object {
         private const val OPEN_DOOR_RESULT = 0x01
@@ -56,6 +52,7 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
         private const val END_INVENTORY = 0x05
         private const val SUBMITTED_SUCCESS = 0x06
         private const val SUBMITTED_FAIL = 0x07
+        private const val GET_INFRARED_AND_LOCK = 0x08
 
         fun newIntent(packageContext: Context?): Intent {
             return Intent(packageContext, WarehousingOperatingActivity::class.java)
@@ -132,6 +129,27 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
                 Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
                 mProgressSyncUserDialog.dismiss()
             }
+            GET_INFRARED_AND_LOCK -> {
+                val data = msg.data
+                val boxStateList = data.getIntegerArrayList("lock")
+                val infraredStateList = data.getIntegerArrayList("infrared")
+                if (boxStateList!!.isEmpty()){
+                    if (mDoorIsOpen) {
+                        mDoorIsOpen = false
+                        isAutoFinish = true
+                        timerStart()
+                        showToast("门关闭")
+                    }
+                }
+                else {
+                    if (!mDoorIsOpen) {
+                        mDoorIsOpen = true
+                        isAutoFinish = false
+                        timerCancel()
+                        showToast("门开启")
+                    }
+                }
+            }
         }
     }
 
@@ -181,6 +199,13 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
 
     private val mCabinetInfoListener = object : CabinetInfoListener {
         override fun getInfraredOrLockState(p0: ArrayList<Int>?, p1: ArrayList<Int>?) {
+            val message = Message.obtain()
+            val bundle = Bundle()
+            bundle.putIntegerArrayList("lock", p0)
+            bundle.putIntegerArrayList("infrared", p1)
+            message.what = GET_INFRARED_AND_LOCK
+            message.data = bundle
+            mHandler.sendMessage(message)
         }
 
         override fun unlockResult(p0: Int) {
@@ -250,7 +275,10 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
     }
 
     private fun warehousingSubmission() {
-        if (dossierList.isEmpty()) return
+        if (dossierList.isEmpty()) {
+            finish()
+            return
+        }
         mProgressSyncUserDialog.setTitle("提交入库列表")
         mProgressSyncUserDialog.setMessage("正在提交入库列表，请稍后......")
         if (!mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.show()
@@ -262,7 +290,7 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
                 changedObject.put("warrantNum", dossierChanged.warrantNum)
                 changedObject.put("rfidNum", dossierChanged.rfidNum)
                 changedObject.put("cabCode", mDevice.deviceName)
-                changedObject.put("inputDate", TimeUtil.nowTimeOfDay())
+                changedObject.put("inputDate", TimeUtil.nowTimeOfSeconds())
                 changedObject.put("position", dossierChanged.floor)
                 changedObject.put("light", dossierChanged.light)
                 orderItemsJsonArray.put(changedObject)

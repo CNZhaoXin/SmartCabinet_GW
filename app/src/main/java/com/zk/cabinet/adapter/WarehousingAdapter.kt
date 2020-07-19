@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.zk.cabinet.R
-import com.zk.cabinet.bean.Dossier
 import com.zk.cabinet.bean.DossierOperating
 import com.zk.cabinet.constant.SelfComm
 
@@ -24,6 +24,7 @@ class WarehousingAdapter(context: Context, dossierList: List<DossierOperating>) 
         if (view == null) {
             view = mLayoutInflater.inflate(R.layout.adapter_warehousing_item, null)
             viewHolder = ViewHolder(
+                view.findViewById(R.id.adapter_warehousing_ll),
                 view.findViewById(R.id.adapter_warehousing_number_tv),
                 view.findViewById(R.id.adapter_warehousing_rfid_tv),
                 view.findViewById(R.id.adapter_warehousing_name_tv),
@@ -42,6 +43,15 @@ class WarehousingAdapter(context: Context, dossierList: List<DossierOperating>) 
         viewHolder.mAdapterWarehousingCateTv.text = dossier.warranCate
         viewHolder.mAdapterWarehousingTypeTv.text = SelfComm.OPERATING_TYPE[dossier.operatingType]
 
+        if (position % 2 != 0) {
+            viewHolder.mAdapterWarehousingLl.setBackgroundColor(
+                mContext.resources.getColor(R.color.md_indigo_55)
+            )
+        } else {
+            viewHolder.mAdapterWarehousingLl.setBackgroundColor(
+                mContext.resources.getColor(R.color.md_grey_200)
+            )
+        }
         return view!!
     }
 
@@ -58,6 +68,7 @@ class WarehousingAdapter(context: Context, dossierList: List<DossierOperating>) 
     }
 
     private class ViewHolder(
+        var mAdapterWarehousingLl: LinearLayout,
         var mAdapterWarehousingNumberTv: TextView,
         var mAdapterWarehousingRfidTv: TextView,
         var mAdapterWarehousingNameTv: TextView,
