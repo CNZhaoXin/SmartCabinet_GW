@@ -19,7 +19,21 @@ android {
         multiDexEnabled true
     }
 
+    signingConfigs {
+        release {
+            storeFile file("FileManagementCabinet")
+            storePassword "zhukun"
+            keyAlias "nopower"
+            keyPassword "zhukun"
+        }
+    }
+
     buildTypes {
+
+        debug {
+            signingConfig signingConfigs.release
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
