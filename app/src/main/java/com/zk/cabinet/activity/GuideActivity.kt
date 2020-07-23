@@ -264,6 +264,8 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                         recordList.add(Record(Key.RootMemberTemp, data.getString("rootMember")))
                         recordList.add(Record(Key.OrgCodeTemp, data.getString("orgCode")))
                         recordList.add(Record(Key.OrgNameTemp, data.getString("orgName")))
+                        val orgList = data.getJSONArray("orgList")
+                        recordList.add(Record(Key.OrgCabinet, (orgList[0] as JSONObject).getString("orgCabinet")))
                         mSpUtil.applyValue(recordList)
 
                         val msg = Message.obtain()

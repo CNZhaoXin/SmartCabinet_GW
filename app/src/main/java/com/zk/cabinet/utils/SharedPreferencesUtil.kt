@@ -128,6 +128,7 @@ class SharedPreferencesUtil {
         RootMemberTemp,
         OrgCodeTemp,
         OrgNameTemp,
+        OrgCabinet,
 
         DeviceIdTemp,
 

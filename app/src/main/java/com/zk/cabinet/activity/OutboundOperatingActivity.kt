@@ -38,7 +38,7 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity() {
     private lateinit var mOutboundBinding: ActivityOutboundOperatingBinding
     private lateinit var mHandler: OutboundOperatingHandler
     private lateinit var mProgressSyncUserDialog: ProgressDialog
-    private lateinit var mDevice: Device
+    private var mDevice: Device? = null
     private var dossierList = ArrayList<DossierOperating>()
     private lateinit var mDossierAdapter: OutboundAdapter
     private val labelInfoList = ArrayList<LabelInfo>()
@@ -164,13 +164,17 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity() {
 
         dossierList = DossierOperatingService.getInstance().queryBySelected() as ArrayList<DossierOperating>
         mDevice = DeviceService.getInstance().queryByDeviceName(dossierList[0].cabinetId)
-        mOutboundBinding.outboundBoxNumberTv.text = "柜体名称：${mDevice.deviceName}(${mDevice.deviceId})"
-
+        if (mDevice == null){
+            showToast("未查询到该柜体！")
+            finish()
+            return
+        }
+        mOutboundBinding.outboundBoxNumberTv.text = "柜体名称：${mDevice!!.deviceName}(${mDevice!!.deviceId})"
         mDossierAdapter = OutboundAdapter(this, dossierList)
         mOutboundBinding.outboundOperatingLv.adapter = mDossierAdapter
 
         UR880Entrance.getInstance()
-            .send(UR880SendInfo.Builder().openDoor(mDevice.deviceId, 0).build())
+            .send(UR880SendInfo.Builder().openDoor(mDevice!!.deviceId, 0).build())
         for (index in 1..5){
             val lights = ArrayList<Int>()
             for (dossierOperating in dossierList){
@@ -179,7 +183,7 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity() {
                 }
             }
             UR880Entrance.getInstance()
-                .send(UR880SendInfo.Builder().turnOnLight(mDevice.deviceId, index, lights).build())
+                .send(UR880SendInfo.Builder().turnOnLight(mDevice!!.deviceId, index, lights).build())
         }
 
     }
@@ -242,9 +246,9 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity() {
                 for (index in 1..5){
                     val lights = ArrayList<Int>()
                     UR880Entrance.getInstance()
-                        .send(UR880SendInfo.Builder().turnOnLight(mDevice.deviceId, index, lights).build())
+                        .send(UR880SendInfo.Builder().turnOnLight(mDevice!!.deviceId, index, lights).build())
                 }
-                finish()
+                outboundSubmission()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -290,7 +294,7 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity() {
                     val changedObject = JSONObject()
                     changedObject.put("warrantNum", dossierChanged.warrantNum)
                     changedObject.put("rfidNum", dossierChanged.rfidNum)
-                    changedObject.put("cabCode", mDevice.deviceName)
+                    changedObject.put("cabCode", mDevice!!.deviceName)
                     changedObject.put("inputDate", TimeUtil.nowTimeOfSeconds())
                     changedObject.put("position", dossierChanged.floor)
                     changedObject.put("light", dossierChanged.light)

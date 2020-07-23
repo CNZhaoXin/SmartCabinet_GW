@@ -50,48 +50,27 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="0dp"
+
+            <TextView
+                android:id="@+id/accessing_box_number_tv"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="@dimen/card_spacing">
+                android:textColor="@color/md_purple_300"
+                android:textSize="@dimen/super_big_text" />
 
-                <TextView
-                    android:id="@+id/accessing_box_number_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textColor="@color/md_purple_300"
-                    android:textSize="@dimen/super_big_text" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:visibility="gone"
-                android:layout_width="0dp"
+            <TextView
+                android:layout_marginTop="@dimen/text_margin_small"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center|right"
-                android:orientation="horizontal"
-                android:padding="@dimen/card_spacing">
-
-                <Button
-                    android:id="@+id/accessing_open_btn"
-                    android:layout_width="115dp"
-                    android:layout_height="65dp"
-                    android:layout_marginRight="@dimen/card_big_spacing"
-                    android:background="@drawable/btn_nor_down"
-                    android:onClick="@{onClickListener}"
-                    android:text="@string/open"
-                    android:textColor="@color/md_purple_300"
-                    android:textSize="@dimen/super_big_text" />
-
-            </LinearLayout>
+                android:gravity="center"
+                android:text="您只能在亮灯的层进行入库操作！"
+                android:textColor="@color/md_pink_500"
+                android:textSize="@dimen/sub_medium_big_text" />
 
         </LinearLayout>
 
@@ -104,7 +83,7 @@
         <ListView
             android:id="@+id/warehousing_operating_lv"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 </layout>

@@ -23,6 +23,8 @@ import com.zk.cabinet.databinding.ActivityWarehousingOperatingBinding
 import com.zk.cabinet.db.DeviceService
 import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.net.NetworkRequest
+import com.zk.cabinet.utils.SharedPreferencesUtil
+import com.zk.cabinet.utils.SharedPreferencesUtil.Key
 import com.zk.common.utils.LogUtil
 import com.zk.common.utils.TimeUtil
 import com.zk.rfid.bean.LabelInfo
@@ -43,6 +45,7 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
     private val dossierList = ArrayList<Dossier>()
     private lateinit var mDossierAdapter: DossierAdapter
     private var mDoorIsOpen = false
+    private val mCabinet = HashMap<String, ArrayList<Int>>()
 
     companion object {
         private const val OPEN_DOOR_RESULT = 0x01
@@ -79,38 +82,43 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
                 LogUtil.instance.d("-------------labelInfo.tid: ${labelInfo.tid}")
                 LogUtil.instance.d("-------------labelInfo.inventoryNumber: ${labelInfo.inventoryNumber}")
 
-                val dossierOperating = DossierOperatingService.getInstance().queryByEPC(labelInfo.epc)
-                if (dossierOperating != null){
-                    var isExit = false
-                    for (dossier in dossierList){
-                        if (dossier.rfidNum == dossierOperating.rfidNum) {
+                val dossierOperatingList =
+                    DossierOperatingService.getInstance().queryListByEPC(labelInfo.epc)
+                if (dossierOperatingList != null) {
+                    for (dossierOperating in dossierOperatingList) {
+                        var isExit = false
+                        for (dossier in dossierList) {
+                            if (dossier.rfidNum == dossierOperating.rfidNum) {
+                                dossier.cabinetId = mDevice.deviceName
+                                val light =
+                                    if (labelInfo.antennaNumber % 24 == 0) 24 else labelInfo.antennaNumber % 24
+                                val floor =
+                                    if (labelInfo.antennaNumber % 24 == 0) labelInfo.antennaNumber / 24 else (labelInfo.antennaNumber / 24 + 1)
+                                dossier.floor = floor
+                                dossier.light = light
+                                isExit = true
+                            }
+                        }
+                        if (!isExit) {
+                            val dossier = Dossier()
+                            dossier.warrantNum = dossierOperating.warrantNum
+                            dossier.rfidNum = dossierOperating.rfidNum
+                            dossier.warrantName = dossierOperating.warrantName
+                            dossier.warrantNo = dossierOperating.warrantNo
+                            dossier.warranCate = dossierOperating.warranCate
+                            dossier.operatingType = dossierOperating.operatingType
+                            dossier.warranType = dossierOperating.warranType
                             dossier.cabinetId = mDevice.deviceName
-                            val light = if (labelInfo.antennaNumber % 24 == 0) 24 else labelInfo.antennaNumber % 24
-                            val floor = if (labelInfo.antennaNumber % 24 == 0) labelInfo.antennaNumber / 24 else (labelInfo.antennaNumber / 24 + 1)
+                            val light =
+                                if (labelInfo.antennaNumber % 24 == 0) 24 else labelInfo.antennaNumber % 24
+                            val floor =
+                                if (labelInfo.antennaNumber % 24 == 0) labelInfo.antennaNumber / 24 else (labelInfo.antennaNumber / 24 + 1)
                             dossier.floor = floor
                             dossier.light = light
-                            isExit = true
+                            dossierList.add(dossier)
                         }
+                        mDossierAdapter.notifyDataSetChanged()
                     }
-                    if (!isExit) {
-                        val dossier = Dossier()
-                        dossier.warrantNum = dossierOperating.warrantNum
-                        dossier.rfidNum = dossierOperating.rfidNum
-                        dossier.warrantName = dossierOperating.warrantName
-                        dossier.warrantNo = dossierOperating.warrantNo
-                        dossier.warranCate = dossierOperating.warranCate
-                        dossier.operatingType = dossierOperating.operatingType
-                        dossier.warranType = dossierOperating.warranType
-                        dossier.cabinetId = mDevice.deviceName
-                        val light =
-                            if (labelInfo.antennaNumber % 24 == 0) 24 else labelInfo.antennaNumber % 24
-                        val floor =
-                            if (labelInfo.antennaNumber % 24 == 0) labelInfo.antennaNumber / 24 else (labelInfo.antennaNumber / 24 + 1)
-                        dossier.floor = floor
-                        dossier.light = light
-                        dossierList.add(dossier)
-                    }
-                    mDossierAdapter.notifyDataSetChanged()
                 }
 
             }
@@ -133,20 +141,41 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
                 val data = msg.data
                 val boxStateList = data.getIntegerArrayList("lock")
                 val infraredStateList = data.getIntegerArrayList("infrared")
-                if (boxStateList!!.isEmpty()){
+                if (boxStateList!!.isEmpty()) {
                     if (mDoorIsOpen) {
                         mDoorIsOpen = false
                         isAutoFinish = true
                         timerStart()
                         showToast("门关闭")
+
+                        for (index in 1..5) {
+                            val lights = ArrayList<Int>()
+                            UR880Entrance.getInstance()
+                                .send(
+                                    UR880SendInfo.Builder()
+                                        .turnOnLight(mDevice.deviceId, index, lights).build()
+                                )
+                        }
                     }
-                }
-                else {
+                } else {
                     if (!mDoorIsOpen) {
                         mDoorIsOpen = true
                         isAutoFinish = false
                         timerCancel()
                         showToast("门开启")
+
+                        val floors = mCabinet[mDevice.deviceName]!!
+                        for (index in floors) {
+                            val lights = ArrayList<Int>()
+                            for (light in 1..24) {
+                                lights.add(light)
+                            }
+                            UR880Entrance.getInstance()
+                                .send(
+                                    UR880SendInfo.Builder()
+                                        .turnOnLight(mDevice.deviceId, index, lights).build()
+                                )
+                        }
                     }
                 }
             }
@@ -167,14 +196,40 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
         mDossierAdapter = DossierAdapter(this, dossierList)
         mWarehousingBinding.warehousingOperatingLv.adapter = mDossierAdapter
 
+
+        val cabinets = mSpUtil.getString(Key.OrgCabinet, "")!!.split(",").toTypedArray()
+        for (cabinet in cabinets) {
+            val device = cabinet.subSequence(0, cabinet.indexOf("/", 0)).toString()
+            val floor = cabinet.subSequence(cabinet.indexOf("_", 0) + 1, cabinet.length).toString()
+            if (mCabinet.containsKey(device)) {
+                mCabinet.getValue(device).add(floor.toInt())
+            } else {
+                val a = ArrayList<Int>()
+                a.add(floor.toInt())
+                mCabinet[device] = a
+            }
+        }
         val deviceList = DeviceService.getInstance().loadAll()
+        val mIterator = deviceList.iterator()
+        while (mIterator.hasNext()) {
+            val next = mIterator.next()
+            if (!mCabinet.containsKey(next.deviceName)) {
+                mIterator.remove()
+            }
+        }
+        if (deviceList.isEmpty()) {
+            showToast("您无权限操作本柜体")
+            finish()
+            return
+        }
         val singleChoiceItems = arrayOfNulls<String>(deviceList.size)
         for (indices in deviceList.indices) {
             singleChoiceItems[indices] = deviceList[indices].deviceName
         }
         val itemSelected = 0
         mDevice = deviceList[itemSelected]
-        mWarehousingBinding.accessingBoxNumberTv.text = "柜体名称：${mDevice.deviceName}(${mDevice.deviceId})"
+        mWarehousingBinding.accessingBoxNumberTv.text =
+            "柜体名称：${mDevice.deviceName}(${mDevice.deviceId})"
         AlertDialog.Builder(this)
             .setTitle("请选择您要操作的柜子")
             .setSingleChoiceItems(
@@ -182,7 +237,8 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
                 itemSelected
             ) { _, which ->
                 mDevice = deviceList[which]
-                mWarehousingBinding.accessingBoxNumberTv.text = "柜体名称：${mDevice.deviceName}(${mDevice.deviceId})"
+                mWarehousingBinding.accessingBoxNumberTv.text =
+                    "柜体名称：${mDevice.deviceName}(${mDevice.deviceId})"
             }
             .setNegativeButton(
                 "开门"
@@ -285,7 +341,7 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
         val jsonObject = JSONObject()
         try {
             val orderItemsJsonArray = JSONArray()
-            for (dossierChanged in dossierList){
+            for (dossierChanged in dossierList) {
                 val changedObject = JSONObject()
                 changedObject.put("warrantNum", dossierChanged.warrantNum)
                 changedObject.put("rfidNum", dossierChanged.rfidNum)

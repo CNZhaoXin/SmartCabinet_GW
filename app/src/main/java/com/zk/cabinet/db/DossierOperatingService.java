@@ -28,6 +28,10 @@ public class DossierOperatingService extends BaseService<DossierOperating, Long>
         return new ArrayList<>();
     }
 
+    public List<DossierOperating> queryListByEPC(String epc) {
+
+        return query(DossierOperatingDao.Properties.RfidNum.eq(epc));
+    }
 
     public DossierOperating queryByEPC(String epc) {
         if (epc == null) return null;
