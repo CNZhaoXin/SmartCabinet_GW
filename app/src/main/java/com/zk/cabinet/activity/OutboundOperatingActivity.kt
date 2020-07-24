@@ -87,7 +87,6 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity() {
             END_INVENTORY -> {
                 Toast.makeText(this, "盘点结束", Toast.LENGTH_SHORT).show()
 
-//                val floor = if (labelInfoList[0].antennaNumber % 24 == 0) labelInfoList[0].antennaNumber / 24 else (labelInfoList[0].antennaNumber / 24 + 1)
                 if (dossierList.isNotEmpty()) {
                     for (dossier in dossierList) {
                         if (dossier.floor == mFloor) {
