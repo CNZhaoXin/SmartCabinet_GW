@@ -41,10 +41,10 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:letterSpacing="0.3"
-            android:paddingTop="100dp"
+            android:paddingTop="10dp"
             android:text="RFID智慧档案管理系统"
             android:textColor="@android:color/background_light"
-            android:textSize="@dimen/super_super_big_more_text" />
+            android:textSize="@dimen/super_big_lite_text" />
 
         <TextView
             android:layout_width="match_parent"
@@ -60,7 +60,6 @@
             android:layout_height="wrap_content"
             android:numColumns="2"
             android:padding="@dimen/big_spacing"
-            android:layout_marginTop="60dp"
             app:OnItemClickListener="@{onItemClickListener}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

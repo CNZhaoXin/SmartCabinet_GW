@@ -64,6 +64,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <service
+            android:name=".service.NetService"
+            android:enabled="true"
+            android:exported="true"></service>
+
         <activity
             android:name=".activity.OutboundOperatingActivity"
             android:label="@string/outbound"
@@ -86,7 +91,7 @@
             android:theme="@style/NoActionBarAppTheme" />
         <activity
             android:name=".activity.DemoInterfaceActivity"
-            android:label="@string/access_operation"
+            android:label="盘库"
             android:theme="@style/NoActionBarAppTheme" />
         <activity
             android:name=".activity.SystemSettingsActivity"

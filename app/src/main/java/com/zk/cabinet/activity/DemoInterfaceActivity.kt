@@ -86,11 +86,11 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
             }
             END_INVENTORY -> {
                 Toast.makeText(this, "${floor + 1}层盘点结束", Toast.LENGTH_SHORT).show()
-//                if(floor < 5){
-//                    floor++
-//                    UR880Entrance.getInstance()
-//                        .send(UR880SendInfo.Builder().inventory(mDeviceId, 0, floor, 0).build())
-//                }
+                if(floor < 5){
+                    floor++
+                    UR880Entrance.getInstance()
+                        .send(UR880SendInfo.Builder().inventory(mDeviceId, 0, floor, 0).build())
+                }
             }
         }
     }
@@ -130,7 +130,7 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private fun initView() {
         mCabinetList = CabinetService.getInstance().loadAll()
         mDemoInterfaceAdapter = DemoInterfaceAdapter(mCabinetList, this)
-        val manager = GridLayoutManager(this, 5, LinearLayoutManager.HORIZONTAL, false)
+        val manager = GridLayoutManager(this, 5, LinearLayoutManager.VERTICAL, false)
         manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return mCabinetList[position].proportion

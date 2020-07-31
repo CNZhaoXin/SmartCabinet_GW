@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.zk.cabinet.R
@@ -25,6 +26,7 @@ class OutboundAdapter(context: Context, dossierList: List<DossierOperating>) :
             view = mLayoutInflater.inflate(R.layout.adapter_outbound_item, null)
             viewHolder = ViewHolder(
                 view.findViewById(R.id.adapter_outbound_ll),
+                view.findViewById(R.id.adapter_outbound_iv),
                 view.findViewById(R.id.adapter_outbound_number_tv),
                 view.findViewById(R.id.adapter_outbound_rfid_tv),
                 view.findViewById(R.id.adapter_outbound_name_tv),
@@ -47,8 +49,11 @@ class OutboundAdapter(context: Context, dossierList: List<DossierOperating>) :
 
         if (dossier.selected){
             viewHolder.mAdapterOutboundLl.setBackgroundColor(mContext.getColor(R.color.md_blue_300))
+            viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.drawable.ok))
         } else {
             viewHolder.mAdapterOutboundLl.setBackgroundColor(mContext.getColor(R.color.white))
+            viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.drawable.no))
+
         }
         return view!!
     }
@@ -67,6 +72,7 @@ class OutboundAdapter(context: Context, dossierList: List<DossierOperating>) :
 
     private class ViewHolder(
         var mAdapterOutboundLl: LinearLayout,
+        var mAdapterOutboundIv: ImageView,
         var mAdapterOutboundNumberTv: TextView,
         var mAdapterOutboundRfidTv: TextView,
         var mAdapterOutboundNameTv: TextView,

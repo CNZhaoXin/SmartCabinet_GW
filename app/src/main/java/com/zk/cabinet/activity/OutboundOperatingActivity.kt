@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.android.volley.DefaultRetryPolicy
@@ -34,7 +36,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-class OutboundOperatingActivity : TimeOffAppCompatActivity() {
+class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickListener {
     private lateinit var mOutboundBinding: ActivityOutboundOperatingBinding
     private lateinit var mHandler: OutboundOperatingHandler
     private lateinit var mProgressSyncUserDialog: ProgressDialog
@@ -153,6 +155,7 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity() {
             DataBindingUtil.setContentView(this, R.layout.activity_outbound_operating)
         setSupportActionBar(mOutboundBinding.outboundOperatingToolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        mOutboundBinding.onItemClickListener = this
 
         mHandler = OutboundOperatingHandler(this)
 
@@ -242,11 +245,11 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                for (index in 1..5){
-                    val lights = ArrayList<Int>()
-                    UR880Entrance.getInstance()
-                        .send(UR880SendInfo.Builder().turnOnLight(mDevice!!.deviceId, index, lights).build())
-                }
+//                for (index in 1..5){
+//                    val lights = ArrayList<Int>()
+//                    UR880Entrance.getInstance()
+//                        .send(UR880SendInfo.Builder().turnOnLight(mDevice!!.deviceId, index, lights).build())
+//                }
                 outboundSubmission()
             }
         }
@@ -347,5 +350,10 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity() {
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
         NetworkRequest.instance.add(jsonObjectRequest)
+    }
+
+    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        dossierList[position].selected = !dossierList[position].selected
+        mDossierAdapter.notifyDataSetChanged()
     }
 }

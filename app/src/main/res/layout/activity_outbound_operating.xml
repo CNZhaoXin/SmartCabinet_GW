@@ -10,6 +10,10 @@
             name="onClickListener"
             type="android.view.View.OnClickListener" />
 
+        <variable
+            name="onItemClickListener"
+            type="android.widget.AdapterView.OnItemClickListener" />
+
     </data>
 
     <LinearLayout
@@ -104,7 +108,8 @@
         <ListView
             android:id="@+id/outbound_operating_lv"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            app:OnItemClickListener="@{onItemClickListener}" />
 
     </LinearLayout>
 </layout>

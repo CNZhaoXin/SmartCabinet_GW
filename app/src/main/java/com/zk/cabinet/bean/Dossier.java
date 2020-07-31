@@ -7,6 +7,7 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Property;
+import org.greenrobot.greendao.annotation.Transient;
 import org.greenrobot.greendao.annotation.Unique;
 
 @Entity(nameInDb = "Dossier")
@@ -45,6 +46,9 @@ public class Dossier {
 
     @Property(nameInDb = "Light")
     private int light;
+
+    @Transient
+    private boolean selected;
 
     @Generated(hash = 503006806)
     public Dossier(Long id, String warrantNum, String rfidNum, String warrantName,
@@ -155,4 +159,11 @@ public class Dossier {
         this.light = light;
     }
 
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
 }

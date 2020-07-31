@@ -29,46 +29,25 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/guide_title_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:letterSpacing="0.3"
-            android:paddingTop="250dp"
+            android:paddingTop="150dp"
             android:text="RFID智慧档案管理系统"
             android:textColor="@android:color/background_light"
             android:textSize="@dimen/super_super_super_big_more_text" />
 
-        <TextClock
-            android:id="@+id/main_time_h_tc"
+        <TextView
+            android:id="@+id/guide_title_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:format12Hour="aahh : mm"
-            android:format24Hour="HH : mm"
             android:gravity="center"
-            android:paddingTop="570dp"
-            android:textColor="@android:color/background_light"
-            android:textSize="@dimen/super_super_super_big_big_more_text" />
-
-        <TextClock
-            android:id="@+id/main_time_d_tc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/main_time_h_tc"
-            android:format12Hour="yyyy-MM-dd EEEE"
-            android:format24Hour="yyyy-MM-dd EEEE"
-            android:gravity="center"
-            android:textColor="@android:color/background_light"
-            android:textSize="@dimen/super_big_more_text" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/main_time_d_tc"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center"
-            android:paddingTop="@dimen/super_big_big_spacing"
-            android:visibility="gone"
-            app:srcCompat="@drawable/fingerprint" />
+            android:text="RFID Intelligent file Management system"
+            android:layout_below="@+id/guide_title_1"
+            android:textColor="@color/md_grey_300"
+            android:textSize="@dimen/big_text" />
 
         <TextView
             android:id="@+id/guide_fingerprint_entry_prompt_tv"

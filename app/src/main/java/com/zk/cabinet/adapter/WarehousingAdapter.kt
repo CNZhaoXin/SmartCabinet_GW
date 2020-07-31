@@ -43,13 +43,13 @@ class WarehousingAdapter(context: Context, dossierList: List<DossierOperating>) 
         viewHolder.mAdapterWarehousingCateTv.text = dossier.warranCate
         viewHolder.mAdapterWarehousingTypeTv.text = SelfComm.OPERATING_TYPE[dossier.operatingType]
 
-        if (position % 2 != 0) {
+        if (position % 2 == 0) {
             viewHolder.mAdapterWarehousingLl.setBackgroundColor(
-                mContext.resources.getColor(R.color.md_indigo_55)
+                mContext.resources.getColor(R.color.md_blue_100)
             )
         } else {
             viewHolder.mAdapterWarehousingLl.setBackgroundColor(
-                mContext.resources.getColor(R.color.md_grey_200)
+                mContext.resources.getColor(R.color.md_blue_200)
             )
         }
         return view!!

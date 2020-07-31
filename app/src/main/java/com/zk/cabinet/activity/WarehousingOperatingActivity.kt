@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.view.MenuItem
+import android.view.View
+import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
@@ -37,7 +39,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
+class WarehousingOperatingActivity : TimeOffAppCompatActivity(),  AdapterView.OnItemClickListener {
     private lateinit var mWarehousingBinding: ActivityWarehousingOperatingBinding
     private lateinit var mHandler: WarehousingOperatingHandler
     private lateinit var mProgressSyncUserDialog: ProgressDialog
@@ -81,14 +83,14 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
                 LogUtil.instance.d("-------------labelInfo.epc: ${labelInfo.epc}")
                 LogUtil.instance.d("-------------labelInfo.tid: ${labelInfo.tid}")
                 LogUtil.instance.d("-------------labelInfo.inventoryNumber: ${labelInfo.inventoryNumber}")
-
+                labelInfo.antennaNumber = labelInfo.antennaNumber + 1
                 val dossierOperatingList =
                     DossierOperatingService.getInstance().queryListByEPC(labelInfo.epc)
                 if (dossierOperatingList != null) {
                     for (dossierOperating in dossierOperatingList) {
                         var isExit = false
                         for (dossier in dossierList) {
-                            if (dossier.rfidNum == dossierOperating.rfidNum) {
+                            if (dossier.rfidNum == dossierOperating.rfidNum && dossier.warrantNum == dossierOperating.warrantNum) {
                                 dossier.cabinetId = mDevice.deviceName
                                 val light =
                                     if (labelInfo.antennaNumber % 24 == 0) 24 else labelInfo.antennaNumber % 24
@@ -96,7 +98,9 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
                                     if (labelInfo.antennaNumber % 24 == 0) labelInfo.antennaNumber / 24 else (labelInfo.antennaNumber / 24 + 1)
                                 dossier.floor = floor
                                 dossier.light = light
+                                dossier.isSelected = true
                                 isExit = true
+                                break
                             }
                         }
                         if (!isExit) {
@@ -115,9 +119,25 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
                                 if (labelInfo.antennaNumber % 24 == 0) labelInfo.antennaNumber / 24 else (labelInfo.antennaNumber / 24 + 1)
                             dossier.floor = floor
                             dossier.light = light
+                            dossier.isSelected = true
                             dossierList.add(dossier)
                         }
                         mDossierAdapter.notifyDataSetChanged()
+
+                    }
+
+                    for (index in 1..5) {
+                        val lights = ArrayList<Int>()
+                        for (dossier in dossierList){
+                            if(dossier.floor == index){
+                                lights.add(dossier.light)
+                            }
+                        }
+                        UR880Entrance.getInstance()
+                            .send(
+                                UR880SendInfo.Builder()
+                                    .turnOnLight(mDevice.deviceId, index, lights).build()
+                            )
                     }
                 }
 
@@ -148,14 +168,14 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
                         timerStart()
                         showToast("门关闭")
 
-                        for (index in 1..5) {
-                            val lights = ArrayList<Int>()
-                            UR880Entrance.getInstance()
-                                .send(
-                                    UR880SendInfo.Builder()
-                                        .turnOnLight(mDevice.deviceId, index, lights).build()
-                                )
-                        }
+//                        for (index in 1..5) {
+//                            val lights = ArrayList<Int>()
+//                            UR880Entrance.getInstance()
+//                                .send(
+//                                    UR880SendInfo.Builder()
+//                                        .turnOnLight(mDevice.deviceId, index, lights).build()
+//                                )
+//                        }
                     }
                 } else {
                     if (!mDoorIsOpen) {
@@ -188,6 +208,7 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
             DataBindingUtil.setContentView(this, R.layout.activity_warehousing_operating)
         setSupportActionBar(mWarehousingBinding.warehousingOperatingToolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        mWarehousingBinding.onItemClickListener = this
 
         mHandler = WarehousingOperatingHandler(this)
 
@@ -342,14 +363,21 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
         try {
             val orderItemsJsonArray = JSONArray()
             for (dossierChanged in dossierList) {
-                val changedObject = JSONObject()
-                changedObject.put("warrantNum", dossierChanged.warrantNum)
-                changedObject.put("rfidNum", dossierChanged.rfidNum)
-                changedObject.put("cabCode", mDevice.deviceName)
-                changedObject.put("inputDate", TimeUtil.nowTimeOfSeconds())
-                changedObject.put("position", dossierChanged.floor)
-                changedObject.put("light", dossierChanged.light)
-                orderItemsJsonArray.put(changedObject)
+                if (dossierChanged.isSelected) {
+                    val changedObject = JSONObject()
+                    changedObject.put("warrantNum", dossierChanged.warrantNum)
+                    changedObject.put("rfidNum", dossierChanged.rfidNum)
+                    changedObject.put("cabCode", mDevice.deviceName)
+                    changedObject.put("inputDate", TimeUtil.nowTimeOfSeconds())
+                    changedObject.put("position", dossierChanged.floor)
+                    changedObject.put("light", dossierChanged.light)
+                    orderItemsJsonArray.put(changedObject)
+                }
+            }
+            if (orderItemsJsonArray.length() == 0){
+                if (mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.dismiss()
+                finish()
+                return
             }
             jsonObject.put("orderItems", orderItemsJsonArray)
         } catch (e: JSONException) {
@@ -398,6 +426,11 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity() {
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
         NetworkRequest.instance.add(jsonObjectRequest)
+    }
+
+    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        dossierList[position].isSelected = !dossierList[position].isSelected
+        mDossierAdapter.notifyDataSetChanged()
     }
 
 }

@@ -1,26 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/adapter_demo_interface_ll"
     android:layout_width="50dp"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:layout_margin="@dimen/card_elevation"
-    android:background="@color/md_light_blue_300"
+    android:layout_margin="@dimen/card_spacing"
     android:gravity="center"
     android:orientation="vertical">
 
-
-    <TextView
-        android:id="@+id/adapter_demo_interface_tv"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/adapter_demo_interface_ll"
+        android:background="@color/md_light_blue_300"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:ems="1"
-        android:gravity="center"
-        android:letterSpacing="0.3"
-        android:text="空格"
-        android:textColor="@color/white"
-        android:textSize="@dimen/sub_big_text" />
+        android:layout_height="match_parent">
 
 
+        <TextView
+            android:id="@+id/adapter_demo_interface_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:ems="1"
+            android:gravity="center"
+            android:letterSpacing="0.3"
+            android:text="空格"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sub_big_text" />
+
+    </androidx.cardview.widget.CardView>
 </LinearLayout>

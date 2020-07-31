@@ -48,7 +48,7 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
     private fun init(){
         mMenuList.add(MainMenuInfo(R.drawable.menu_get, getString(R.string.warehousing)))
         mMenuList.add(MainMenuInfo(R.drawable.menu_out, getString(R.string.outbound)))
-        mMenuList.add(MainMenuInfo(R.drawable.menu_cabinet, getString(R.string.access_operation)))
+        mMenuList.add(MainMenuInfo(R.drawable.menu_cabinet, "盘库"))
         mMenuList.add(MainMenuInfo(R.drawable.menu_system_settings, getString(R.string.system_settings)))
         mMenuList.add(MainMenuInfo(R.drawable.menu_back, getString(R.string.go_back)))
         mMenuAdapter = MainMenuAdapter(this, mMenuList)
