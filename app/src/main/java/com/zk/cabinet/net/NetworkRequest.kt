@@ -22,6 +22,8 @@ class NetworkRequest : VolleyRequest() {
     lateinit var mOutboundList: String
     lateinit var mWarehousingSubmission: String
     lateinit var mOutboundSubmission: String
+    lateinit var mInventoryRequest: String
+    lateinit var mInventoryReport: String
 
     companion object {
         private const val URL_HEAD = "http://"
@@ -34,6 +36,8 @@ class NetworkRequest : VolleyRequest() {
         private const val OUTBOUND = "/cabinet/delivery/order/page"
         private const val WAREHOUSING_SUBMISSION = "/cabinet/sku/store"
         private const val OUTBOUND_SUBMISSION = "/cabinet/sku/out"
+        private const val INVENTORY_REQUEST = "/cabinet/inventory/order/page"
+        private const val INVENTORY_REPORT = "/cabinet/inventory/order/add"
 
 
         val instance: NetworkRequest by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -57,6 +61,8 @@ class NetworkRequest : VolleyRequest() {
         mOutboundList = URL_HEAD + url + URL_COLON + port + OUTBOUND
         mWarehousingSubmission = URL_HEAD + url + URL_COLON + port + WAREHOUSING_SUBMISSION
         mOutboundSubmission = URL_HEAD + url + URL_COLON + port + OUTBOUND_SUBMISSION
+        mInventoryRequest = URL_HEAD + url + URL_COLON + port + INVENTORY_REQUEST
+        mInventoryReport = URL_HEAD + url + URL_COLON + port + INVENTORY_REPORT
     }
 
 

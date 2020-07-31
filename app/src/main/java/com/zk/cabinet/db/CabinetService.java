@@ -37,22 +37,10 @@ public class CabinetService extends BaseService<Cabinet, Long> {
             cabinets[i - 1] = new Cabinet();
             cabinets[i - 1].setId(null);
             cabinets[i - 1].setDeviceId(null);
-            cabinets[i - 1].setFloor(i % 5 == 0 ? (4) : (i % 5 - 1));
-            cabinets[i - 1].setPosition(i % 5 == 0 ? (i / 5 - 1) : (i / 5));
+            cabinets[i - 1].setFloor(i % 5 == 0 ? (5) : (i % 5));
+            cabinets[i - 1].setPosition(i % 5 == 0 ? (i / 5) : (i / 5 + 1));
             cabinets[i - 1].setProportion(1);
-        }
-        insert(cabinets);
-    }
-
-    public void mainBuildNew() {
-        Cabinet[] cabinets = new Cabinet[120];
-        for (int i = 1; i < 121; i++) {
-            cabinets[i - 1] = new Cabinet();
-            cabinets[i - 1].setId(null);
-            cabinets[i - 1].setDeviceId(null);
-            cabinets[i - 1].setFloor(i % 5 == 0 ? (4) : (i % 5 - 1));
-            cabinets[i - 1].setPosition(i);
-            cabinets[i - 1].setProportion(1);
+            cabinets[i - 1].setAntennaNumber((cabinets[i - 1].getFloor() - 1) * 24 +  cabinets[i - 1].getPosition());
         }
         insert(cabinets);
     }

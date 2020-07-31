@@ -33,20 +33,25 @@ public class Cabinet {
     @NotNull
     private int proportion;
 
+    @Property(nameInDb = "AntennaNumber")
+    @NotNull
+    private int antennaNumber;
+
     @Transient
     private ArrayList<LabelInfo> labelInfoList;
 
     @Transient
     private long elementCount;
 
-    @Generated(hash = 1062215190)
+    @Generated(hash = 1747457399)
     public Cabinet(Long id, String deviceId, int floor, int position,
-            int proportion) {
+            int proportion, int antennaNumber) {
         this.id = id;
         this.deviceId = deviceId;
         this.floor = floor;
         this.position = position;
         this.proportion = proportion;
+        this.antennaNumber = antennaNumber;
     }
 
     @Generated(hash = 456667810)
@@ -107,5 +112,13 @@ public class Cabinet {
 
     public void setElementCount(long elementCount) {
         this.elementCount = elementCount;
+    }
+
+    public int getAntennaNumber() {
+        return this.antennaNumber;
+    }
+
+    public void setAntennaNumber(int antennaNumber) {
+        this.antennaNumber = antennaNumber;
     }
 }

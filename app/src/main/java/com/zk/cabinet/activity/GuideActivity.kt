@@ -119,7 +119,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         mCabinetOnlineAdapter = CabinetOnlineAdapter(this, mCabinetOnlineList)
         mGuideBinding.guideCabinetOnlineStatusRv.adapter = mCabinetOnlineAdapter
 
-        UR880Entrance.getInstance().init(UR880Entrance.CONNECTION_TCP_IP, 7880, null)
+        UR880Entrance.getInstance().init(UR880Entrance.CONNECTION_TCP_IP, 8080, null)
         UR880Entrance.getInstance().addOnDeviceInformationListener(mDeviceInformationListener)
         UR880Entrance.getInstance().connect()
     }

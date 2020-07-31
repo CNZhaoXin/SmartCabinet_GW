@@ -29,6 +29,7 @@ public class CabinetDao extends AbstractDao<Cabinet, Long> {
         public final static Property Floor = new Property(2, int.class, "floor", false, "Floor");
         public final static Property Position = new Property(3, int.class, "position", false, "Position");
         public final static Property Proportion = new Property(4, int.class, "proportion", false, "Proportion");
+        public final static Property AntennaNumber = new Property(5, int.class, "antennaNumber", false, "AntennaNumber");
     }
 
 
@@ -48,7 +49,8 @@ public class CabinetDao extends AbstractDao<Cabinet, Long> {
                 "\"DeviceId\" TEXT," + // 1: deviceId
                 "\"Floor\" INTEGER NOT NULL ," + // 2: floor
                 "\"Position\" INTEGER NOT NULL ," + // 3: position
-                "\"Proportion\" INTEGER NOT NULL );"); // 4: proportion
+                "\"Proportion\" INTEGER NOT NULL ," + // 4: proportion
+                "\"AntennaNumber\" INTEGER NOT NULL );"); // 5: antennaNumber
     }
 
     /** Drops the underlying database table. */
@@ -73,6 +75,7 @@ public class CabinetDao extends AbstractDao<Cabinet, Long> {
         stmt.bindLong(3, entity.getFloor());
         stmt.bindLong(4, entity.getPosition());
         stmt.bindLong(5, entity.getProportion());
+        stmt.bindLong(6, entity.getAntennaNumber());
     }
 
     @Override
@@ -91,6 +94,7 @@ public class CabinetDao extends AbstractDao<Cabinet, Long> {
         stmt.bindLong(3, entity.getFloor());
         stmt.bindLong(4, entity.getPosition());
         stmt.bindLong(5, entity.getProportion());
+        stmt.bindLong(6, entity.getAntennaNumber());
     }
 
     @Override
@@ -105,7 +109,8 @@ public class CabinetDao extends AbstractDao<Cabinet, Long> {
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // deviceId
             cursor.getInt(offset + 2), // floor
             cursor.getInt(offset + 3), // position
-            cursor.getInt(offset + 4) // proportion
+            cursor.getInt(offset + 4), // proportion
+            cursor.getInt(offset + 5) // antennaNumber
         );
         return entity;
     }
@@ -117,6 +122,7 @@ public class CabinetDao extends AbstractDao<Cabinet, Long> {
         entity.setFloor(cursor.getInt(offset + 2));
         entity.setPosition(cursor.getInt(offset + 3));
         entity.setProportion(cursor.getInt(offset + 4));
+        entity.setAntennaNumber(cursor.getInt(offset + 5));
      }
     
     @Override

@@ -27,7 +27,7 @@ class FileManagementCabinetApplication: Application() {
             true
         )
         if (CabinetService.getInstance().count() == 0.toLong()){
-            CabinetService.getInstance().mainBuildNew()
+            CabinetService.getInstance().mainBuild()
         }
         NetworkRequest.instance.init(this)
     }
