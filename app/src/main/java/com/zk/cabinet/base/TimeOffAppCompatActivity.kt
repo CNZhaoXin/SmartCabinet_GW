@@ -131,8 +131,10 @@ open class TimeOffAppCompatActivity : AppCompatActivity() {
     }
 
     protected open fun showToast(charSequence: CharSequence?) {
-        if (mToast == null) mToast = Toast.makeText(applicationContext, "", Toast.LENGTH_SHORT)
-        mToast!!.setText(charSequence)
-        mToast!!.show()
+//        if (mToast == null) mToast = Toast.makeText(applicationContext, "", Toast.LENGTH_SHORT)
+//        mToast!!.setText(charSequence)
+//        mToast!!.show()
+        mToast?.cancel()
+        mToast = Toast.makeText(applicationContext, charSequence, Toast.LENGTH_SHORT).apply { show() }
     }
 }

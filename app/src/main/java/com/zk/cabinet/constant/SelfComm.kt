@@ -24,6 +24,11 @@ object SelfComm {
 
     val ONLINE_DEVICE =  Collections.synchronizedList(ArrayList<String>())
 
+
+    const val NET_SERVICE_CONNECT = 0x0202
+    const val NET_SERVICE_INVENTORY = 0x0203
+
+
     val OPERATING_TYPE = HashMap<Int, String>()
 
     init {

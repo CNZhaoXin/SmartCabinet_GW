@@ -65,7 +65,7 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
                 intentActivity(OutboundActivity.newIntent(this))
             }
             R.drawable.menu_cabinet ->{
-                intentActivity(DemoInterfaceActivity.newIntent(this))
+                intentActivity(DemoInterfaceActivity.newIntent(packageContext = this, isAutomatic = false))
             }
             R.drawable.menu_system_settings ->{
                 intentActivity(SystemSettingsActivity.newIntent(this))

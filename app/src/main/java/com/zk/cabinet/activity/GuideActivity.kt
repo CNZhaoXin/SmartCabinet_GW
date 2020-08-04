@@ -2,10 +2,10 @@ package com.zk.cabinet.activity
 
 import android.app.AlertDialog
 import android.app.ProgressDialog
+import android.content.ComponentName
 import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
-import android.os.Message
+import android.content.ServiceConnection
+import android.os.*
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +27,7 @@ import com.zk.cabinet.databinding.ActivityGuideBinding
 import com.zk.cabinet.databinding.DialogLoginBinding
 import com.zk.cabinet.db.DeviceService
 import com.zk.cabinet.net.NetworkRequest
+import com.zk.cabinet.service.NetService
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil.Record
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
@@ -88,6 +89,12 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                 mProgressSyncUserDialog.dismiss()
                 Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
             }
+            SelfComm.NET_SERVICE_INVENTORY -> {
+                val data = msg.data
+                val cabCodeList: ArrayList<String> = data.getStringArrayList("cabCodeList")!!
+                val inventoryId: ArrayList<String> = data.getStringArrayList("inventoryIdList")!!
+                intentActivity(DemoInterfaceActivity.newIntent(this, true, cabCodeList, inventoryId))
+            }
         }
     }
 
@@ -119,9 +126,26 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         mCabinetOnlineAdapter = CabinetOnlineAdapter(this, mCabinetOnlineList)
         mGuideBinding.guideCabinetOnlineStatusRv.adapter = mCabinetOnlineAdapter
 
-        UR880Entrance.getInstance().init(UR880Entrance.CONNECTION_TCP_IP, 8080, null)
+        UR880Entrance.getInstance().init(UR880Entrance.CONNECTION_TCP_IP, 7880, null)
         UR880Entrance.getInstance().addOnDeviceInformationListener(mDeviceInformationListener)
         UR880Entrance.getInstance().connect()
+
+        val netServiceIntent = Intent(this, NetService::class.java)
+        val netServiceConnection = object : ServiceConnection {
+            override fun onServiceDisconnected(name: ComponentName?) {
+
+            }
+
+            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                val mNetMessenger = Messenger(service)
+
+                val message = Message.obtain()
+                message.what = SelfComm.NET_SERVICE_CONNECT
+                message.replyTo = Messenger(mHandler)
+                mNetMessenger.send(message)
+            }
+        }
+        bindService(netServiceIntent, netServiceConnection, BIND_AUTO_CREATE)
     }
 
     override fun onClick(v: View?) {

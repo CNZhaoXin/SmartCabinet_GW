@@ -3,12 +3,12 @@
     android:id="@+id/RelativeLayout1"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="@dimen/super_big_spacing">
+    android:padding="@dimen/super_big_big_spacing">
 
     <ImageView
         android:id="@+id/adapter_main_menu_item_iv"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_centerHorizontal="true" />
 
     <TextView

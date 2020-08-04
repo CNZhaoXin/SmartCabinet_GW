@@ -23,6 +23,7 @@ import com.zk.cabinet.R
 import com.zk.cabinet.adapter.DemoInterfaceAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.Cabinet
+import com.zk.cabinet.bean.Device
 import com.zk.cabinet.databinding.ActivityDemoInterfaceBinding
 import com.zk.cabinet.db.CabinetService
 import com.zk.cabinet.db.DeviceService
@@ -38,6 +39,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
+import kotlin.properties.Delegates
 
 class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private lateinit var mDemoInterfaceBinding: ActivityDemoInterfaceBinding
@@ -45,24 +47,43 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private lateinit var mCabinetList: List<Cabinet>
     private lateinit var mDemoInterfaceAdapter: DemoInterfaceAdapter
     private lateinit var mHandler: DemoInterfaceHandler
-    private lateinit var mDeviceId: String
+    private lateinit var mDevice: Device
     private var floor = 1
+    private var isSubmitData = false
+    private var inventoryId = "-1"
+    private var isAutomatic by Delegates.notNull<Boolean>()
+    private val mDeviceList = ArrayList<Device>()
+    private var mInventoryIdList = ArrayList<String>()
 
     companion object {
         private const val START_INVENTORY = 0x01
         private const val INVENTORY_VALUE = 0x02
         private const val CANCEL_INVENTORY = 0x03
         private const val END_INVENTORY = 0x04
+        private const val SUBMITTED_SUCCESS = 0x05
+        private const val SUBMITTED_FAIL = 0x06
 
-        fun newIntent(packageContext: Context?): Intent {
-            return Intent(packageContext, DemoInterfaceActivity::class.java)
+        private const val AUTOMATIC = "isAutomatic"
+        private const val CAB_CODE_LIST = "cabCodeList"
+        private const val INVENTORY_ID = "inventoryId"
+        fun newIntent(
+            packageContext: Context,
+            isAutomatic: Boolean,
+            cabCodeList: ArrayList<String>? = null,
+            inventoryId: ArrayList<String>? = null
+        ): Intent {
+            val intent = Intent(packageContext, DemoInterfaceActivity::class.java)
+            intent.putExtra(AUTOMATIC, isAutomatic)
+            intent.putExtra(CAB_CODE_LIST, cabCodeList)
+            intent.putExtra(INVENTORY_ID, inventoryId)
+            return intent
         }
     }
 
     private fun handleMessage(msg: Message) {
         when (msg.what) {
             START_INVENTORY -> {
-                Toast.makeText(this, "开始盘点", Toast.LENGTH_SHORT).show()
+                showToast("开始盘点${floor + 1}层")
             }
             INVENTORY_VALUE -> {
                 val labelInfo = msg.obj as LabelInfo
@@ -76,14 +97,14 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                 LogUtil.instance.d("-------------labelInfo.tid: ${labelInfo.tid}")
                 LogUtil.instance.d("-------------labelInfo.inventoryNumber: ${labelInfo.inventoryNumber}")
                 labelInfo.antennaNumber = labelInfo.antennaNumber + 1
-                for (cabinet in mCabinetList){
-                    if (cabinet.antennaNumber == labelInfo.antennaNumber){
-                        if (cabinet.labelInfoList == null){
+                for (cabinet in mCabinetList) {
+                    if (cabinet.antennaNumber == labelInfo.antennaNumber) {
+                        if (cabinet.labelInfoList == null) {
                             cabinet.labelInfoList = ArrayList()
                             cabinet.labelInfoList!!.add(labelInfo)
                             mDemoInterfaceAdapter.notifyDataSetChanged()
                         } else {
-                            if (!cabinet.labelInfoList.contains(labelInfo)){
+                            if (!cabinet.labelInfoList.contains(labelInfo)) {
                                 cabinet.labelInfoList!!.add(labelInfo)
                                 mDemoInterfaceAdapter.notifyDataSetChanged()
                             }
@@ -93,20 +114,52 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                 }
             }
             CANCEL_INVENTORY -> {
-                Toast.makeText(this, "停止盘点", Toast.LENGTH_SHORT).show()
+                showToast("停止盘点")
             }
             END_INVENTORY -> {
-                Toast.makeText(this, "${floor + 1}层盘点结束", Toast.LENGTH_SHORT).show()
-                if(floor < 5){
-                    floor++
+                floor++
+                showToast("${floor}层盘点结束")
+                if (floor < 5) {
                     UR880Entrance.getInstance()
-                        .send(UR880SendInfo.Builder().inventory(mDeviceId, 0, floor, 0).build())
+                        .send(
+                            UR880SendInfo.Builder().inventory(mDevice.deviceId, 0, floor, 0).build()
+                        )
+                } else {
+                    mDemoInterfaceBinding.demoInterfaceInventoryStartBtn.isEnabled = true
+                    if (mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.dismiss()
+                    if (isAutomatic){
+                        warehousingSubmission()
+                    }
+                }
+            }
+            SUBMITTED_SUCCESS -> {
+                isSubmitData = false
+                if (mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.dismiss()
+                showToast(msg.obj.toString())
+                if (isAutomatic){
+                    if (mDeviceList.size > 0){
+                        mDevice = mDeviceList.removeAt(0)
+                        inventoryId = mInventoryIdList.removeAt(0)
+                        mDemoInterfaceBinding.demoInterfaceBoxNumberTv.text =
+                            "柜体名称：${mDevice.deviceName}(${mDevice.deviceId})"
+                        startInventory()
+                    } else {
+                        finish()
+                    }
+                }
+            }
+            SUBMITTED_FAIL -> {
+                if (mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.dismiss()
+                showToast(msg.obj.toString())
+                if (isAutomatic){
+                    finish()
                 }
             }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        isAutoFinish = false
         super.onCreate(savedInstanceState)
         mDemoInterfaceBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_demo_interface)
@@ -118,26 +171,53 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
 
         mProgressSyncUserDialog = ProgressDialog(this)
 
-        val deviceList = DeviceService.getInstance().loadAll()
-        val singleChoiceItems = arrayOfNulls<String>(deviceList.size)
-        for (indices in deviceList.indices) {
-            singleChoiceItems[indices] = deviceList[indices].deviceName
-        }
-        val itemSelected = 0
-        mDeviceId = deviceList[itemSelected].deviceId
-        AlertDialog.Builder(this)
-            .setTitle("请选择您要操作的柜子")
-            .setSingleChoiceItems(
-                singleChoiceItems,
-                itemSelected
-            ) { dialog, which ->
-                mDeviceId = deviceList[which].deviceId
-                dialog.cancel()
-            }
-            .setCancelable(false)
-            .show()
+        isAutomatic = intent.getBooleanExtra(AUTOMATIC, false)
 
-        initView()
+        if (!isAutomatic) {
+            val deviceList = DeviceService.getInstance().loadAll()
+            val singleChoiceItems = arrayOfNulls<String>(deviceList.size)
+            for (indices in deviceList.indices) {
+                singleChoiceItems[indices] = deviceList[indices].deviceName
+            }
+            val itemSelected = 0
+            mDevice = deviceList[itemSelected]
+            mDemoInterfaceBinding.demoInterfaceBoxNumberTv.text =
+                "柜体名称：${mDevice.deviceName}(${mDevice.deviceId})"
+            AlertDialog.Builder(this)
+                .setTitle("请选择您要操作的柜子")
+                .setSingleChoiceItems(
+                    singleChoiceItems,
+                    itemSelected
+                ) { dialog, which ->
+                    mDevice = deviceList[itemSelected]
+                    mDemoInterfaceBinding.demoInterfaceBoxNumberTv.text =
+                        "柜体名称：${mDevice.deviceName}(${mDevice.deviceId})"
+                    dialog.cancel()
+                }
+                .setCancelable(false)
+                .show()
+
+            initView()
+        } else {
+            mDemoInterfaceBinding.demoInterfaceInventoryStartBtn.visibility = View.GONE
+            mDemoInterfaceBinding.demoInterfaceInventoryStopBtn.visibility = View.GONE
+            mDemoInterfaceBinding.demoInterfaceOpenDoorBtn.visibility = View.GONE
+            mDemoInterfaceBinding.demoInterfaceSubmitDataBtn.visibility = View.GONE
+
+            mInventoryIdList = intent.getStringArrayListExtra(INVENTORY_ID)!!
+            val cabCodeList = intent.getStringArrayListExtra(CAB_CODE_LIST)!!
+            for (deviceId in cabCodeList){
+                mDeviceList.add(DeviceService.getInstance().queryByDeviceName(deviceId))
+            }
+            mDevice = mDeviceList.removeAt(0)
+            inventoryId = mInventoryIdList.removeAt(0)
+            mDemoInterfaceBinding.demoInterfaceBoxNumberTv.text =
+                "柜体名称：${mDevice.deviceName}(${mDevice.deviceId})"
+
+            initView()
+
+            startInventory()
+        }
     }
 
     private fun initView() {
@@ -198,21 +278,23 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         when (v?.id) {
+            R.id.demo_interface_submit_data_btn -> {
+                warehousingSubmission()
+            }
             R.id.demo_interface_inventory_start_btn -> {
-                floor = 0
-                for (cabinet in mCabinetList){
-                    if (cabinet.labelInfoList != null) cabinet.labelInfoList.clear()
+                if (isSubmitData) {
+                    showToast("请先提交数据！")
+                    return
                 }
-                UR880Entrance.getInstance()
-                    .send(UR880SendInfo.Builder().inventory(mDeviceId, 0, floor, 0).build())
+                startInventory()
             }
             R.id.demo_interface_inventory_stop_btn -> {
                 UR880Entrance.getInstance()
-                    .send(UR880SendInfo.Builder().cancel(mDeviceId).build())
+                    .send(UR880SendInfo.Builder().cancel(mDevice.deviceId).build())
             }
             R.id.demo_interface_open_door_btn -> {
                 UR880Entrance.getInstance()
-                    .send(UR880SendInfo.Builder().openDoor(mDeviceId, 0).build())
+                    .send(UR880SendInfo.Builder().openDoor(mDevice.deviceId, 0).build())
             }
         }
     }
@@ -226,76 +308,115 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         }
     }
 
+    private fun startInventory(){
+        isSubmitData = true
+        mDemoInterfaceBinding.demoInterfaceInventoryStartBtn.isEnabled = false
+        mProgressSyncUserDialog.setTitle("盘库")
+        mProgressSyncUserDialog.setMessage("正在提盘，请稍后......")
+        if (!mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.show()
+        floor = 0
+        for (cabinet in mCabinetList) {
+            if (cabinet.labelInfoList != null) cabinet.labelInfoList.clear()
+        }
+        mDemoInterfaceAdapter.notifyDataSetChanged()
+        UR880Entrance.getInstance()
+            .send(UR880SendInfo.Builder().inventory(mDevice.deviceId, 0, floor, 0).build())
+    }
+
     private fun warehousingSubmission() {
-//        mProgressSyncUserDialog.setTitle("提交盘库列表")
-//        mProgressSyncUserDialog.setMessage("正在提盘入库列表，请稍后......")
-//        if (!mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.show()
-//        val jsonObject = JSONObject()
-//        try {
-//            val orderItemsJsonArray = JSONArray()
-//            for (dossierChanged in dossierList) {
-//                if (dossierChanged.isSelected) {
-//                    val changedObject = JSONObject()
-//                    changedObject.put("warrantNum", dossierChanged.warrantNum)
-//                    changedObject.put("rfidNum", dossierChanged.rfidNum)
-//                    changedObject.put("cabCode", mDevice.deviceName)
-//                    changedObject.put("inputDate", TimeUtil.nowTimeOfSeconds())
-//                    changedObject.put("position", dossierChanged.floor)
-//                    changedObject.put("light", dossierChanged.light)
-//                    orderItemsJsonArray.put(changedObject)
-//                }
-//            }
-//            if (orderItemsJsonArray.length() == 0){
-//                if (mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.dismiss()
-//                finish()
-//                return
-//            }
-//            jsonObject.put("orderItems", orderItemsJsonArray)
-//        } catch (e: JSONException) {
-//            e.printStackTrace()
-//        }
-//        val jsonObjectRequest = JsonObjectRequest(
-//            Request.Method.POST, NetworkRequest.instance.mInventoryReport,
-//            jsonObject, Response.Listener { response ->
-//                try {
-//                    LogUtil.instance.d("----------------------------$response")
-//                    val success = response!!.getBoolean("success")
-//                    if (success) {
-//                        val msg = Message.obtain()
-//                        msg.what = WarehousingOperatingActivity.SUBMITTED_SUCCESS
-//                        mHandler.sendMessage(msg)
-//                    } else {
-//                        val msg = Message.obtain()
-//                        msg.what = WarehousingOperatingActivity.SUBMITTED_FAIL
-//                        msg.obj = response.getString("message")
-//                        mHandler.sendMessage(msg)
-//                    }
-//                } catch (e: JSONException) {
-//                    e.printStackTrace()
-//                    val msg = Message.obtain()
-//                    msg.what = WarehousingOperatingActivity.SUBMITTED_FAIL
-//                    msg.obj = "数据解析失败。"
-//                    mHandler.sendMessage(msg)
-//                }
-//            }, Response.ErrorListener { error ->
-//                val msg = if (error != null)
-//                    if (error.networkResponse != null)
-//                        "errorCode: ${error.networkResponse.statusCode} VolleyError: $error"
-//                    else
-//                        "errorCode: -1 VolleyError: $error"
-//                else {
-//                    "errorCode: -1 VolleyError: 未知"
-//                }
-//                val message = Message.obtain()
-//                message.what = WarehousingOperatingActivity.SUBMITTED_FAIL
-//                message.obj = msg
-//                mHandler.sendMessage(message)
-//            })
-//        jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
-//            10000,
-//            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-//            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-//        )
-//        NetworkRequest.instance.add(jsonObjectRequest)
+        if (!isSubmitData) {
+            showToast("无需提交数据")
+            return
+        }
+        mProgressSyncUserDialog.setTitle("提交盘库列表")
+        mProgressSyncUserDialog.setMessage("正在提盘入库列表，请稍后......")
+        if (!mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.show()
+        val jsonObject = JSONObject()
+        try {
+            val orderItemsJsonArray = JSONArray()
+            val inventoriesJsonArray = JSONArray()
+            for (cabinet in mCabinetList) {
+                if (cabinet.labelInfoList != null && cabinet.labelInfoList.size > 0) {
+                    for (labelInfo in cabinet.labelInfoList) {
+                        val changedObject = JSONObject()
+                        changedObject.put("rfidNum", labelInfo.epc)
+                        changedObject.put("cabCode", mDevice.deviceName)
+                        val light =
+                            if (labelInfo.antennaNumber % 24 == 0) 24 else labelInfo.antennaNumber % 24
+                        val floor =
+                            if (labelInfo.antennaNumber % 24 == 0) labelInfo.antennaNumber / 24 else (labelInfo.antennaNumber / 24 + 1)
+                        changedObject.put("position", floor)
+                        changedObject.put("light", light)
+                        orderItemsJsonArray.put(changedObject)
+                    }
+                }
+            }
+            if (orderItemsJsonArray.length() == 0) {
+                val msg = Message.obtain()
+                msg.what = SUBMITTED_SUCCESS
+                msg.obj = "无可提交的数据"
+                mHandler.sendMessage(msg)
+                return
+            }
+            val inventories = JSONObject()
+            inventories.put("inventoryId", inventoryId)
+            inventories.put("orderItems", orderItemsJsonArray)
+            inventoriesJsonArray.put(inventories)
+            jsonObject.put("inventories", inventoriesJsonArray)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+        LogUtil.instance.d("----------------------------$jsonObject")
+        val jsonObjectRequest = JsonObjectRequest(
+            Request.Method.POST, NetworkRequest.instance.mInventoryReport,
+            jsonObject, Response.Listener { response ->
+                try {
+                    LogUtil.instance.d("----------------------------$response")
+                    val success = response!!.getBoolean("success")
+                    if (success) {
+                        val msg = Message.obtain()
+                        msg.what = SUBMITTED_SUCCESS
+                        msg.obj = "数据提交成功"
+                        mHandler.sendMessage(msg)
+                    } else {
+                        val msg = Message.obtain()
+                        msg.what = SUBMITTED_FAIL
+                        msg.obj = response.getString("message")
+                        mHandler.sendMessage(msg)
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    val msg = Message.obtain()
+                    msg.what = SUBMITTED_FAIL
+                    msg.obj = "数据解析失败。"
+                    mHandler.sendMessage(msg)
+                }
+            }, Response.ErrorListener { error ->
+                val msg = if (error != null)
+                    if (error.networkResponse != null)
+                        "errorCode: ${error.networkResponse.statusCode} VolleyError: $error"
+                    else
+                        "errorCode: -1 VolleyError: $error"
+                else {
+                    "errorCode: -1 VolleyError: 未知"
+                }
+                val message = Message.obtain()
+                message.what = SUBMITTED_FAIL
+                message.obj = msg
+                mHandler.sendMessage(message)
+            })
+        jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
+            10000,
+            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
+        NetworkRequest.instance.add(jsonObjectRequest)
+    }
+
+    override fun onDestroy() {
+//        UR880Entrance.getInstance().removeCabinetInfoListener(mCabinetInfoListener)
+        UR880Entrance.getInstance().removeInventoryListener(mInventoryListener)
+
+        super.onDestroy()
     }
 }

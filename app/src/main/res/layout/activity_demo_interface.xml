@@ -48,11 +48,30 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="@dimen/card_spacing">
+
+
+            <TextView
+                android:id="@+id/demo_interface_box_number_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/md_purple_300"
+                android:textSize="@dimen/super_big_text" />
+
+        </LinearLayout>
+
 
         <androidx.cardview.widget.CardView
             android:id="@+id/demo_interface_cv"
             android:layout_width="wrap_content"
-            android:layout_height="1020dp"
+            android:layout_height="950dp"
             android:layout_gravity="center"
             android:layout_margin="@dimen/sub_big_spacing"
             android:background="#22ffffff"
@@ -112,6 +131,18 @@
                 android:letterSpacing="0.3"
                 android:onClick="@{onClickListener}"
                 android:text="停止"
+                android:textColor="@color/white"
+                android:textSize="@dimen/card_big_spacing" />
+
+            <Button
+                android:id="@+id/demo_interface_submit_data_btn"
+                android:layout_width="160dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="@dimen/card_big_spacing"
+                android:background="@color/md_teal_A400"
+                android:letterSpacing="0.3"
+                android:onClick="@{onClickListener}"
+                android:text="盘库提交"
                 android:textColor="@color/white"
                 android:textSize="@dimen/card_big_spacing" />
 

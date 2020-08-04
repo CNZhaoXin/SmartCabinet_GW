@@ -36,7 +36,7 @@ class NetworkRequest : VolleyRequest() {
         private const val OUTBOUND = "/cabinet/delivery/order/page"
         private const val WAREHOUSING_SUBMISSION = "/cabinet/sku/store"
         private const val OUTBOUND_SUBMISSION = "/cabinet/sku/out"
-        private const val INVENTORY_REQUEST = "/cabinet/inventory/order/page"
+        private const val INVENTORY_REQUEST = "/cabinet/inventory/order/page?cabCode="
         private const val INVENTORY_REPORT = "/cabinet/inventory/order/add"
 
 
