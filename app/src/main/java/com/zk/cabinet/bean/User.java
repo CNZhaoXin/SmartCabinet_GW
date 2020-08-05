@@ -62,7 +62,7 @@ public class User {
     @Expose
     @SerializedName("FingerPrint")
     @Property(nameInDb = "FingerPrint")
-    private String fingerPrint;
+    private byte[] fingerPrint;
 
     //人脸信息
     @Expose
@@ -76,10 +76,10 @@ public class User {
     @Property(nameInDb = "ModifyTime")
     private String modifyTime;
 
-    @Generated(hash = 1709772062)
+    @Generated(hash = 1547812811)
     public User(Long id, Long webId, String userCode, String userName,
             String cabinet, int userType, String password, String cardID,
-            String fingerPrint, String faceInfo, String modifyTime) {
+            byte[] fingerPrint, String faceInfo, String modifyTime) {
         this.id = id;
         this.webId = webId;
         this.userCode = userCode;
@@ -161,11 +161,11 @@ public class User {
         this.cardID = cardID;
     }
 
-    public String getFingerPrint() {
+    public byte[] getFingerPrint() {
         return this.fingerPrint;
     }
 
-    public void setFingerPrint(String fingerPrint) {
+    public void setFingerPrint(byte[] fingerPrint) {
         this.fingerPrint = fingerPrint;
     }
 
@@ -184,5 +184,7 @@ public class User {
     public void setModifyTime(String modifyTime) {
         this.modifyTime = modifyTime;
     }
+
+
     
 }

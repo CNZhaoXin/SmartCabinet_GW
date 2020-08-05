@@ -32,7 +32,7 @@ public class UserDao extends AbstractDao<User, Long> {
         public final static Property UserType = new Property(5, int.class, "userType", false, "UserType");
         public final static Property Password = new Property(6, String.class, "password", false, "Password");
         public final static Property CardID = new Property(7, String.class, "cardID", false, "CardID");
-        public final static Property FingerPrint = new Property(8, String.class, "fingerPrint", false, "FingerPrint");
+        public final static Property FingerPrint = new Property(8, byte[].class, "fingerPrint", false, "FingerPrint");
         public final static Property FaceInfo = new Property(9, String.class, "faceInfo", false, "FaceInfo");
         public final static Property ModifyTime = new Property(10, String.class, "modifyTime", false, "ModifyTime");
     }
@@ -58,7 +58,7 @@ public class UserDao extends AbstractDao<User, Long> {
                 "\"UserType\" INTEGER NOT NULL ," + // 5: userType
                 "\"Password\" TEXT," + // 6: password
                 "\"CardID\" TEXT," + // 7: cardID
-                "\"FingerPrint\" TEXT," + // 8: fingerPrint
+                "\"FingerPrint\" BLOB," + // 8: fingerPrint
                 "\"FaceInfo\" TEXT," + // 9: faceInfo
                 "\"ModifyTime\" TEXT);"); // 10: modifyTime
     }
@@ -109,9 +109,9 @@ public class UserDao extends AbstractDao<User, Long> {
             stmt.bindString(8, cardID);
         }
  
-        String fingerPrint = entity.getFingerPrint();
+        byte[] fingerPrint = entity.getFingerPrint();
         if (fingerPrint != null) {
-            stmt.bindString(9, fingerPrint);
+            stmt.bindBlob(9, fingerPrint);
         }
  
         String faceInfo = entity.getFaceInfo();
@@ -165,9 +165,9 @@ public class UserDao extends AbstractDao<User, Long> {
             stmt.bindString(8, cardID);
         }
  
-        String fingerPrint = entity.getFingerPrint();
+        byte[] fingerPrint = entity.getFingerPrint();
         if (fingerPrint != null) {
-            stmt.bindString(9, fingerPrint);
+            stmt.bindBlob(9, fingerPrint);
         }
  
         String faceInfo = entity.getFaceInfo();
@@ -197,7 +197,7 @@ public class UserDao extends AbstractDao<User, Long> {
             cursor.getInt(offset + 5), // userType
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // password
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // cardID
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // fingerPrint
+            cursor.isNull(offset + 8) ? null : cursor.getBlob(offset + 8), // fingerPrint
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // faceInfo
             cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10) // modifyTime
         );
@@ -214,7 +214,7 @@ public class UserDao extends AbstractDao<User, Long> {
         entity.setUserType(cursor.getInt(offset + 5));
         entity.setPassword(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setCardID(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setFingerPrint(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setFingerPrint(cursor.isNull(offset + 8) ? null : cursor.getBlob(offset + 8));
         entity.setFaceInfo(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
         entity.setModifyTime(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
      }
