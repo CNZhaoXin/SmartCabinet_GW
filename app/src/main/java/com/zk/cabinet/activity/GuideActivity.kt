@@ -277,6 +277,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        FingerprintParsingLibrary.getInstance().setFingerprintVerify(true)
     }
 
     private fun login(user: String, pwd: String) {
@@ -347,11 +348,6 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
         NetworkRequest.instance.add(jsonObjectRequest)
-    }
-
-    override fun onActivityReenter(resultCode: Int, data: Intent?) {
-        super.onActivityReenter(resultCode, data)
-        FingerprintParsingLibrary.getInstance().setFingerprintVerify(true)
     }
 
     private val mFingerprintVerifyListener = object : FingerprintVerifyListener {
