@@ -16,21 +16,22 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.zk.cabinet.R
 import com.zk.cabinet.adapter.CabinetOnlineAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.CabinetOnlineInfo
+import com.zk.cabinet.bean.User
+import com.zk.cabinet.callback.FingerprintVerifyListener
 import com.zk.cabinet.constant.SelfComm
 import com.zk.cabinet.databinding.ActivityGuideBinding
 import com.zk.cabinet.databinding.DialogLoginBinding
 import com.zk.cabinet.db.DeviceService
 import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.service.NetService
-import com.zk.cabinet.utils.SharedPreferencesUtil
-import com.zk.cabinet.utils.SharedPreferencesUtil.Record
+import com.zk.cabinet.utils.FingerprintParsingLibrary
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
+import com.zk.cabinet.utils.SharedPreferencesUtil.Record
 import com.zk.common.utils.LogUtil
 import com.zk.rfid.callback.DeviceInformationListener
 import com.zk.rfid.ur880.UR880Entrance
@@ -44,6 +45,8 @@ private const val DEVICE_HEARTBEAT = 0x03
 private const val DEVICE_REMOVED = 0x04
 private const val LOGIN_BY_PWD_SUCCESS = 0x05
 private const val LOGIN_BY_PWD_FAIL = 0x06
+private const val FINGER_LOGIN_SUCCESS = 0x07
+private const val FINGER_LOGIN_ERROR = 0x08
 
 class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongClickListener {
     private lateinit var mGuideBinding: ActivityGuideBinding
@@ -82,7 +85,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             }
             LOGIN_BY_PWD_SUCCESS -> {
                 mProgressSyncUserDialog.dismiss()
-                Toast.makeText(this, "登录成功，欢迎：${msg.obj}", Toast.LENGTH_SHORT).show()
+                showToast("登录成功，欢迎：${msg.obj}")
                 intentActivity(MainMenuActivity.newIntent(this))
             }
             LOGIN_BY_PWD_FAIL -> {
@@ -94,6 +97,15 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                 val cabCodeList: ArrayList<String> = data.getStringArrayList("cabCodeList")!!
                 val inventoryId: ArrayList<String> = data.getStringArrayList("inventoryIdList")!!
                 intentActivity(DemoInterfaceActivity.newIntent(this, true, cabCodeList, inventoryId))
+            }
+            FINGER_LOGIN_SUCCESS -> {
+                if (!mProgressSyncUserDialog.isShowing){
+                    val user = msg.obj as User
+                    login(user.userCode, user.password)
+                }
+            }
+            FINGER_LOGIN_ERROR -> {
+                showToast(msg.obj.toString())
             }
         }
     }
@@ -110,6 +122,9 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     private fun init() {
         mProgressSyncUserDialog = ProgressDialog(this)
+        mProgressSyncUserDialog.setTitle("登录")
+        mProgressSyncUserDialog.setMessage("正在登录，请稍后......")
+        mProgressSyncUserDialog.setCancelable(false)
 
         val deviceList = DeviceService.getInstance().loadAll()
         if(deviceList != null && deviceList.size > 0) {
@@ -146,6 +161,10 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             }
         }
         bindService(netServiceIntent, netServiceConnection, BIND_AUTO_CREATE)
+
+        FingerprintParsingLibrary.getInstance().init(this)
+        FingerprintParsingLibrary.getInstance().onFingerprintVerifyListener(mFingerprintVerifyListener)
+        FingerprintParsingLibrary.getInstance().setFingerprintVerify(true)
     }
 
     override fun onClick(v: View?) {
@@ -163,10 +182,6 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                     mDialogLoginBinding!!.dialogOtherLoginAccountEdt.text.toString().trim()
                 val pwd = mDialogLoginBinding!!.dialogOtherLoginPwdEdt.text.toString().trim()
                 if (!TextUtils.isEmpty(userCode) && !TextUtils.isEmpty(pwd)) {
-                    mProgressSyncUserDialog.setTitle("登录")
-                    mProgressSyncUserDialog.setMessage("正在登录，请稍后......")
-                    mProgressSyncUserDialog.setCancelable(false)
-                    mProgressSyncUserDialog.show()
                     login(userCode, pwd)
 
                 } else {
@@ -188,6 +203,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     override fun intentActivity(intent: Intent?) {
         dismissLoginDialog()
+        FingerprintParsingLibrary.getInstance().setFingerprintVerify(false)
         super.intentActivity(intent)
     }
 
@@ -204,6 +220,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         super.onDestroy()
         UR880Entrance.getInstance().removeAllDeviceInformationListener()
         UR880Entrance.getInstance().disConnect()
+        FingerprintParsingLibrary.getInstance().close()
     }
 
     private val mDeviceInformationListener = object : DeviceInformationListener {
@@ -263,6 +280,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
     }
 
     private fun login(user: String, pwd: String) {
+        mProgressSyncUserDialog.show()
         val jsonObject = JSONObject()
         try {
             jsonObject.put("username", user)
@@ -329,5 +347,26 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         )
         NetworkRequest.instance.add(jsonObjectRequest)
+    }
+
+    override fun onActivityReenter(resultCode: Int, data: Intent?) {
+        super.onActivityReenter(resultCode, data)
+        FingerprintParsingLibrary.getInstance().setFingerprintVerify(true)
+    }
+
+    private val mFingerprintVerifyListener = object : FingerprintVerifyListener {
+        override fun fingerprintVerify(result: Boolean, user: User?) {
+            if (result) {
+                val msg = Message.obtain()
+                msg.what = FINGER_LOGIN_SUCCESS
+                msg.obj = user
+                mHandler.sendMessage(msg)
+            } else {
+                val msg = Message.obtain()
+                msg.what = FINGER_LOGIN_ERROR
+                msg.obj = "该指纹不存在。"
+                mHandler.sendMessage(msg)
+            }
+        }
     }
 }

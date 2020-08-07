@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.AdapterView
 import androidx.databinding.DataBindingUtil
 import com.zk.cabinet.R
-import com.zk.cabinet.activity.SystemSettingsActivity
 import com.zk.cabinet.adapter.MainMenuAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.MainMenuInfo
@@ -50,6 +49,7 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
         mMenuList.add(MainMenuInfo(R.drawable.menu_out, getString(R.string.outbound)))
         mMenuList.add(MainMenuInfo(R.drawable.menu_cabinet, "盘库"))
         mMenuList.add(MainMenuInfo(R.drawable.menu_system_settings, getString(R.string.system_settings)))
+        mMenuList.add(MainMenuInfo(R.drawable.menu_personnel_management, getString(R.string.personnel_management)));
         mMenuList.add(MainMenuInfo(R.drawable.menu_back, getString(R.string.go_back)))
         mMenuAdapter = MainMenuAdapter(this, mMenuList)
         mMainMenuBinding.mainMenuGv.adapter = mMenuAdapter
@@ -72,6 +72,9 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
             }
             R.drawable.menu_back ->{
                 finish()
+            }
+            R.drawable.menu_personnel_management -> {
+                intentActivity(Intent(this@MainMenuActivity, PersonnelManagementActivity::class.java))
             }
         }
     }

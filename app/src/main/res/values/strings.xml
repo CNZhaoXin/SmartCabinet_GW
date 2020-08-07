@@ -320,4 +320,6 @@
     <string name="face_activation_prompt_07">正在激活中，请稍后...</string>
 
     <!--系统设置-->
+
+    <string name="title_personnel_management">人员管理</string>
 </resources>

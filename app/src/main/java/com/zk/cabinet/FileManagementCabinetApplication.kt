@@ -1,8 +1,10 @@
 package com.zk.cabinet
 
 import android.app.Application
+import com.zk.cabinet.bean.User
 import com.zk.cabinet.db.CabinetService
 import com.zk.cabinet.db.DBHelper
+import com.zk.cabinet.db.UserService
 import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
@@ -28,6 +30,14 @@ class FileManagementCabinetApplication: Application() {
         )
         if (CabinetService.getInstance().count() == 0.toLong()){
             CabinetService.getInstance().mainBuild()
+        }
+        if (UserService.getInstance().count() == 0.toLong()){
+            val user = User()
+            user.userCode = "admin"
+            user.userName = "admin"
+            user.userType = 1
+            user.password = "admin"
+            UserService.getInstance().insert(user)
         }
         NetworkRequest.instance.init(this)
     }

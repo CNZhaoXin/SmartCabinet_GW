@@ -36,18 +36,6 @@ public class UserService extends BaseService<User, Long> {
         return user;
     }
 
-    public User queryByWebId(Long webId) {
-
-        if (webId == null) return null;
-
-        List<User> list = query(UserDao.Properties.WebId.eq(webId));
-        User user = null;
-        if (list != null && list.size() > 0) {
-            user = list.get(0);
-        }
-        return user;
-    }
-
     public List<User> queryByUserCodeList(String userCode) {
         if (userCode == null) return null;
         return query(UserDao.Properties.UserCode.eq(userCode));
@@ -77,38 +65,4 @@ public class UserService extends BaseService<User, Long> {
         return user;
     }
 
-    public void insertOrUpdate(final List<User> userList) {
-        if (getDao() == null || getDaoSession() == null)
-            LogUtil.Companion.getInstance().d(TAG, CHECK_INIT);
-        else {
-            getDaoSession().runInTx(new Runnable() {
-                @Override
-                public void run() {
-                    User UserTemp;
-                    for (User user : userList) {
-                        try {
-                            getDao().insert(user);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            UserTemp = queryByWebId(user.getWebId());
-                            if (UserTemp != null) {
-
-                                UserTemp.setUserCode(user.getUserCode());
-                                UserTemp.setUserName(user.getUserName());
-                                UserTemp.setCabinet(user.getCabinet());
-                                UserTemp.setUserType(user.getUserType());
-                                UserTemp.setPassword(user.getPassword());
-                                UserTemp.setCardID(user.getCardID());
-                                UserTemp.setFingerPrint(user.getFingerPrint());
-                                UserTemp.setFaceInfo(user.getFaceInfo());
-                                UserTemp.setModifyTime(user.getModifyTime());
-
-                                update(UserTemp);
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    }
 }

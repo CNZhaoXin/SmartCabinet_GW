@@ -15,13 +15,6 @@ public class User {
     @Id
     private Long id;
 
-    //平台id
-    @Expose
-    @SerializedName("ID")
-    @Property(nameInDb = "WebID")
-    @Unique
-    private Long webId;
-
     //用户编号
     @Expose
     @SerializedName("UserCode")
@@ -76,12 +69,11 @@ public class User {
     @Property(nameInDb = "ModifyTime")
     private String modifyTime;
 
-    @Generated(hash = 1547812811)
-    public User(Long id, Long webId, String userCode, String userName,
-            String cabinet, int userType, String password, String cardID,
-            byte[] fingerPrint, String faceInfo, String modifyTime) {
+    @Generated(hash = 1814295009)
+    public User(Long id, String userCode, String userName, String cabinet,
+            int userType, String password, String cardID, byte[] fingerPrint,
+            String faceInfo, String modifyTime) {
         this.id = id;
-        this.webId = webId;
         this.userCode = userCode;
         this.userName = userName;
         this.cabinet = cabinet;
@@ -103,14 +95,6 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getWebId() {
-        return this.webId;
-    }
-
-    public void setWebId(Long webId) {
-        this.webId = webId;
     }
 
     public String getUserCode() {
@@ -184,7 +168,5 @@ public class User {
     public void setModifyTime(String modifyTime) {
         this.modifyTime = modifyTime;
     }
-
-
     
 }
