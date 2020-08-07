@@ -29,17 +29,13 @@ import java.util.Objects;
 
 public class PersonnelManagementActivity extends TimeOffAppCompatActivity {
     private final static int FINGERPRINT = 0x00;
-    private final static int UP_FINGERPRINT_SUCCESS = 0x01;
-    private final static int UP_FINGERPRINT_ERROR = 0x02;
     private ActivityPersonnelManagementBinding binding;
 
     private List<User> list;
     private UserAdapter mAdapter;
 
-    private View mDialogView;
     private ProgressDialog fingerDialog;
     private int mPosition;
-    private ProgressDialog progressDialog;
 
     private MHandler mHandler;
     private void handleMessage(Message msg) {
@@ -49,16 +45,12 @@ public class PersonnelManagementActivity extends TimeOffAppCompatActivity {
                     list.get(mPosition).setFingerPrint((byte[]) msg.obj);
                     list.get(mPosition).setModifyTime(TimeUtil.INSTANCE.nowTimeOfSeconds());
                     UserService.getInstance().update(list.get(mPosition));
-                    FingerprintParsingLibrary.getInstance().upUserList();
                     showToast(list.get(mPosition).getUserName() + "您的指纹已录入！");
                     mPosition = -1;
+                    if (fingerDialog != null && fingerDialog.isShowing()) fingerDialog.dismiss();
                     mAdapter.notifyDataSetChanged();
+                    FingerprintParsingLibrary.getInstance().upUserList();
                 }
-                break;
-            case UP_FINGERPRINT_SUCCESS:
-            case UP_FINGERPRINT_ERROR:
-                progressDialog.dismiss();
-                showToast(msg.obj.toString());
                 break;
         }
     }
@@ -75,7 +67,6 @@ public class PersonnelManagementActivity extends TimeOffAppCompatActivity {
     }
 
     private void init(){
-        progressDialog = new ProgressDialog(this);
         list = UserService.getInstance().loadAll();
         mAdapter = new UserAdapter(this, list);
         binding.personalManagementQueryLv.setAdapter(mAdapter);
