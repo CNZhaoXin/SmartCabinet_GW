@@ -3,96 +3,57 @@
     android:id="@+id/adapter_user_item_ll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/transparent"
     android:gravity="center"
     android:orientation="vertical"
-    android:paddingTop="@dimen/card_spacing"
-    android:paddingBottom="@dimen/card_spacing">
+    android:paddingTop="30dp"
+    android:paddingBottom="30dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="@dimen/title_medium_l_spacing"
-            android:layout_weight="3"
-            android:gravity="center"
-            android:text="用户名称："
-            android:textColor="@color/gray_deep"
-            android:textSize="@dimen/sub_big_text" />
 
         <TextView
             android:id="@+id/adapter_user_name_tv"
             android:layout_width="0dp"
-            android:layout_height="@dimen/title_medium_l_spacing"
-            android:layout_weight="5"
-            android:gravity="center|left"
-            android:textColor="@color/gray_deep"
-            android:textSize="@dimen/sub_medium_text" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="@dimen/title_medium_l_spacing"
-            android:layout_weight="3"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
-            android:text="用户编号："
-            android:textColor="@color/gray_deep"
-            android:textSize="@dimen/sub_big_text" />
+            android:text="[用户名称]"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/adapter_user_id_tv"
             android:layout_width="0dp"
-            android:layout_height="@dimen/title_medium_l_spacing"
-            android:layout_weight="5"
-            android:gravity="center|left"
-            android:textColor="@color/gray_deep"
-            android:textSize="@dimen/sub_medium_text" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="@dimen/title_medium_spacing"
-            android:layout_weight="3"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
-            android:text="用户密码："
-            android:textColor="@color/gray_deep"
-            android:textSize="@dimen/sub_big_text" />
+            android:text="[用户编号]"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
 
+        <!-- 用户密码-->
         <TextView
             android:layout_width="0dp"
-            android:layout_height="@dimen/title_medium_spacing"
-            android:layout_weight="5"
-            android:gravity="center|left"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
             android:text="******"
-            android:textColor="@color/gray_deep"
-            android:textSize="@dimen/sub_medium_text" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="@dimen/title_medium_spacing"
-            android:layout_weight="3"
-            android:gravity="center"
-            android:text="用户指纹："
-            android:textColor="@color/gray_deep"
-            android:textSize="@dimen/sub_big_text" />
+            android:textColor="@color/white"
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/adapter_user_finger_tv"
             android:layout_width="0dp"
-            android:layout_height="@dimen/title_medium_spacing"
-            android:layout_weight="5"
-            android:gravity="center|left"
-            android:textColor="@color/gray_deep"
-            android:textSize="@dimen/sub_medium_text" />
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="[用户指纹]"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
 
     </LinearLayout>
 

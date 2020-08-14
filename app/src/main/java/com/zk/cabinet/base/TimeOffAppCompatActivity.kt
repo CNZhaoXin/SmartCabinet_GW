@@ -12,7 +12,6 @@ import com.zk.cabinet.R
 import com.zk.cabinet.constant.SelfComm
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
-import com.zk.cabinet.utils.SharedPreferencesUtil.Record
 import com.zk.common.utils.LogUtil
 
 open class TimeOffAppCompatActivity : AppCompatActivity() {
@@ -116,7 +115,8 @@ open class TimeOffAppCompatActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (isAutoFinish &&
             requestCode == SelfComm.COUNT_DOWN_REQUEST_CODE &&
-            resultCode == SelfComm.COUNT_DOWN_RESULT_CODE) {
+            resultCode == SelfComm.COUNT_DOWN_RESULT_CODE
+        ) {
             setResult(SelfComm.COUNT_DOWN_RESULT_CODE)
             finish()
         }
@@ -135,6 +135,7 @@ open class TimeOffAppCompatActivity : AppCompatActivity() {
 //        mToast!!.setText(charSequence)
 //        mToast!!.show()
         mToast?.cancel()
-        mToast = Toast.makeText(applicationContext, charSequence, Toast.LENGTH_SHORT).apply { show() }
+        mToast =
+            Toast.makeText(applicationContext, charSequence, Toast.LENGTH_SHORT).apply { show() }
     }
 }

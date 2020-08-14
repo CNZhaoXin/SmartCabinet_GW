@@ -5,25 +5,22 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.zk.cabinet.R
 import com.zk.cabinet.bean.Cabinet
-import com.zk.cabinet.bean.DemoInterfaceLabelInfo
 
-class DemoInterfaceAdapter(
-    cabinetList: List<Cabinet>,
-    context: Context
-) :
+class DemoInterfaceAdapter(cabinetList: List<Cabinet>, context: Context) :
     RecyclerView.Adapter<DemoInterfaceAdapter.ViewHolder>() {
     private val mCabinetList = cabinetList
     private val mContext = context
     public var mOnItemClickListener: OnItemClickListener? = null
 
     class ViewHolder(arg0: View) : RecyclerView.ViewHolder(arg0) {
-        lateinit var mDemoInterfaceLl: LinearLayout
+        lateinit var mDemoInterfaceLl: FrameLayout
         lateinit var mDemoInterfaceTv: TextView
+        lateinit var mTvLineNumber: TextView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,6 +32,8 @@ class DemoInterfaceAdapter(
             view.findViewById(R.id.adapter_demo_interface_tv)
         viewHolder.mDemoInterfaceLl =
             view.findViewById(R.id.adapter_demo_interface_ll)
+        viewHolder.mTvLineNumber =
+            view.findViewById(R.id.tv_line_number)
         return viewHolder
     }
 
@@ -45,12 +44,16 @@ class DemoInterfaceAdapter(
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val cabinet = mCabinetList[position]
-        if (cabinet.labelInfoList != null &&  cabinet.labelInfoList.size > 0){
-            holder.mDemoInterfaceLl.setBackgroundColor(mContext.resources.getColor(R.color.md_light_blue_300))
-            holder.mDemoInterfaceTv.text = "${cabinet.labelInfoList.size}本档案"
+        holder.mTvLineNumber.text = cabinet.floor.toString() + "-" + cabinet.position.toString()
+
+        if (cabinet.labelInfoList != null && cabinet.labelInfoList.size > 0) {
+            holder.mDemoInterfaceLl.setBackgroundDrawable(mContext.resources.getDrawable(R.drawable.shape_line_fill))
+            holder.mDemoInterfaceTv.setTextColor(mContext.resources.getColor(R.color.white))
+            holder.mDemoInterfaceTv.text = "${cabinet.labelInfoList.size}份档案"
         } else {
-            holder.mDemoInterfaceLl.setBackgroundColor(mContext.resources.getColor(R.color.md_grey_500))
-            holder.mDemoInterfaceTv.text = "空格"
+            holder.mDemoInterfaceLl.setBackgroundDrawable(mContext.resources.getDrawable(R.drawable.shape_line))
+            holder.mDemoInterfaceTv.setTextColor(mContext.resources.getColor(R.color.md_light_blue_300))
+            holder.mDemoInterfaceTv.text = "空 余"
         }
         if (mOnItemClickListener != null) {
             holder.itemView.setOnClickListener {

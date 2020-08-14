@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".activity.MainMenuActivity">
 
@@ -13,83 +12,141 @@
     </data>
 
     <LinearLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/bg2"
         android:orientation="vertical">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/demo_interface_abl"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_marginTop="30dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/demo_interface_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:layout_scrollFlags="scroll|enterAlways"
-                app:popupTheme="@style/AppTheme.PopupOverlay">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:layout_centerVertical="true"
+                android:background="@drawable/shape_oprator_bg"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingRight="30dp">
+
+                <TextView
+                    android:id="@+id/tv_operator_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:text="操作员:"
+                    android:textColor="@color/gray_light"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:id="@+id/tv_operator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="xxx"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="10dp"
+                    android:text="操作:"
+                    android:textColor="@color/gray_light"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="『档案盘库』"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <!-- 柜体:1234567801 (+读写器设备id 204776083)-->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:text="柜体:"
+                    android:textColor="@color/gray_light"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:id="@+id/demo_interface_box_number_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="xxx"
+                    android:textColor="@color/md_red_500"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_count_clock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginRight="10dp"
+                    android:src="@mipmap/ic_clock" />
 
                 <TextView
                     android:id="@+id/demo_interface_countdown_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:paddingEnd="@dimen/super_big_spacing"
-                    android:textColor="@color/colorFontMain"
-                    android:textSize="@dimen/medium_text" />
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:text="0"
+                    android:textColor="#EE6911"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
 
-            </androidx.appcompat.widget.Toolbar>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical"
+                    android:text="秒"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
-        </com.google.android.material.appbar.AppBarLayout>
+            </LinearLayout>
 
-        <LinearLayout
+        </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/demo_interface_rv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:baselineAligned="false"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:padding="@dimen/card_spacing">
-
-
-            <TextView
-                android:id="@+id/demo_interface_box_number_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/md_purple_300"
-                android:textSize="@dimen/super_big_text" />
-
-        </LinearLayout>
-
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/demo_interface_cv"
-            android:layout_width="wrap_content"
             android:layout_height="950dp"
             android:layout_gravity="center"
-            android:layout_margin="@dimen/sub_big_spacing"
-            android:background="#22ffffff"
-            android:backgroundTint="#22ffffff"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/shape_list_trans_bg"
+            android:descendantFocusability="blocksDescendants"
             android:gravity="center"
-            android:padding="20dp">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/demo_interface_rv"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_margin="@dimen/sub_big_spacing"
-                android:descendantFocusability="blocksDescendants"
-                android:gravity="center"
-                android:saveEnabled="false" />
-
-        </androidx.cardview.widget.CardView>
+            android:padding="30dp"
+            android:saveEnabled="false"
+            android:scrollbarThumbHorizontal="@drawable/shape_scrollbar"
+            android:scrollbars="horizontal" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -98,53 +155,101 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/demo_interface_open_door_btn"
-                android:layout_width="160dp"
-                android:layout_height="60dp"
-                android:layout_marginRight="@dimen/card_big_spacing"
-                android:background="@color/md_teal_A400"
-                android:letterSpacing="0.3"
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/selector_menu_orange"
+                android:drawableLeft="@mipmap/ic_back_small"
+                android:drawablePadding="15dp"
+                android:gravity="center"
                 android:onClick="@{onClickListener}"
-                android:text="开门"
+                android:paddingLeft="30dp"
+                android:paddingTop="20dp"
+                android:paddingRight="30dp"
+                android:paddingBottom="20dp"
+                android:text="返 回"
                 android:textColor="@color/white"
-                android:textSize="@dimen/sub_big_text" />
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
 
             <Button
-                android:id="@+id/demo_interface_inventory_start_btn"
-                android:layout_width="160dp"
-                android:layout_height="60dp"
-                android:layout_marginRight="@dimen/card_big_spacing"
-                android:background="@color/md_teal_A400"
-                android:letterSpacing="0.3"
+                android:id="@+id/btn_inventory_storage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/selector_menu_blue"
+                android:drawableLeft="@mipmap/ic_inventory_storage_small"
+                android:drawablePadding="15dp"
+                android:gravity="center"
                 android:onClick="@{onClickListener}"
-                android:text="盘库"
+                android:paddingLeft="30dp"
+                android:paddingTop="20dp"
+                android:paddingRight="30dp"
+                android:paddingBottom="20dp"
+                android:text="盘 库"
                 android:textColor="@color/white"
-                android:textSize="@dimen/sub_big_text" />
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
 
             <Button
-                android:id="@+id/demo_interface_inventory_stop_btn"
-                android:layout_width="160dp"
-                android:layout_height="60dp"
-                android:layout_marginLeft="@dimen/card_big_spacing"
-                android:background="@color/md_teal_A400"
-                android:letterSpacing="0.3"
+                android:id="@+id/btn_submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/selector_menu_blue"
+                android:drawableLeft="@mipmap/ic_submit_small"
+                android:drawablePadding="15dp"
+                android:gravity="center"
                 android:onClick="@{onClickListener}"
-                android:text="停止"
+                android:paddingLeft="30dp"
+                android:paddingTop="20dp"
+                android:paddingRight="30dp"
+                android:paddingBottom="20dp"
+                android:text="提 交"
                 android:textColor="@color/white"
-                android:textSize="@dimen/card_big_spacing" />
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
             <Button
-                android:id="@+id/demo_interface_submit_data_btn"
-                android:layout_width="160dp"
-                android:layout_height="60dp"
-                android:layout_marginLeft="@dimen/card_big_spacing"
-                android:background="@color/md_teal_A400"
-                android:letterSpacing="0.3"
+                android:id="@+id/btn_open_door"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_menu_green"
+                android:drawableLeft="@mipmap/ic_open_door_small"
+                android:drawablePadding="15dp"
+                android:gravity="center"
                 android:onClick="@{onClickListener}"
-                android:text="盘库提交"
+                android:paddingLeft="30dp"
+                android:paddingTop="20dp"
+                android:paddingRight="30dp"
+                android:paddingBottom="20dp"
+                android:text="开 柜"
                 android:textColor="@color/white"
-                android:textSize="@dimen/card_big_spacing" />
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_inventory_stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/selector_menu_red"
+                android:drawableLeft="@mipmap/ic_stop_small"
+                android:drawablePadding="15dp"
+                android:gravity="center"
+                android:onClick="@{onClickListener}"
+                android:paddingLeft="30dp"
+                android:paddingTop="20dp"
+                android:paddingRight="30dp"
+                android:paddingBottom="20dp"
+                android:text="停 止"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
         </LinearLayout>
 

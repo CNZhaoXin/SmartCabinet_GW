@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
@@ -21,6 +20,7 @@ import com.zk.cabinet.bean.DossierOperating
 import com.zk.cabinet.databinding.ActivityWarehousingBinding
 import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.net.NetworkRequest
+import com.zk.cabinet.utils.SharedPreferencesUtil
 import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -31,7 +31,7 @@ private const val GET_WAREHOUSING_FAIL = 0x02
 class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private lateinit var mWarehousingBinding: ActivityWarehousingBinding
     private lateinit var mHandler: WarehousingHandler
-    private lateinit var mProgressSyncUserDialog: ProgressDialog
+    private lateinit var mProgressDialog: ProgressDialog
 
     private var mWarehousingList = ArrayList<DossierOperating>()
     private lateinit var mWarehousingAdapter: WarehousingAdapter
@@ -45,13 +45,13 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private fun handleMessage(msg: Message) {
         when (msg.what) {
             GET_WAREHOUSING_SUCCESS -> {
-                mProgressSyncUserDialog.dismiss()
+                mProgressDialog.dismiss()
                 mWarehousingList = msg.obj as ArrayList<DossierOperating>
                 mWarehousingAdapter.setList(mWarehousingList)
                 mWarehousingAdapter.notifyDataSetChanged()
             }
             GET_WAREHOUSING_FAIL -> {
-                mProgressSyncUserDialog.dismiss()
+                mProgressDialog.dismiss()
                 Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
             }
         }
@@ -61,8 +61,7 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         mWarehousingBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_warehousing)
-        setSupportActionBar(mWarehousingBinding.warehousingToolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
         mWarehousingBinding.onClickListener = this
 
         mHandler = WarehousingHandler(this)
@@ -70,22 +69,19 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         mWarehousingAdapter = WarehousingAdapter(this, mWarehousingList)
         mWarehousingBinding.warehousingLv.adapter = mWarehousingAdapter
 
-        mProgressSyncUserDialog = ProgressDialog(this)
+        mProgressDialog = ProgressDialog(this, R.style.mLoadingDialog)
+        mProgressDialog.setCancelable(false)
+        mProgressDialog.setMessage("正在获取档案列表，请稍后...")
+        if (!mProgressDialog.isShowing) mProgressDialog.show()
         getWarehousing()
+
+        val name = mSpUtil.getString(SharedPreferencesUtil.Key.NameTemp, "未知")
+        mWarehousingBinding.tvOperator.text = name
     }
 
     override fun countDownTimerOnTick(millisUntilFinished: Long) {
         super.countDownTimerOnTick(millisUntilFinished)
         mWarehousingBinding.warehousingCountdownTv.text = millisUntilFinished.toString()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private class WarehousingHandler(warehousingActivity: WarehousingActivity) : Handler() {
@@ -98,10 +94,6 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     }
 
     private fun getWarehousing() {
-        mProgressSyncUserDialog.setTitle("获取入库列表")
-        mProgressSyncUserDialog.setMessage("正在获取入库列表，请稍后......")
-        if (!mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.show()
-
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET,
             NetworkRequest.instance.mWarehousingList,
@@ -130,20 +122,20 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                         val msg = Message.obtain()
                         msg.what = GET_WAREHOUSING_SUCCESS
                         msg.obj = werehousingList
-                        mHandler.sendMessage(msg)
+                        mHandler.sendMessageDelayed(msg, 800)
                     } else {
                         val msg = Message.obtain()
                         msg.what = GET_WAREHOUSING_FAIL
                         msg.obj = response.getString("message")
-                        mHandler.sendMessage(msg)
+                        mHandler.sendMessageDelayed(msg, 800)
                     }
 
                 } catch (e: JSONException) {
                     e.printStackTrace()
                     val msg = Message.obtain()
                     msg.what = GET_WAREHOUSING_FAIL
-                    msg.obj = "数据解析失败。"
-                    mHandler.sendMessage(msg)
+                    msg.obj = "数据解析失败"
+                    mHandler.sendMessageDelayed(msg, 800)
                 }
             },
             Response.ErrorListener { error ->
@@ -158,7 +150,7 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                 val message = Message.obtain()
                 message.what = GET_WAREHOUSING_FAIL
                 message.obj = msg
-                mHandler.sendMessage(message)
+                mHandler.sendMessageDelayed(message, 800)
             })
         jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
             10000,
@@ -169,9 +161,13 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     }
 
     override fun onClick(v: View?) {
-        when(v?.id){
-            R.id.warehousing_out_btn -> {
+        when (v?.id) {
+            R.id.btn_open_door -> {
                 intentActivity(WarehousingOperatingActivity.newIntent(this))
+            }
+
+            R.id.btn_back -> {
+                finish()
             }
         }
     }

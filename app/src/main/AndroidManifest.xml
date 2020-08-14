@@ -66,7 +66,8 @@
         <service
             android:name=".service.NetService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
         <activity
             android:name=".activity.PersonnelManagementActivity"
             android:label="@string/title_personnel_management"
@@ -93,7 +94,7 @@
             android:theme="@style/NoActionBarAppTheme" />
         <activity
             android:name=".activity.DemoInterfaceActivity"
-            android:label="盘库"
+            android:label="@string/inventory_storage"
             android:theme="@style/NoActionBarAppTheme" />
         <activity
             android:name=".activity.SystemSettingsActivity"

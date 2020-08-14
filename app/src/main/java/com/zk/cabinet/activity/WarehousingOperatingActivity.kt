@@ -3,25 +3,28 @@ package com.zk.cabinet.activity
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.view.MenuItem
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.zk.cabinet.R
+import com.zk.cabinet.adapter.DeviceAdapter
 import com.zk.cabinet.adapter.DossierAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.Device
 import com.zk.cabinet.bean.Dossier
 import com.zk.cabinet.databinding.ActivityWarehousingOperatingBinding
+import com.zk.cabinet.databinding.DialogDeviceSingleSelectWarehousingBinding
 import com.zk.cabinet.db.DeviceService
 import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.net.NetworkRequest
@@ -39,10 +42,11 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-class WarehousingOperatingActivity : TimeOffAppCompatActivity(),  AdapterView.OnItemClickListener {
+class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickListener,
+    View.OnClickListener {
     private lateinit var mWarehousingBinding: ActivityWarehousingOperatingBinding
     private lateinit var mHandler: WarehousingOperatingHandler
-    private lateinit var mProgressSyncUserDialog: ProgressDialog
+    private lateinit var mProgressDialog: ProgressDialog
     private lateinit var mDevice: Device
     private val dossierList = ArrayList<Dossier>()
     private lateinit var mDossierAdapter: DossierAdapter
@@ -67,9 +71,11 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(),  AdapterView.On
     private fun handleMessage(msg: Message) {
         when (msg.what) {
             OPEN_DOOR_RESULT -> {
+                LogUtil.instance.d("zx---开锁成功")
                 showToast(msg.obj.toString())
             }
             START_INVENTORY -> {
+                LogUtil.instance.d("zx---开始盘点")
                 Toast.makeText(this, "开始盘点", Toast.LENGTH_SHORT).show()
             }
             INVENTORY_VALUE -> {
@@ -128,8 +134,8 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(),  AdapterView.On
 
                     for (index in 1..5) {
                         val lights = ArrayList<Int>()
-                        for (dossier in dossierList){
-                            if(dossier.floor == index){
+                        for (dossier in dossierList) {
+                            if (dossier.floor == index) {
                                 lights.add(dossier.light)
                             }
                         }
@@ -143,19 +149,21 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(),  AdapterView.On
 
             }
             CANCEL_INVENTORY -> {
+                LogUtil.instance.d("zx---停止盘点")
                 Toast.makeText(this, "停止盘点", Toast.LENGTH_SHORT).show()
             }
             END_INVENTORY -> {
+                LogUtil.instance.d("zx---盘点结束")
                 Toast.makeText(this, "盘点结束", Toast.LENGTH_SHORT).show()
             }
             SUBMITTED_SUCCESS -> {
                 Toast.makeText(this, "数据提交成功", Toast.LENGTH_SHORT).show()
-                mProgressSyncUserDialog.dismiss()
+                mProgressDialog.dismiss()
                 finish()
             }
             SUBMITTED_FAIL -> {
                 Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
-                mProgressSyncUserDialog.dismiss()
+                mProgressDialog.dismiss()
             }
             GET_INFRARED_AND_LOCK -> {
                 val data = msg.data
@@ -206,17 +214,19 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(),  AdapterView.On
         super.onCreate(savedInstanceState)
         mWarehousingBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_warehousing_operating)
-        setSupportActionBar(mWarehousingBinding.warehousingOperatingToolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        mWarehousingBinding.onClickListener = this
         mWarehousingBinding.onItemClickListener = this
+
+        val name = mSpUtil.getString(SharedPreferencesUtil.Key.NameTemp, "xxx")
+        mWarehousingBinding.tvOperator.text = name
 
         mHandler = WarehousingOperatingHandler(this)
 
-        mProgressSyncUserDialog = ProgressDialog(this)
+        mProgressDialog = ProgressDialog(this, R.style.mLoadingDialog)
+        mProgressDialog.setCancelable(false)
 
         mDossierAdapter = DossierAdapter(this, dossierList)
         mWarehousingBinding.warehousingOperatingLv.adapter = mDossierAdapter
-
 
         val cabinets = mSpUtil.getString(Key.OrgCabinet, "")!!.split(",").toTypedArray()
         for (cabinet in cabinets) {
@@ -243,35 +253,72 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(),  AdapterView.On
             finish()
             return
         }
-        val singleChoiceItems = arrayOfNulls<String>(deviceList.size)
-        for (indices in deviceList.indices) {
-            singleChoiceItems[indices] = deviceList[indices].deviceName
-        }
-        val itemSelected = 0
-        mDevice = deviceList[itemSelected]
-        mWarehousingBinding.accessingBoxNumberTv.text =
-            "柜体名称：${mDevice.deviceName}(${mDevice.deviceId})"
-        AlertDialog.Builder(this)
-            .setTitle("请选择您要操作的柜子")
-            .setSingleChoiceItems(
-                singleChoiceItems,
-                itemSelected
-            ) { _, which ->
-                mDevice = deviceList[which]
-                mWarehousingBinding.accessingBoxNumberTv.text =
-                    "柜体名称：${mDevice.deviceName}(${mDevice.deviceId})"
-            }
-            .setNegativeButton(
-                "开门"
-            ) { _, _ ->
-                UR880Entrance.getInstance()
-                    .send(UR880SendInfo.Builder().openDoor(mDevice.deviceId, 0).build())
-            }
-            .setCancelable(false)
-            .show()
+
+        showSingleSelectDialog()
 
         UR880Entrance.getInstance().addOnCabinetInfoListener(mCabinetInfoListener)
         UR880Entrance.getInstance().addOnInventoryListener(mInventoryListener)
+    }
+
+    private var mDeviceSingleSelectDialogBinding: DialogDeviceSingleSelectWarehousingBinding? = null
+    private var mSingleSelectDialog: android.app.AlertDialog? = null
+    private lateinit var mDialogDeviceAdapter: DeviceAdapter
+
+    // 柜体单选弹窗
+    private fun showSingleSelectDialog() {
+        if (mSingleSelectDialog == null) {
+            mDeviceSingleSelectDialogBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(this),
+                R.layout.dialog_device_single_select_warehousing,
+                null,
+                false
+            )
+
+            mSingleSelectDialog = android.app.AlertDialog.Builder(this)
+                .setCancelable(false)
+                .setView(mDeviceSingleSelectDialogBinding!!.root)
+                .create()
+
+            val window = mSingleSelectDialog!!.window
+            window!!.setBackgroundDrawable(ColorDrawable(0))
+        }
+
+        val deviceList = DeviceService.getInstance().loadAll()
+        var selectPosition = 0
+
+        mDialogDeviceAdapter = DeviceAdapter(this, deviceList)
+        mDeviceSingleSelectDialogBinding!!.listView.adapter = mDialogDeviceAdapter
+        mDeviceSingleSelectDialogBinding!!.listView.descendantFocusability =
+            ViewGroup.FOCUS_BLOCK_DESCENDANTS
+        mDeviceSingleSelectDialogBinding!!.setOnItemClickListener { adapterView, view, position, id ->
+            for (indices in deviceList.indices) {
+                if (position != indices) {
+                    deviceList[indices].isSelected = false
+                } else {
+                    deviceList[indices].isSelected = true
+                    selectPosition = position
+                    mDeviceSingleSelectDialogBinding!!.btnConfirm.isEnabled = true
+                    mDeviceSingleSelectDialogBinding!!.btnConfirm.background =
+                        getDrawable(R.drawable.selector_menu_green)
+                }
+            }
+            mDialogDeviceAdapter.notifyDataSetChanged()
+        }
+        mDeviceSingleSelectDialogBinding!!.setOnClickListener { view: View? ->
+            if (view!!.id == R.id.btn_cancel) {
+                mSingleSelectDialog!!.dismiss()
+                finish()
+            } else if (view.id == R.id.btn_confirm) {
+                mDevice = deviceList[selectPosition]
+                mWarehousingBinding.accessingBoxNumberTv.text = "${mDevice.deviceName}"
+
+                UR880Entrance.getInstance()
+                    .send(UR880SendInfo.Builder().openDoor(mDevice.deviceId, 0).build())
+                mSingleSelectDialog!!.dismiss()
+            }
+        }
+
+        mSingleSelectDialog!!.show()
     }
 
     private val mCabinetInfoListener = object : CabinetInfoListener {
@@ -325,13 +372,24 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(),  AdapterView.On
         mWarehousingBinding.warehousingOperatingCountdownTv.text = millisUntilFinished.toString()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        when (item.itemId) {
+//            android.R.id.home -> {
+//              warehousingSubmission()
+//            }
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.btn_back -> {
+                finish()
+            }
+            R.id.btn_in_storage -> {
                 warehousingSubmission()
             }
         }
-        return super.onOptionsItemSelected(item)
     }
 
     private class WarehousingOperatingHandler(warehousingOperatingActivity: WarehousingOperatingActivity) :
@@ -356,9 +414,9 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(),  AdapterView.On
             finish()
             return
         }
-        mProgressSyncUserDialog.setTitle("提交入库列表")
-        mProgressSyncUserDialog.setMessage("正在提交入库列表，请稍后......")
-        if (!mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.show()
+        mProgressDialog.setMessage("正在进行档案入库，请稍后...")
+        if (!mProgressDialog.isShowing) mProgressDialog.show()
+
         val jsonObject = JSONObject()
         try {
             val orderItemsJsonArray = JSONArray()
@@ -374,8 +432,8 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(),  AdapterView.On
                     orderItemsJsonArray.put(changedObject)
                 }
             }
-            if (orderItemsJsonArray.length() == 0){
-                if (mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.dismiss()
+            if (orderItemsJsonArray.length() == 0) {
+                if (mProgressDialog.isShowing) mProgressDialog.dismiss()
                 finish()
                 return
             }
@@ -392,19 +450,19 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(),  AdapterView.On
                     if (success) {
                         val msg = Message.obtain()
                         msg.what = SUBMITTED_SUCCESS
-                        mHandler.sendMessage(msg)
+                        mHandler.sendMessageDelayed(msg, 800)
                     } else {
                         val msg = Message.obtain()
                         msg.what = SUBMITTED_FAIL
                         msg.obj = response.getString("message")
-                        mHandler.sendMessage(msg)
+                        mHandler.sendMessageDelayed(msg, 800)
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
                     val msg = Message.obtain()
                     msg.what = SUBMITTED_FAIL
-                    msg.obj = "数据解析失败。"
-                    mHandler.sendMessage(msg)
+                    msg.obj = "数据解析失败"
+                    mHandler.sendMessageDelayed(msg, 800)
                 }
             }, Response.ErrorListener { error ->
                 val msg = if (error != null)
@@ -418,7 +476,7 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(),  AdapterView.On
                 val message = Message.obtain()
                 message.what = SUBMITTED_FAIL
                 message.obj = msg
-                mHandler.sendMessage(message)
+                mHandler.sendMessageDelayed(message, 800)
             })
         jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
             10000,

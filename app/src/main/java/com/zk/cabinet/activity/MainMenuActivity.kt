@@ -3,7 +3,6 @@ package com.zk.cabinet.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import androidx.databinding.DataBindingUtil
@@ -12,6 +11,7 @@ import com.zk.cabinet.adapter.MainMenuAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.MainMenuInfo
 import com.zk.cabinet.databinding.ActivityMainMenuBinding
+import com.zk.cabinet.utils.SharedPreferencesUtil
 
 class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickListener {
     private lateinit var mMainMenuBinding: ActivityMainMenuBinding
@@ -29,14 +29,11 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
         super.onCreate(savedInstanceState)
         mMainMenuBinding = DataBindingUtil.setContentView(this, R.layout.activity_main_menu)
         mMainMenuBinding.onItemClickListener = this
-        init()
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> finish()
-        }
-        return super.onOptionsItemSelected(item)
+        val name = mSpUtil.getString(SharedPreferencesUtil.Key.NameTemp, "xxx")
+        mMainMenuBinding.tvOperator.text = name
+
+        init()
     }
 
     override fun countDownTimerOnTick(millisUntilFinished: Long) {
@@ -44,38 +41,85 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
         mMainMenuBinding.mainMenuCountdownTv.text = millisUntilFinished.toString()
     }
 
-    private fun init(){
-        mMenuList.add(MainMenuInfo(R.drawable.menu_get, getString(R.string.warehousing)))
-        mMenuList.add(MainMenuInfo(R.drawable.menu_out, getString(R.string.outbound)))
-        mMenuList.add(MainMenuInfo(R.drawable.menu_cabinet, "盘库"))
-        mMenuList.add(MainMenuInfo(R.drawable.menu_system_settings, getString(R.string.system_settings)))
-        mMenuList.add(MainMenuInfo(R.drawable.menu_personnel_management, getString(R.string.personnel_management)));
-        mMenuList.add(MainMenuInfo(R.drawable.menu_back, getString(R.string.go_back)))
+    private fun init() {
+        mMenuList.add(
+            MainMenuInfo(
+                R.mipmap.ic_in_storage,
+                getString(R.string.warehousing),
+                R.drawable.selector_menu_blue
+            )
+        )
+        mMenuList.add(
+            MainMenuInfo(
+                R.mipmap.ic_out_storage,
+                getString(R.string.outbound),
+                R.drawable.selector_menu_blue
+            )
+        )
+        mMenuList.add(
+            MainMenuInfo(
+                R.mipmap.ic_inventory_storage,
+                getString(R.string.inventory_storage),
+                R.drawable.selector_menu_green
+            )
+        )
+        mMenuList.add(
+            MainMenuInfo(
+                R.mipmap.ic_fingerprint,
+                getString(R.string.personnel_management),
+                R.drawable.selector_menu_green
+            )
+        )
+        mMenuList.add(
+            MainMenuInfo(
+                R.mipmap.ic_back,
+                getString(R.string.logout),
+                R.drawable.selector_menu_red
+            )
+        )
+        mMenuList.add(
+            MainMenuInfo(
+                R.mipmap.ic_system_setting,
+                getString(R.string.system_settings),
+                R.drawable.selector_menu_orange
+            )
+        )
+
         mMenuAdapter = MainMenuAdapter(this, mMenuList)
         mMainMenuBinding.mainMenuGv.adapter = mMenuAdapter
-
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        when(mMenuList[position].mImageUrl){
-            R.drawable.menu_get ->{
+        when (mMenuList[position].mImage) {
+            R.mipmap.ic_in_storage -> {
                 intentActivity(WarehousingActivity.newIntent(this))
             }
-            R.drawable.menu_out ->{
+            R.mipmap.ic_out_storage -> {
                 intentActivity(OutboundActivity.newIntent(this))
             }
-            R.drawable.menu_cabinet ->{
-                intentActivity(DemoInterfaceActivity.newIntent(packageContext = this, isAutomatic = false))
+            R.mipmap.ic_inventory_storage -> {
+                intentActivity(
+                    DemoInterfaceActivity.newIntent(
+                        packageContext = this,
+                        isAutomatic = false
+                    )
+                )
             }
-            R.drawable.menu_system_settings ->{
+            R.mipmap.ic_fingerprint -> {
+                intentActivity(
+                    Intent(
+                        this@MainMenuActivity,
+                        PersonnelManagementActivity::class.java
+                    )
+                )
+            }
+            R.mipmap.ic_system_setting -> {
                 intentActivity(SystemSettingsActivity.newIntent(this))
             }
-            R.drawable.menu_back ->{
+            R.mipmap.ic_back -> {
                 finish()
             }
-            R.drawable.menu_personnel_management -> {
-                intentActivity(Intent(this@MainMenuActivity, PersonnelManagementActivity::class.java))
-            }
+
         }
     }
 }

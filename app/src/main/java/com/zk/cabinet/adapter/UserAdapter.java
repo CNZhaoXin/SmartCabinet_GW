@@ -16,7 +16,6 @@ import java.util.List;
 /**
  * Created by ZK on 2017/12/13.
  */
-
 public class UserAdapter extends BaseAdapter {
     private List<User> list;
     private Context mContext;
@@ -61,13 +60,7 @@ public class UserAdapter extends BaseAdapter {
 
         viewHolder.adapter_user_name_tv.setText(user.getUserName());
         viewHolder.adapter_user_id_tv.setText(user.getUserCode());
-        viewHolder.adapter_user_finger_tv.setText(user.getFingerPrint() == null ? "点击录入指纹" : "******");
-
-        if (i % 2 != 0) {
-            viewHolder.adapter_user_item_ll.setBackgroundColor(mContext.getResources().getColor(R.color.md_indigo_55));
-        } else {
-            viewHolder.adapter_user_item_ll.setBackgroundColor(mContext.getResources().getColor(R.color.md_grey_200));
-        }
+        viewHolder.adapter_user_finger_tv.setText(user.getFingerPrint() == null ? "未录入〔点击录入〕" : "已录入〔点击重录〕");
 
         return view;
     }

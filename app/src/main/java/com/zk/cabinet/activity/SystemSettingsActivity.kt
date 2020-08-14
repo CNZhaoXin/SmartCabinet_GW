@@ -27,18 +27,15 @@ import com.zk.cabinet.databinding.ActivitySystemSettingsBinding
 import com.zk.cabinet.dialog.*
 import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.utils.MediaPlayerUtil
-import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
 import com.zk.cabinet.utils.SharedPreferencesUtil.Record
 import com.zk.common.utils.ActivityUtil
 import com.zk.common.utils.AppVersionUtil
 import com.zk.common.utils.LogUtil
-import java.io.File
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
-
 
 class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private lateinit var mSystemSettingsBinding: ActivitySystemSettingsBinding
@@ -130,6 +127,7 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
         super.onCreate(savedInstanceState)
         mSystemSettingsBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_system_settings)
+
         mSystemSettingsBinding.onClickListener = this
         setSupportActionBar(mSystemSettingsBinding.systemSettingToolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)

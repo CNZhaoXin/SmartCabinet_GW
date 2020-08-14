@@ -1,9 +1,10 @@
 package com.zk.cabinet.bean;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Property;
-import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Transient;
 
 @Entity(nameInDb = "Device")
 public class Device {
@@ -23,6 +24,9 @@ public class Device {
         this.deviceId = deviceId;
         this.deviceName = deviceName;
     }
+
+    @Transient
+    private boolean selected;
 
     @Generated(hash = 1469582394)
     public Device() {
@@ -52,4 +56,11 @@ public class Device {
         this.deviceName = deviceName;
     }
 
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
 }

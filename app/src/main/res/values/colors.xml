@@ -16,6 +16,10 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 
+    <!-- 按钮和条目的水波纹颜色，一个是白色，一个是黑色 -->
+    <color name="color_ripple_white">#30ffffff</color>
+    <color name="color_ripple_black">#30000000</color>
+
     <!--ALL COLOURS-->
     <color name="transparent">#00000000</color>
 
@@ -264,6 +268,7 @@
     <color name="md_red_900">#B71C1C</color>
     <color name="md_red_A100">#FF8A80</color>
     <color name="md_red_A200">#FF5252</color>
+    <color name="md_red_A300">#FE4747</color>
     <color name="md_red_A400">#FF1744</color>
     <color name="md_red_A700">#D50000</color>
 

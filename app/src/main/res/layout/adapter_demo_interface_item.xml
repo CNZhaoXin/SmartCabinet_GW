@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/adapter_demo_interface_ll"
     android:layout_width="50dp"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:layout_margin="@dimen/card_elevation"
-    android:background="@color/md_light_blue_300"
+    android:layout_margin="15dp"
+    android:background="@drawable/shape_line"
     android:gravity="center"
     android:orientation="vertical">
-
 
     <TextView
         android:id="@+id/adapter_demo_interface_tv"
@@ -17,10 +16,21 @@
         android:layout_gravity="center"
         android:ems="1"
         android:gravity="center"
-        android:letterSpacing="0.3"
-        android:text="空格"
+        android:letterSpacing="0.2"
+        android:paddingBottom="10dp"
+        android:text="空 余"
+        android:textColor="@color/md_light_blue_300"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_line_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:paddingBottom="7dp"
+        android:text="0-0"
         android:textColor="@color/white"
-        android:textSize="@dimen/sub_big_text" />
+        android:textSize="15sp" />
 
-
-</LinearLayout>
+</FrameLayout>

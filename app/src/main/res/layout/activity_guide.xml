@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:bind="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
 
@@ -21,11 +20,12 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/guide_cabinet_online_status_rv"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="60dp"
-            android:layout_marginStart="@dimen/medium_spacing"
-            android:layout_marginEnd="@dimen/medium_spacing"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/shape_oprator_bg"
             android:orientation="horizontal"
+            android:paddingRight="10dp"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -34,20 +34,22 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:letterSpacing="0.2"
-            android:paddingTop="250dp"
+            android:paddingTop="220dp"
             android:text="RFID智慧档案管理系统"
             android:textColor="@android:color/background_light"
-            android:textSize="@dimen/super_super_super_big_more_text" />
+            android:textSize="@dimen/super_super_super_big_more_text"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/guide_title_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/guide_title_1"
             android:gravity="center"
             android:text="RFID Intelligent file Management system"
-            android:layout_below="@+id/guide_title_1"
             android:textColor="@color/md_grey_300"
-            android:textSize="@dimen/super_big_text" />
+            android:textSize="@dimen/super_big_text"
+            android:textStyle="bold" />
 
         <TextClock
             android:id="@+id/main_time_h_tc"
@@ -56,7 +58,7 @@
             android:format12Hour="aahh : mm"
             android:format24Hour="HH : mm"
             android:gravity="center"
-            android:paddingTop="570dp"
+            android:paddingTop="480dp"
             android:textColor="@android:color/background_light"
             android:textSize="@dimen/super_super_super_big_big_more_text" />
 
@@ -88,12 +90,12 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center"
-            android:layout_marginBottom="200dp"
+            android:layout_marginBottom="170dp"
             android:gravity="center"
             android:padding="@dimen/medium_spacing"
             android:text="@string/other_login_prompt"
-            android:textColor="@color/gray_light"
-            android:textSize="@dimen/sub_big_text" />
+            android:textColor="@color/md_red_500"
+            android:textSize="23sp" />
 
     </RelativeLayout>
 </layout>

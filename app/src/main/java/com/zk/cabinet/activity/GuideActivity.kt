@@ -5,8 +5,10 @@ import android.app.ProgressDialog
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.drawable.ColorDrawable
 import android.os.*
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -39,7 +41,6 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-
 private const val DEVICE_REGISTERED = 0x02
 private const val DEVICE_HEARTBEAT = 0x03
 private const val DEVICE_REMOVED = 0x04
@@ -58,11 +59,9 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
     private var mDialogLoginBinding: DialogLoginBinding? = null
     private var mDialogLogin: AlertDialog? = null
 
-    private lateinit var mProgressSyncUserDialog: ProgressDialog
+    private lateinit var mProgressDialog: ProgressDialog
 
-    companion object {
-
-    }
+    companion object {}
 
     private fun handleMessage(msg: Message) {
         when (msg.what) {
@@ -84,22 +83,29 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                 mCabinetOnlineAdapter.notifyDataSetChanged()
             }
             LOGIN_BY_PWD_SUCCESS -> {
-                mProgressSyncUserDialog.dismiss()
+                mProgressDialog.dismiss()
                 showToast("登录成功，欢迎：${msg.obj}")
                 intentActivity(MainMenuActivity.newIntent(this))
             }
             LOGIN_BY_PWD_FAIL -> {
-                mProgressSyncUserDialog.dismiss()
+                mProgressDialog.dismiss()
                 Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
             }
             SelfComm.NET_SERVICE_INVENTORY -> {
                 val data = msg.data
                 val cabCodeList: ArrayList<String> = data.getStringArrayList("cabCodeList")!!
                 val inventoryId: ArrayList<String> = data.getStringArrayList("inventoryIdList")!!
-                intentActivity(DemoInterfaceActivity.newIntent(this, true, cabCodeList, inventoryId))
+                intentActivity(
+                    DemoInterfaceActivity.newIntent(
+                        this,
+                        true,
+                        cabCodeList,
+                        inventoryId
+                    )
+                )
             }
             FINGER_LOGIN_SUCCESS -> {
-                if (!mProgressSyncUserDialog.isShowing){
+                if (!mProgressDialog.isShowing) {
                     val user = msg.obj as User
                     login(user.userCode, user.password)
                 }
@@ -116,22 +122,23 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         mGuideBinding = DataBindingUtil.setContentView(this, R.layout.activity_guide)
         mGuideBinding.onClickListener = this
         mHandler = MainHandler(this)
-
         init()
     }
 
     private fun init() {
-        mProgressSyncUserDialog = ProgressDialog(this)
-        mProgressSyncUserDialog.setTitle("登录")
-        mProgressSyncUserDialog.setMessage("正在登录，请稍后......")
-        mProgressSyncUserDialog.setCancelable(false)
+        mProgressDialog = ProgressDialog(this, R.style.mLoadingDialog)
+        mProgressDialog.setMessage("正在登录...")
+        mProgressDialog.setCancelable(false)
 
         val deviceList = DeviceService.getInstance().loadAll()
-        if(deviceList != null && deviceList.size > 0) {
+        if (deviceList != null && deviceList.size > 0) {
             for (device in deviceList) {
-                mCabinetOnlineList.add( CabinetOnlineInfo(
-                    device.deviceId,
-                    device.deviceName, false))
+                mCabinetOnlineList.add(
+                    CabinetOnlineInfo(
+                        device.deviceId,
+                        device.deviceName, false
+                    )
+                )
             }
         }
 
@@ -163,7 +170,8 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         bindService(netServiceIntent, netServiceConnection, BIND_AUTO_CREATE)
 
         FingerprintParsingLibrary.getInstance().init(this)
-        FingerprintParsingLibrary.getInstance().onFingerprintVerifyListener(mFingerprintVerifyListener)
+        FingerprintParsingLibrary.getInstance()
+            .onFingerprintVerifyListener(mFingerprintVerifyListener)
         FingerprintParsingLibrary.getInstance().setFingerprintVerify(true)
     }
 
@@ -183,7 +191,6 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                 val pwd = mDialogLoginBinding!!.dialogOtherLoginPwdEdt.text.toString().trim()
                 if (!TextUtils.isEmpty(userCode) && !TextUtils.isEmpty(pwd)) {
                     login(userCode, pwd)
-
                 } else {
                     showToast(resources.getString(R.string.fill_complete))
                 }
@@ -216,6 +223,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         }
     }
 
+
     override fun onDestroy() {
         super.onDestroy()
         UR880Entrance.getInstance().removeAllDeviceInformationListener()
@@ -244,10 +252,9 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             LogUtil.instance.d("removed -----p0: $p0 ")
         }
 
-
     }
 
-    //登录弹窗
+    // 登录弹窗
     private fun showLoginDialog() {
         if (mDialogLogin == null) {
             mDialogLogin = AlertDialog.Builder(this).create()
@@ -267,6 +274,10 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         mDialogLoginBinding!!.dialogOtherLoginAccountEdt.isFocusable = true
         mDialogLoginBinding!!.dialogOtherLoginAccountEdt.isFocusableInTouchMode = true
         mDialogLoginBinding!!.dialogOtherLoginAccountEdt.requestFocus()
+
+        val window = mDialogLogin!!.window
+        window!!.setBackgroundDrawable(ColorDrawable(0))
+
         mDialogLogin!!.show()
     }
 
@@ -281,7 +292,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
     }
 
     private fun login(user: String, pwd: String) {
-        mProgressSyncUserDialog.show()
+        mProgressDialog.show()
         val jsonObject = JSONObject()
         try {
             jsonObject.put("username", user)
@@ -296,6 +307,10 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                     val success = response!!.getBoolean("success")
                     if (success) {
                         val data = response.getJSONObject("data")
+                        Log.e("TAG", data.toString())
+                        // {"id":"1","name":"彭发红2","gender":0,"phoneNumber":"13368118440","loginCode":"admin","roleId":"1","roleName":"管理员","rootMember":true,"orgCode":"6665","orgName":"6665",
+                        // "orgList":[{"id":"7cace0829663d4a43f224017b2a4acfa","name":"17774016396","code":"6665","parentOrgCode":null,"childOrgCode":null,"orgCabinet":"1234567801\/1234567801_1,a-b111\/a-b111_3"}]}
+
                         val recordList = ArrayList<Record>()
                         recordList.add(Record(Key.IdTemp, data.getString("id")))
                         recordList.add(Record(Key.NameTemp, data.getString("name")))
@@ -308,25 +323,30 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                         recordList.add(Record(Key.OrgCodeTemp, data.getString("orgCode")))
                         recordList.add(Record(Key.OrgNameTemp, data.getString("orgName")))
                         val orgList = data.getJSONArray("orgList")
-                        recordList.add(Record(Key.OrgCabinet, (orgList[0] as JSONObject).getString("orgCabinet")))
+                        recordList.add(
+                            Record(
+                                Key.OrgCabinet,
+                                (orgList[0] as JSONObject).getString("orgCabinet")
+                            )
+                        )
                         mSpUtil.applyValue(recordList)
 
                         val msg = Message.obtain()
                         msg.what = LOGIN_BY_PWD_SUCCESS
                         msg.obj = data.getString("name")
-                        mHandler.sendMessage(msg)
+                        mHandler.sendMessageDelayed(msg, 1000)
                     } else {
                         val msg = Message.obtain()
                         msg.what = LOGIN_BY_PWD_FAIL
                         msg.obj = "用户名或密码错误"
-                        mHandler.sendMessage(msg)
+                        mHandler.sendMessageDelayed(msg, 1000)
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
                     val msg = Message.obtain()
                     msg.what = LOGIN_BY_PWD_FAIL
-                    msg.obj = "数据解析失败。"
-                    mHandler.sendMessage(msg)
+                    msg.obj = "数据解析失败"
+                    mHandler.sendMessageDelayed(msg, 1000)
                 }
             }, Response.ErrorListener { error ->
                 val msg = if (error != null)
@@ -340,7 +360,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                 val message = Message.obtain()
                 message.what = LOGIN_BY_PWD_FAIL
                 message.obj = msg
-                mHandler.sendMessage(message)
+                mHandler.sendMessageDelayed(message, 1000)
             })
         jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
             10000,
@@ -350,8 +370,8 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         NetworkRequest.instance.add(jsonObjectRequest)
     }
 
-    private val mFingerprintVerifyListener = object : FingerprintVerifyListener {
-        override fun fingerprintVerify(result: Boolean, user: User?) {
+    private val mFingerprintVerifyListener =
+        FingerprintVerifyListener { result, user ->
             if (result) {
                 val msg = Message.obtain()
                 msg.what = FINGER_LOGIN_SUCCESS
@@ -360,9 +380,8 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             } else {
                 val msg = Message.obtain()
                 msg.what = FINGER_LOGIN_ERROR
-                msg.obj = "该指纹不存在。"
+                msg.obj = "该指纹不存在"
                 mHandler.sendMessage(msg)
             }
         }
-    }
 }

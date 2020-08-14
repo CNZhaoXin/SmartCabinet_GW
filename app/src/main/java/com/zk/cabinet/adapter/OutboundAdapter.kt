@@ -45,15 +45,13 @@ class OutboundAdapter(context: Context, dossierList: List<DossierOperating>) :
         viewHolder.mAdapterOutboundNoTv.text = dossier.warrantNo
         viewHolder.mAdapterOutboundCateTv.text = dossier.warranCate
         viewHolder.mAdapterOutboundTypeTv.text = SelfComm.OPERATING_TYPE[dossier.operatingType]
-        viewHolder.mAdapterOutboundPositionTv.text = "${dossier.cabinetId} - ${dossier.floor} -${dossier.light}"
+        viewHolder.mAdapterOutboundPositionTv.text =
+            "${dossier.cabinetId} - ${dossier.floor} -${dossier.light}"
 
-        if (dossier.selected){
-            viewHolder.mAdapterOutboundLl.setBackgroundColor(mContext.getColor(R.color.md_blue_300))
-            viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.drawable.ok))
+        if (dossier.selected) {
+            viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.mipmap.ic_check))
         } else {
-            viewHolder.mAdapterOutboundLl.setBackgroundColor(mContext.getColor(R.color.white))
-            viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.drawable.no))
-
+            viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.mipmap.ic_check_no))
         }
         return view!!
     }

@@ -61,4 +61,23 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
+    <style name="mLoadingDialog" parent="Base.Theme.AppCompat.Light.Dialog">
+        <item name="android:windowAnimationStyle">@style/Base.Animation.AppCompat.Dialog</item>
+        <item name="android:windowFrame">@null</item>
+        <!--是否浮在窗口之上-->
+        <item name="android:windowIsFloating">true</item>
+        <!--半透明-->
+        <item name="android:windowIsTranslucent">true</item>
+        <!--是否显示title-->
+        <item name="android:windowNoTitle">true</item>
+        <!--dialog之外没有焦点的区域是否罩上黑色半透明 主要是这个地方false表示不要遮罩-->
+        <item name="android:backgroundDimEnabled">true</item>
+
+        <item name="android:windowBackground">@drawable/shape_loading_dialog_bg</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <!--  progressBar的颜色 -->
+        <item name="colorAccent">@color/white</item>
+    </style>
+
 </resources>

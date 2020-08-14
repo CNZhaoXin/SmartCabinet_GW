@@ -1,26 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/RelativeLayout1"
     android:layout_width="wrap_content"
     android:layout_height="60dp"
-    android:gravity="center">
+    android:gravity="center"
+    android:orientation="horizontal">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="柜体:"
+        android:textColor="@color/gray_light"
+        android:textSize="22sp" />
 
     <TextView
         android:id="@+id/adapter_cabinet_online_item_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:gravity="center"
-        android:text="@string/app_name"
-        android:textColor="@color/colorFontMain" />
+        android:layout_marginRight="5dp"
+        android:text="xxx"
+        android:textColor="@color/md_red_500"
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/adapter_cabinet_online_item_iv"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:layout_centerVertical="true"
-        android:layout_gravity="center"
-        android:layout_marginRight="@dimen/sub_medium_spacing"
-        android:layout_toRightOf="@+id/adapter_cabinet_online_item_tv"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="20dp"
         android:src="@drawable/cabinet_offline" />
-</RelativeLayout>
+
+</LinearLayout>

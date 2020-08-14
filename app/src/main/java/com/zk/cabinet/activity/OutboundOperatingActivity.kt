@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
@@ -24,6 +23,7 @@ import com.zk.cabinet.databinding.ActivityOutboundOperatingBinding
 import com.zk.cabinet.db.DeviceService
 import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.net.NetworkRequest
+import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.common.utils.LogUtil
 import com.zk.common.utils.TimeUtil
 import com.zk.rfid.bean.LabelInfo
@@ -36,10 +36,11 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
 
-class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickListener {
+class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickListener,
+    View.OnClickListener {
     private lateinit var mOutboundBinding: ActivityOutboundOperatingBinding
     private lateinit var mHandler: OutboundOperatingHandler
-    private lateinit var mProgressSyncUserDialog: ProgressDialog
+    private lateinit var mProgressDialog: ProgressDialog
     private var mDevice: Device? = null
     private var dossierList = ArrayList<DossierOperating>()
     private lateinit var mDossierAdapter: OutboundAdapter
@@ -117,15 +118,14 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
                 val data = msg.data
                 val boxStateList = data.getIntegerArrayList("lock")
                 val infraredStateList = data.getIntegerArrayList("infrared")
-                if (boxStateList!!.isEmpty()){
+                if (boxStateList!!.isEmpty()) {
                     if (mDoorIsOpen) {
                         mDoorIsOpen = false
                         isAutoFinish = true
                         timerStart()
                         showToast("门关闭")
                     }
-                }
-                else {
+                } else {
                     if (!mDoorIsOpen) {
                         mDoorIsOpen = true
                         isAutoFinish = false
@@ -139,12 +139,12 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
             }
             SUBMITTED_SUCCESS -> {
                 Toast.makeText(this, "数据提交成功", Toast.LENGTH_SHORT).show()
-                mProgressSyncUserDialog.dismiss()
+                mProgressDialog.dismiss()
                 finish()
             }
             SUBMITTED_FAIL -> {
                 Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
-                mProgressSyncUserDialog.dismiss()
+                mProgressDialog.dismiss()
             }
         }
     }
@@ -153,8 +153,10 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
         super.onCreate(savedInstanceState)
         mOutboundBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_outbound_operating)
-        setSupportActionBar(mOutboundBinding.outboundOperatingToolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        val name = mSpUtil.getString(SharedPreferencesUtil.Key.NameTemp, "xxx")
+        mOutboundBinding.tvOperator.text = name
+
+        mOutboundBinding.onClickListener = this
         mOutboundBinding.onItemClickListener = this
 
         mHandler = OutboundOperatingHandler(this)
@@ -162,30 +164,36 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
         UR880Entrance.getInstance().addOnCabinetInfoListener(mCabinetInfoListener)
         UR880Entrance.getInstance().addOnInventoryListener(mInventoryListener)
 
-        mProgressSyncUserDialog = ProgressDialog(this)
+        mProgressDialog = ProgressDialog(this, R.style.mLoadingDialog)
+        mProgressDialog.setCancelable(false)
 
-        dossierList = DossierOperatingService.getInstance().queryBySelected() as ArrayList<DossierOperating>
+        dossierList =
+            DossierOperatingService.getInstance().queryBySelected() as ArrayList<DossierOperating>
         mDevice = DeviceService.getInstance().queryByDeviceName(dossierList[0].cabinetId)
-        if (mDevice == null){
+        if (mDevice == null) {
             showToast("未查询到该柜体！")
             finish()
             return
         }
-        mOutboundBinding.outboundBoxNumberTv.text = "柜体名称：${mDevice!!.deviceName}(${mDevice!!.deviceId})"
+//        mOutboundBinding.outboundBoxNumberTv.text = "柜体名称：${mDevice!!.deviceName}(${mDevice!!.deviceId})"
+        mOutboundBinding.outboundBoxNumberTv.text = "${mDevice!!.deviceName}"
+
         mDossierAdapter = OutboundAdapter(this, dossierList)
         mOutboundBinding.outboundOperatingLv.adapter = mDossierAdapter
 
         UR880Entrance.getInstance()
             .send(UR880SendInfo.Builder().openDoor(mDevice!!.deviceId, 0).build())
-        for (index in 1..5){
+        for (index in 1..5) {
             val lights = ArrayList<Int>()
-            for (dossierOperating in dossierList){
-                if(dossierOperating.floor == index){
+            for (dossierOperating in dossierList) {
+                if (dossierOperating.floor == index) {
                     lights.add(dossierOperating.light)
                 }
             }
             UR880Entrance.getInstance()
-                .send(UR880SendInfo.Builder().turnOnLight(mDevice!!.deviceId, index, lights).build())
+                .send(
+                    UR880SendInfo.Builder().turnOnLight(mDevice!!.deviceId, index, lights).build()
+                )
         }
 
     }
@@ -236,24 +244,40 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
 
     }
 
-
     override fun countDownTimerOnTick(millisUntilFinished: Long) {
         super.countDownTimerOnTick(millisUntilFinished)
         mOutboundBinding.outboundOperatingCountdownTv.text = millisUntilFinished.toString()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-//                for (index in 1..5){
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        when (item.itemId) {
+//            android.R.id.home -> {
+////                for (index in 1..5){
+////                    val lights = ArrayList<Int>()
+////                    UR880Entrance.getInstance()
+////                        .send(UR880SendInfo.Builder().turnOnLight(mDevice!!.deviceId, index, lights).build())
+////                }
+//                outboundSubmission()
+//            }
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.btn_out_storage -> {
+//                 for (index in 1..5){
 //                    val lights = ArrayList<Int>()
 //                    UR880Entrance.getInstance()
 //                        .send(UR880SendInfo.Builder().turnOnLight(mDevice!!.deviceId, index, lights).build())
 //                }
                 outboundSubmission()
             }
+
+            R.id.btn_back -> {
+                finish()
+            }
         }
-        return super.onOptionsItemSelected(item)
     }
 
     private class OutboundOperatingHandler(outboundOperatingActivity: OutboundOperatingActivity) :
@@ -275,23 +299,23 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
 
     private fun outboundSubmission() {
         var isOK = false
-        for (dossier in dossierList){
-            if (!dossier.selected){
+        for (dossier in dossierList) {
+            if (!dossier.selected) {
                 isOK = true
                 break
             }
         }
-        if (!isOK){
+        if (!isOK) {
             finish()
             return
         }
-        mProgressSyncUserDialog.setTitle("提交入库列表")
-        mProgressSyncUserDialog.setMessage("正在提交入库列表，请稍后......")
-        if (!mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.show()
+        mProgressDialog.setMessage("正在提交入库列表，请稍后...")
+        if (!mProgressDialog.isShowing) mProgressDialog.show()
+
         val jsonObject = JSONObject()
         try {
             val orderItemsJsonArray = JSONArray()
-            for (dossierChanged in dossierList){
+            for (dossierChanged in dossierList) {
                 if (!dossierChanged.selected) {
                     val changedObject = JSONObject()
                     changedObject.put("warrantNum", dossierChanged.warrantNum)
@@ -316,19 +340,19 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
                     if (success) {
                         val msg = Message.obtain()
                         msg.what = SUBMITTED_SUCCESS
-                        mHandler.sendMessage(msg)
+                        mHandler.sendMessageDelayed(msg, 800)
                     } else {
                         val msg = Message.obtain()
                         msg.what = SUBMITTED_FAIL
                         msg.obj = response.getString("message")
-                        mHandler.sendMessage(msg)
+                        mHandler.sendMessageDelayed(msg, 800)
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
                     val msg = Message.obtain()
                     msg.what = SUBMITTED_FAIL
-                    msg.obj = "数据解析失败。"
-                    mHandler.sendMessage(msg)
+                    msg.obj = "数据解析失败"
+                    mHandler.sendMessageDelayed(msg, 800)
                 }
             }, Response.ErrorListener { error ->
                 val msg = if (error != null)
@@ -342,7 +366,7 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
                 val message = Message.obtain()
                 message.what = SUBMITTED_FAIL
                 message.obj = msg
-                mHandler.sendMessage(message)
+                mHandler.sendMessageDelayed(message, 800)
             })
         jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
             10000,

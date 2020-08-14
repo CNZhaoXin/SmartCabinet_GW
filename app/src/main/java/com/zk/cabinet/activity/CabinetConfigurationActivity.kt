@@ -2,7 +2,6 @@ package com.zk.cabinet.activity
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -12,7 +11,6 @@ import com.zk.cabinet.R
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.Device
 import com.zk.cabinet.databinding.ActivityCabinetConfigurationBinding
-import com.zk.cabinet.db.CabinetService
 import com.zk.cabinet.db.DeviceService
 import kotlin.properties.Delegates
 
@@ -44,6 +42,7 @@ class CabinetConfigurationActivity : TimeOffAppCompatActivity() {
         super.onCreate(savedInstanceState)
         mActivityCabinetConfigurationBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_cabinet_configuration)
+
         setSupportActionBar(mActivityCabinetConfigurationBinding.cabinetConfigToolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 

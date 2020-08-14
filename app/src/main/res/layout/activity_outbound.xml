@@ -17,58 +17,246 @@
     </data>
 
     <LinearLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/bg2"
         android:orientation="vertical">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/outbound_abl"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_marginTop="30dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/outbound_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:layout_scrollFlags="scroll|enterAlways"
-                app:popupTheme="@style/AppTheme.PopupOverlay">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:layout_centerVertical="true"
+                android:background="@drawable/shape_oprator_bg"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingRight="20dp">
 
                 <TextView
-                    android:gravity="center"
-                    android:id="@+id/outbound_out_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:layout_marginEnd="@dimen/big_spacing"
-                    android:layout_marginLeft="@dimen/big_spacing"
-                    android:onClick="@{onClickListener}"
-                    android:text="开门"
-                    android:textSize="@dimen/super_big_lite_text"
-                    android:textColor="@color/white" />
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:text="操作员:"
+                    android:textColor="@color/gray_light"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:id="@+id/tv_operator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="xxx"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="10dp"
+                    android:text="操作:"
+                    android:textColor="@color/gray_light"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="『档案出库』"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginRight="10dp"
+                    android:src="@mipmap/ic_clock" />
 
                 <TextView
                     android:id="@+id/outbound_countdown_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:paddingEnd="@dimen/super_big_spacing"
-                    android:textColor="@color/colorFontMain"
-                    android:textSize="@dimen/medium_text" />
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:text="0"
+                    android:textColor="#EE6911"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
 
-            </androidx.appcompat.widget.Toolbar>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical"
+                    android:text="秒"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
-        </com.google.android.material.appbar.AppBarLayout>
+            </LinearLayout>
 
-        <ListView
-            android:id="@+id/outbound_lv"
+        </RelativeLayout>
+
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:OnItemClickListener="@{onItemClickListener}" />
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="60dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="60dp"
+                android:layout_marginBottom="60dp"
+                android:background="@drawable/shape_list_trans_bg"
+                android:orientation="vertical"
+                android:paddingLeft="20dp"
+                android:paddingTop="15dp"
+                android:paddingRight="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="25dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/title_medium_l_spacing"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="「权证编号」"
+                        android:textColor="#1ABDE6"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/title_medium_l_spacing"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="「权证名称」"
+                        android:textColor="#1ABDE6"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/title_medium_spacing"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="「权证号码」"
+                        android:textColor="#1ABDE6"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/title_medium_l_spacing"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="「权证类别」"
+                        android:textColor="#1ABDE6"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/title_medium_spacing"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="「RFID标签」"
+                        android:textColor="#1ABDE6"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/title_medium_spacing"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="「出库类型」"
+                        android:textColor="#1ABDE6"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/title_medium_spacing"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="「所在位置」"
+                        android:textColor="#1ABDE6"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+                <ListView
+                    android:id="@+id/outbound_lv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:OnItemClickListener="@{onItemClickListener}" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="100dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="60dp"
+                    android:background="@drawable/selector_menu_orange"
+                    android:drawableLeft="@mipmap/ic_back"
+                    android:drawablePadding="20dp"
+                    android:gravity="center"
+                    android:onClick="@{onClickListener}"
+                    android:padding="30dp"
+                    android:text="返 回"
+                    android:textColor="@color/white"
+                    android:textSize="36sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btn_open_door"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_btn_un_enable"
+                    android:drawableLeft="@mipmap/ic_open_door"
+                    android:drawablePadding="20dp"
+                    android:enabled="false"
+                    android:gravity="center"
+                    android:onClick="@{onClickListener}"
+                    android:padding="30dp"
+                    android:text="开 柜"
+                    android:textColor="@color/white"
+                    android:textSize="36sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
 
     </LinearLayout>
+
 </layout>

@@ -1,6 +1,7 @@
 package com.zk.cabinet.bean
 
-class MainMenuInfo(imageUrl: Int, imageName: String) {
-    val mImageUrl = imageUrl
-    val mImageName = imageName
+class MainMenuInfo(mImage: Int, mText: String, mBackGround: Int) {
+    val mImage = mImage
+    val mText = mText
+    val mBackground = mBackGround
 }

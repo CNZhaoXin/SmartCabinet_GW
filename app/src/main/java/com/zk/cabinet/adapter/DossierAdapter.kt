@@ -10,7 +10,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.zk.cabinet.R
 import com.zk.cabinet.bean.Dossier
-import com.zk.cabinet.bean.DossierOperating
 import com.zk.cabinet.constant.SelfComm
 
 class DossierAdapter(context: Context, dossierList: List<Dossier>) :
@@ -46,14 +45,15 @@ class DossierAdapter(context: Context, dossierList: List<Dossier>) :
         viewHolder.mAdapterOutboundNoTv.text = dossier.warrantNo
         viewHolder.mAdapterOutboundCateTv.text = dossier.warranCate
         viewHolder.mAdapterOutboundTypeTv.text = SelfComm.OPERATING_TYPE[dossier.operatingType]
-        viewHolder.mAdapterOutboundPositionTv.text = "${dossier.cabinetId} - ${dossier.floor} -${dossier.light}"
+        viewHolder.mAdapterOutboundPositionTv.text =
+            "${dossier.cabinetId} - ${dossier.floor} -${dossier.light}"
 
-        if (dossier.isSelected){
-            viewHolder.mAdapterOutboundLl.setBackgroundColor(mContext.getColor(R.color.md_blue_300))
-            viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.drawable.ok))
+        if (dossier.isSelected) {
+//            viewHolder.mAdapterOutboundLl.setBackgroundColor(mContext.getColor(R.color.md_blue_300))
+            viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.mipmap.ic_check))
         } else {
-            viewHolder.mAdapterOutboundLl.setBackgroundColor(mContext.getColor(R.color.white))
-            viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.drawable.no))
+//            viewHolder.mAdapterOutboundLl.setBackgroundColor(mContext.getColor(R.color.white))
+            viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.mipmap.ic_check_no))
         }
 
         return view!!
