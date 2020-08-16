@@ -54,6 +54,7 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private var isAutomatic by Delegates.notNull<Boolean>()
     private val mDeviceList = ArrayList<Device>()
     private var mInventoryIdList = ArrayList<String>()
+    private lateinit var mOrgCode :String
 
     companion object {
         private const val START_INVENTORY = 0x01
@@ -172,6 +173,8 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         mProgressSyncUserDialog = ProgressDialog(this)
 
         isAutomatic = intent.getBooleanExtra(AUTOMATIC, false)
+
+        mOrgCode = mSpUtil.getString(SharedPreferencesUtil.Key.OrgCodeTemp, "00000000")!!
 
         if (!isAutomatic) {
             val deviceList = DeviceService.getInstance().loadAll()
@@ -362,6 +365,7 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
             inventories.put("inventoryId", inventoryId)
             inventories.put("orderItems", orderItemsJsonArray)
             inventoriesJsonArray.put(inventories)
+            jsonObject.put("inputOrg", mOrgCode)
             jsonObject.put("inventories", inventoriesJsonArray)
         } catch (e: JSONException) {
             e.printStackTrace()

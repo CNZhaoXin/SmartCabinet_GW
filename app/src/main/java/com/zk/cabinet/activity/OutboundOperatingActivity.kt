@@ -24,6 +24,7 @@ import com.zk.cabinet.databinding.ActivityOutboundOperatingBinding
 import com.zk.cabinet.db.DeviceService
 import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.net.NetworkRequest
+import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.common.utils.LogUtil
 import com.zk.common.utils.TimeUtil
 import com.zk.rfid.bean.LabelInfo
@@ -46,6 +47,7 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
     private val labelInfoList = ArrayList<LabelInfo>()
     private var mFloor = -1
     private var mDoorIsOpen = false
+    private lateinit var mOrgCode :String
 
     companion object {
         private const val OPEN_DOOR_RESULT = 0x01
@@ -158,6 +160,8 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
         mOutboundBinding.onItemClickListener = this
 
         mHandler = OutboundOperatingHandler(this)
+
+        mOrgCode = mSpUtil.getString(SharedPreferencesUtil.Key.OrgCodeTemp, "00000000")!!
 
         UR880Entrance.getInstance().addOnCabinetInfoListener(mCabinetInfoListener)
         UR880Entrance.getInstance().addOnInventoryListener(mInventoryListener)
@@ -285,8 +289,8 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
             finish()
             return
         }
-        mProgressSyncUserDialog.setTitle("提交入库列表")
-        mProgressSyncUserDialog.setMessage("正在提交入库列表，请稍后......")
+        mProgressSyncUserDialog.setTitle("提交出库列表")
+        mProgressSyncUserDialog.setMessage("正在提交出库列表，请稍后......")
         if (!mProgressSyncUserDialog.isShowing) mProgressSyncUserDialog.show()
         val jsonObject = JSONObject()
         try {
@@ -303,6 +307,7 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
                     orderItemsJsonArray.put(changedObject)
                 }
             }
+            jsonObject.put("orgCode", mOrgCode)
             jsonObject.put("orderItems", orderItemsJsonArray)
         } catch (e: JSONException) {
             e.printStackTrace()

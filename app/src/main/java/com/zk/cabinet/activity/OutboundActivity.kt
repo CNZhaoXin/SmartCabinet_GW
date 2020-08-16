@@ -22,6 +22,7 @@ import com.zk.cabinet.bean.DossierOperating
 import com.zk.cabinet.databinding.ActivityOutboundBinding
 import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.net.NetworkRequest
+import com.zk.cabinet.utils.SharedPreferencesUtil
 import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -108,7 +109,10 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener, Adapt
 
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET,
-            NetworkRequest.instance.mOutboundList,
+            "${NetworkRequest.instance.mOutboundList}?orgCode=${mSpUtil.getString(
+                SharedPreferencesUtil.Key.OrgCodeTemp,
+                "00000000"
+            )!!}",
             Response.Listener { response ->
                 try {
                     DossierOperatingService.getInstance().deleteAll()
