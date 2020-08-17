@@ -52,6 +52,7 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
     private lateinit var mDossierAdapter: DossierAdapter
     private var mDoorIsOpen = false
     private val mCabinet = HashMap<String, ArrayList<Int>>()
+    private lateinit var mOrgCode :String
 
     companion object {
         private const val OPEN_DOOR_RESULT = 0x01
@@ -228,6 +229,7 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
         mDossierAdapter = DossierAdapter(this, dossierList)
         mWarehousingBinding.warehousingOperatingLv.adapter = mDossierAdapter
 
+        mOrgCode = mSpUtil.getString(Key.OrgCodeTemp, "00000000")!!
         val cabinets = mSpUtil.getString(Key.OrgCabinet, "")!!.split(",").toTypedArray()
         for (cabinet in cabinets) {
             val device = cabinet.subSequence(0, cabinet.indexOf("/", 0)).toString()
@@ -437,6 +439,7 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
                 finish()
                 return
             }
+            jsonObject.put("orgCode", mOrgCode)
             jsonObject.put("orderItems", orderItemsJsonArray)
         } catch (e: JSONException) {
             e.printStackTrace()

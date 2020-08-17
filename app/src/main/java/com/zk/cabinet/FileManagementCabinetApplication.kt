@@ -1,6 +1,7 @@
 package com.zk.cabinet
 
 import android.app.Application
+import com.tencent.bugly.crashreport.CrashReport
 import com.zk.cabinet.bean.User
 import com.zk.cabinet.db.CabinetService
 import com.zk.cabinet.db.DBHelper
@@ -14,6 +15,9 @@ class FileManagementCabinetApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        CrashReport.initCrashReport(applicationContext, "23298db165", true)
+
         //初始化数据库
         DBHelper.getInstance().init(this)
         //初始化SharedPreferencesUtil

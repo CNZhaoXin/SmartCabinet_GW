@@ -47,6 +47,7 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
     private val labelInfoList = ArrayList<LabelInfo>()
     private var mFloor = -1
     private var mDoorIsOpen = false
+    private lateinit var mOrgCode :String
 
     companion object {
         private const val OPEN_DOOR_RESULT = 0x01
@@ -160,6 +161,8 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
         mOutboundBinding.onItemClickListener = this
 
         mHandler = OutboundOperatingHandler(this)
+
+        mOrgCode = mSpUtil.getString(SharedPreferencesUtil.Key.OrgCodeTemp, "00000000")!!
 
         UR880Entrance.getInstance().addOnCabinetInfoListener(mCabinetInfoListener)
         UR880Entrance.getInstance().addOnInventoryListener(mInventoryListener)
@@ -309,7 +312,7 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
             finish()
             return
         }
-        mProgressDialog.setMessage("正在提交入库列表，请稍后...")
+        mProgressDialog.setMessage("正在提交出库列表，请稍后...")
         if (!mProgressDialog.isShowing) mProgressDialog.show()
 
         val jsonObject = JSONObject()
@@ -327,6 +330,7 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
                     orderItemsJsonArray.put(changedObject)
                 }
             }
+            jsonObject.put("orgCode", mOrgCode)
             jsonObject.put("orderItems", orderItemsJsonArray)
         } catch (e: JSONException) {
             e.printStackTrace()

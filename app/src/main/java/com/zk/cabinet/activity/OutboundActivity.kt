@@ -101,7 +101,10 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
     private fun getOutbound() {
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET,
-            NetworkRequest.instance.mOutboundList,
+            "${NetworkRequest.instance.mOutboundList}?orgCode=${mSpUtil.getString(
+                SharedPreferencesUtil.Key.OrgCodeTemp,
+                "00000000"
+            )!!}",
             Response.Listener { response ->
                 try {
                     DossierOperatingService.getInstance().deleteAll()

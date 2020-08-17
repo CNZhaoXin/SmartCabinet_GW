@@ -20,6 +20,7 @@ import com.zk.cabinet.bean.DossierOperating
 import com.zk.cabinet.databinding.ActivityWarehousingBinding
 import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.net.NetworkRequest
+import com.zk.cabinet.utils.SharedPreferencesUtil.Key
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import org.json.JSONException
 import org.json.JSONObject
@@ -96,7 +97,9 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private fun getWarehousing() {
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET,
-            NetworkRequest.instance.mWarehousingList,
+            "${NetworkRequest.instance.mWarehousingList}?orgCode=${mSpUtil.getString(Key.OrgCodeTemp,
+                "00000000"
+            )!!}",
             Response.Listener { response ->
                 try {
                     DossierOperatingService.getInstance().deleteAll()

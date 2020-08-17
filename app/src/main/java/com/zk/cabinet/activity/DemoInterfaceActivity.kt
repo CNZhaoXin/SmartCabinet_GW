@@ -55,6 +55,7 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private var isAutomatic by Delegates.notNull<Boolean>()
     private var mInventoryIdList = ArrayList<String>()
     private val mDeviceList = ArrayList<Device>()
+    private lateinit var mOrgCode :String
 
     companion object {
         private const val START_INVENTORY = 0x01
@@ -176,13 +177,15 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
 
         isAutomatic = intent.getBooleanExtra(AUTOMATIC, false)
 
+        mOrgCode = mSpUtil.getString(SharedPreferencesUtil.Key.OrgCodeTemp, "00000000")!!
+
         if (!isAutomatic) { // 手动进入盘点界面
             // 是否开启倒计时关闭
             isAutoFinish = true
             showSingleSelectDialog()
             initView()
         } else {   // 自动盘点时界面
-            // 是否开启倒计时关闭
+            //  自动盘点时关闭倒计时
             isAutoFinish = false
 
             mDemoInterfaceBinding.tvOperatorText.visibility = View.GONE
@@ -408,6 +411,7 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
             inventories.put("inventoryId", inventoryId)
             inventories.put("orderItems", orderItemsJsonArray)
             inventoriesJsonArray.put(inventories)
+            jsonObject.put("inputOrg", mOrgCode)
             jsonObject.put("inventories", inventoriesJsonArray)
         } catch (e: JSONException) {
             e.printStackTrace()
