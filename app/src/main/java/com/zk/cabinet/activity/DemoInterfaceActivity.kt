@@ -55,7 +55,7 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private var isAutomatic by Delegates.notNull<Boolean>()
     private var mInventoryIdList = ArrayList<String>()
     private val mDeviceList = ArrayList<Device>()
-    private lateinit var mOrgCode :String
+    private lateinit var mOrgCode: String
 
     companion object {
         private const val START_INVENTORY = 0x01

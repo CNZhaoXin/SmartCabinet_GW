@@ -35,13 +35,24 @@ public class UserService extends BaseService<User, Long> {
         return user;
     }
 
+    public User queryByUserUuId(String uuId) {
+
+        if (uuId == null) return null;
+
+        List<User> list = query(UserDao.Properties.UuId.eq(uuId));
+        User user = null;
+        if (list != null && list.size() > 0) {
+            user = list.get(0);
+        }
+        return user;
+    }
+
     public List<User> queryByUserCodeList(String userCode) {
         if (userCode == null) return null;
         return query(UserDao.Properties.UserCode.eq(userCode));
     }
 
     public User queryByUserCode(String userCode) {
-
         if (userCode == null) return null;
 
         List<User> list = query(UserDao.Properties.UserCode.eq(userCode));

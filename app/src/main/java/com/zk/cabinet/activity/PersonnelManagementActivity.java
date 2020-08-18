@@ -8,7 +8,6 @@ import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
 
 import androidx.databinding.DataBindingUtil;
 
@@ -35,21 +34,35 @@ public class PersonnelManagementActivity extends TimeOffAppCompatActivity {
     private UserAdapter mAdapter;
     private int mPosition;
     private AlertDialog mFingerDialog;
-
     private MHandler mHandler;
+    private User curUser;
+    boolean isCanInputFingerprint;
 
     private void handleMessage(Message msg) {
         switch (msg.what) {
             case FINGERPRINT:
-                if (mPosition != -1) {
-                    list.get(mPosition).setFingerPrint((byte[]) msg.obj);
-                    list.get(mPosition).setModifyTime(TimeUtil.INSTANCE.nowTimeOfSeconds());
-                    UserService.getInstance().update(list.get(mPosition));
-                    showToast(list.get(mPosition).getUserName() + " ,您的指纹已录入！");
-                    mPosition = -1;
+//                if (mPosition != -1) {
+//                    list.get(mPosition).setFingerPrint((byte[]) msg.obj);
+//                    list.get(mPosition).setModifyTime(TimeUtil.INSTANCE.nowTimeOfSeconds());
+//                    UserService.getInstance().update(list.get(mPosition));
+//                    showToast(list.get(mPosition).getUserName() + " ,您的指纹已录入！");
+//                    mPosition = -1;
+//                    if (mFingerDialog != null && mFingerDialog.isShowing()) mFingerDialog.dismiss();
+//                    mAdapter.notifyDataSetChanged();
+//                    FingerprintParsingLibrary.getInstance().upUserList();
+//                }
+
+                if (isCanInputFingerprint) {
+                    curUser.setFingerPrint((byte[]) msg.obj);
+                    curUser.setModifyTime(TimeUtil.INSTANCE.nowTimeOfSeconds());
+                    UserService.getInstance().update(curUser);
+                    isCanInputFingerprint = false;
                     if (mFingerDialog != null && mFingerDialog.isShowing()) mFingerDialog.dismiss();
-                    mAdapter.notifyDataSetChanged();
                     FingerprintParsingLibrary.getInstance().upUserList();
+
+                    binding.tvFingerprint.setText("已录入");
+                    binding.tvFingerprint.setTextColor(getResources().getColor(R.color.md_teal_A400));
+                    showToast(curUser.getUserName() + " ,您的指纹已成功录入！");
                 }
                 break;
         }
@@ -60,12 +73,6 @@ public class PersonnelManagementActivity extends TimeOffAppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_personnel_management);
         mHandler = new MHandler(this);
-        binding.btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
 
         String name = getMSpUtil().getString(SharedPreferencesUtil.Key.NameTemp, "xxx");
         binding.tvOperator.setText(name);
@@ -73,12 +80,66 @@ public class PersonnelManagementActivity extends TimeOffAppCompatActivity {
         init();
     }
 
+//    private void init() {
+//        list = UserService.getInstance().loadAll();
+//        mAdapter = new UserAdapter(this, list);
+//        binding.listView.setAdapter(mAdapter);
+//        binding.listView.setOnItemClickListener(onItemClickListener);
+//        FingerprintParsingLibrary.getInstance().onFingerprintListener(fingerprintListener);
+//    }
+
     private void init() {
-        list = UserService.getInstance().loadAll();
-        mAdapter = new UserAdapter(this, list);
-        binding.listView.setAdapter(mAdapter);
-        binding.listView.setOnItemClickListener(onItemClickListener);
-        FingerprintParsingLibrary.getInstance().onFingerprintListener(fingerprintListener);
+        String uuId = getMSpUtil().getString(SharedPreferencesUtil.Key.IdTemp, "");
+        curUser = UserService.getInstance().queryByUserUuId(uuId);
+
+        binding.tvUserName.setText(curUser.getUserName());
+        binding.tvLoginCode.setText(curUser.getUserCode());
+
+        if (curUser.getFingerPrint() == null) {
+            binding.tvFingerprint.setText("未录入");
+            binding.tvFingerprint.setTextColor(getResources().getColor(R.color.md_red_A200));
+            binding.btnInputFingerprint.setText("录 入");
+        } else {
+            binding.tvFingerprint.setText("已录入");
+            binding.tvFingerprint.setTextColor(getResources().getColor(R.color.md_teal_A400));
+            binding.btnInputFingerprint.setText("重 录");
+        }
+
+        binding.btnInputFingerprint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mFingerDialog == null) {
+                    DialogFingerBinding dialogFingerBinding = DataBindingUtil.inflate(LayoutInflater.from(PersonnelManagementActivity.this), R.layout.dialog_finger, null, false);
+                    dialogFingerBinding.btnCancel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            mFingerDialog.dismiss();
+                            isCanInputFingerprint = false;
+                        }
+                    });
+
+                    mFingerDialog = new AlertDialog.Builder(PersonnelManagementActivity.this)
+                            .setCancelable(false)
+                            .setView(dialogFingerBinding.getRoot())
+                            .create();
+
+                    Window window = mFingerDialog.getWindow();
+                    assert window != null;
+                    window.setBackgroundDrawable(new ColorDrawable(0));
+                }
+                mFingerDialog.show();
+
+                isCanInputFingerprint = true;
+                FingerprintParsingLibrary.getInstance().onFingerprintListener(fingerprintListener);
+            }
+        });
+
+        binding.btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
     protected void countDownTimerOnTick(long millisUntilFinished) {
@@ -91,38 +152,38 @@ public class PersonnelManagementActivity extends TimeOffAppCompatActivity {
         super.onDestroy();
     }
 
-    private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            mPosition = position;
-
-            if (mFingerDialog == null) {
-                DialogFingerBinding dialogFingerBinding = DataBindingUtil.inflate(LayoutInflater.from(PersonnelManagementActivity.this), R.layout.dialog_finger, null, false);
-                dialogFingerBinding.btnCancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mPosition = -1;
-                        mFingerDialog.dismiss();
-                    }
-                });
-
-                mFingerDialog = new AlertDialog.Builder(PersonnelManagementActivity.this)
-                        .setCancelable(false)
-                        .setView(dialogFingerBinding.getRoot())
-                        .create();
-
-                Window window = mFingerDialog.getWindow();
-                assert window != null;
-                window.setBackgroundDrawable(new ColorDrawable(0));
-            }
-            mFingerDialog.show();
-        }
-    };
+//    private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
+//        @Override
+//        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//            mPosition = position;
+//
+//            if (mFingerDialog == null) {
+//                DialogFingerBinding dialogFingerBinding = DataBindingUtil.inflate(LayoutInflater.from(PersonnelManagementActivity.this), R.layout.dialog_finger, null, false);
+//                dialogFingerBinding.btnCancel.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        mPosition = -1;
+//                        mFingerDialog.dismiss();
+//                    }
+//                });
+//
+//                mFingerDialog = new AlertDialog.Builder(PersonnelManagementActivity.this)
+//                        .setCancelable(false)
+//                        .setView(dialogFingerBinding.getRoot())
+//                        .create();
+//
+//                Window window = mFingerDialog.getWindow();
+//                assert window != null;
+//                window.setBackgroundDrawable(new ColorDrawable(0));
+//            }
+//            mFingerDialog.show();
+//        }
+//    };
 
     private FingerprintListener fingerprintListener = new FingerprintListener() {
         @Override
         public void fingerprint(byte[] fingerprint) {
-            if (mPosition != -1) {
+            if (isCanInputFingerprint) {
                 Message msg = Message.obtain();
                 msg.what = FINGERPRINT;
                 msg.obj = fingerprint;

@@ -29,6 +29,7 @@ import com.zk.cabinet.constant.SelfComm
 import com.zk.cabinet.databinding.ActivityGuideBinding
 import com.zk.cabinet.databinding.DialogLoginBinding
 import com.zk.cabinet.db.DeviceService
+import com.zk.cabinet.db.UserService
 import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.service.NetService
 import com.zk.cabinet.utils.FingerprintParsingLibrary
@@ -223,7 +224,6 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         }
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         UR880Entrance.getInstance().removeAllDeviceInformationListener()
@@ -312,24 +312,53 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                         // "orgList":[{"id":"7cace0829663d4a43f224017b2a4acfa","name":"17774016396","code":"6665","parentOrgCode":null,"childOrgCode":null,"orgCabinet":"1234567801\/1234567801_1,a-b111\/a-b111_3"}]}
 
                         val recordList = ArrayList<Record>()
-                        recordList.add(Record(Key.IdTemp, data.getString("id")))
-                        recordList.add(Record(Key.NameTemp, data.getString("name")))
-                        recordList.add(Record(Key.GenderTemp, data.getString("gender")))
-                        recordList.add(Record(Key.PhoneNumberTemp, data.getString("phoneNumber")))
-                        recordList.add(Record(Key.LoginCodeTemp, data.getString("loginCode")))
-                        recordList.add(Record(Key.RoleIdTemp, data.getString("roleId")))
-                        recordList.add(Record(Key.RoleNameTemp, data.getString("roleName")))
-                        recordList.add(Record(Key.RootMemberTemp, data.getString("rootMember")))
-                        recordList.add(Record(Key.OrgCodeTemp, data.getString("orgCode")))
-                        recordList.add(Record(Key.OrgNameTemp, data.getString("orgName")))
+                        var id = data.getString("id")
+                        var name = data.getString("name") // 用户昵称
+                        var gender = data.getString("gender")
+                        var phoneNumber = data.getString("phoneNumber")
+                        var loginCode = data.getString("loginCode") // 登录账号
+                        var roleId = data.getString("roleId") // 用户类型
+                        var roleName = data.getString("roleName")
+                        var rootMember = data.getString("rootMember")
+                        var orgCode = data.getString("orgCode")
+                        var orgName = data.getString("orgName")
                         val orgList = data.getJSONArray("orgList")
-                        recordList.add(
-                            Record(
-                                Key.OrgCabinet,
-                                (orgList[0] as JSONObject).getString("orgCabinet")
-                            )
-                        )
+                        var orgCabinet = (orgList[0] as JSONObject).getString("orgCabinet")
+
+                        recordList.add(Record(Key.IdTemp, id))
+                        recordList.add(Record(Key.NameTemp, name))
+                        recordList.add(Record(Key.GenderTemp, gender))
+                        recordList.add(Record(Key.PhoneNumberTemp, phoneNumber))
+                        recordList.add(Record(Key.LoginCodeTemp, loginCode))
+                        recordList.add(Record(Key.RoleIdTemp, roleId))
+                        recordList.add(Record(Key.RoleNameTemp, roleName))
+                        recordList.add(Record(Key.RootMemberTemp, rootMember))
+                        recordList.add(Record(Key.OrgCodeTemp, orgCode))
+                        recordList.add(Record(Key.OrgNameTemp, orgName))
+                        recordList.add(Record(Key.OrgCabinet, orgCabinet))
                         mSpUtil.applyValue(recordList)
+
+                        // 登录成功, 存在: 更新用户信息, 不存在:创建新用户
+                        val user = UserService.getInstance().queryByUserUuId(id)
+                        if (user == null) {
+                            val newUser = User()
+                            newUser.uuId = id
+                            newUser.userCode = loginCode
+                            newUser.password = pwd
+                            newUser.userName = name
+                            newUser.userType = roleId.toInt()
+                            newUser.cabinet = orgCabinet
+                            UserService.getInstance().insert(newUser)
+                        } else {
+                            user.uuId = id
+                            user.userCode = loginCode
+                            user.password = pwd
+                            user.userName = name
+                            user.userType = roleId.toInt()
+                            user.cabinet = orgCabinet
+                            UserService.getInstance().update(user)
+                            FingerprintParsingLibrary.getInstance().upUserList()
+                        }
 
                         val msg = Message.obtain()
                         msg.what = LOGIN_BY_PWD_SUCCESS

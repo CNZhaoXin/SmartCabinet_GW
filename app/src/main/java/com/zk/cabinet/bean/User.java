@@ -7,13 +7,18 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Property;
-import org.greenrobot.greendao.annotation.Unique;
 
 @Entity(nameInDb = "User")
 public class User {
     @Property(nameInDb = "ID")
     @Id
     private Long id;
+
+    // 用户UUID
+    @Expose
+    @SerializedName("UserUuId")
+    @Property(nameInDb = "uuId")
+    private String uuId;
 
     //用户编号
     @Expose
@@ -69,11 +74,12 @@ public class User {
     @Property(nameInDb = "ModifyTime")
     private String modifyTime;
 
-    @Generated(hash = 1814295009)
-    public User(Long id, String userCode, String userName, String cabinet,
-            int userType, String password, String cardID, byte[] fingerPrint,
-            String faceInfo, String modifyTime) {
+    @Generated(hash = 467077992)
+    public User(Long id, String uuId, String userCode, String userName, String cabinet,
+                int userType, String password, String cardID, byte[] fingerPrint, String faceInfo,
+                String modifyTime) {
         this.id = id;
+        this.uuId = uuId;
         this.userCode = userCode;
         this.userName = userName;
         this.cabinet = cabinet;
@@ -168,5 +174,12 @@ public class User {
     public void setModifyTime(String modifyTime) {
         this.modifyTime = modifyTime;
     }
-    
+
+    public void setUuId(String uuId) {
+        this.uuId = uuId;
+    }
+
+    public String getUuId() {
+        return uuId;
+    }
 }
