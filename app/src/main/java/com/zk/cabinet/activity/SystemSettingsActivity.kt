@@ -155,7 +155,8 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
         isShowRestartNowForSet = mSpUtil.getBoolean(Key.RestartNowForSet, false)
 
         mDeviceCode = mSpUtil.getString(Key.DeviceCode, resources.getString(R.string.null_prompt))!!
-        mUnitNumber = mSpUtil.getString(Key.OrgCodeTemp, resources.getString(R.string.null_prompt))!!
+        mUnitNumber =
+            mSpUtil.getString(Key.OrgCodeTemp, resources.getString(R.string.null_prompt))!!
         mUnitAddress =
             mSpUtil.getString(Key.UnitAddress, resources.getString(R.string.null_prompt))!!
 
@@ -355,7 +356,7 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                                     }
                                 }
                             })
-                    mDeviceCodeDialog!!.mInputType = InputType.TYPE_CLASS_NUMBER
+                    mDeviceCodeDialog!!.mInputType = InputType.TYPE_CLASS_TEXT
                 }
                 mDeviceCodeDialog!!.mMessage = mDeviceCode
                 mDeviceCodeDialog!!.show(supportFragmentManager, "DeviceCode")
@@ -380,7 +381,7 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                                     }
                                 }
                             })
-                    mUnitNumberDialog!!.mInputType = InputType.TYPE_CLASS_NUMBER
+                    mUnitNumberDialog!!.mInputType = InputType.TYPE_CLASS_TEXT
                 }
                 mUnitNumberDialog!!.mMessage = mUnitNumber
                 mUnitNumberDialog!!.show(supportFragmentManager, "UnitNumber")

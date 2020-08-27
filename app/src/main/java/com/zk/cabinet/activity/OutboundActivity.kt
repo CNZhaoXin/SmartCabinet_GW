@@ -6,24 +6,27 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import com.alibaba.fastjson.JSON
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.zk.cabinet.R
 import com.zk.cabinet.adapter.OutboundAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
-import com.zk.cabinet.bean.DossierOperating
+import com.zk.cabinet.bean.Device
+import com.zk.cabinet.bean.ResultGetOutBound
 import com.zk.cabinet.databinding.ActivityOutboundBinding
-import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import org.json.JSONException
-import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
@@ -33,12 +36,14 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
     private lateinit var mHandler: OutboundHandler
     private lateinit var mProgressDialog: ProgressDialog
 
-    private var mOutboundList = ArrayList<DossierOperating>()
+    private var mOutboundList =
+        ArrayList<ResultGetOutBound.NameValuePairsBeanX.DataBean.ValuesBean>()
     private lateinit var mOutboundAdapter: OutboundAdapter
 
     companion object {
         private const val GET_OUTBOUND_SUCCESS = 0x01
         private const val GET_OUTBOUND_FAIL = 0x02
+        private const val GET_OUTBOUND_NO_DATA = 0x03
 
         fun newIntent(packageContext: Context?): Intent {
             return Intent(packageContext, OutboundActivity::class.java)
@@ -49,9 +54,15 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
         when (msg.what) {
             GET_OUTBOUND_SUCCESS -> {
                 mProgressDialog.dismiss()
-                mOutboundList = msg.obj as ArrayList<DossierOperating>
+                mOutboundList =
+                    msg.obj as ArrayList<ResultGetOutBound.NameValuePairsBeanX.DataBean.ValuesBean>
                 mOutboundAdapter.setList(mOutboundList)
                 mOutboundAdapter.notifyDataSetChanged()
+            }
+            GET_OUTBOUND_NO_DATA -> {
+                mProgressDialog.dismiss()
+                Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
+                finish()
             }
             GET_OUTBOUND_FAIL -> {
                 mProgressDialog.dismiss()
@@ -73,15 +84,13 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
         mOutboundAdapter = OutboundAdapter(this, mOutboundList)
         mOutboundBinding.outboundLv.adapter = mOutboundAdapter
 
+        val name = mSpUtil.getString(SharedPreferencesUtil.Key.NameTemp, "xxx")
+        mOutboundBinding.tvOperator.text = name
+
         mProgressDialog = ProgressDialog(this, R.style.mLoadingDialog)
         mProgressDialog.setCancelable(false)
-        mProgressDialog.setMessage("正在获取出库列表，请稍后...")
-        mProgressDialog.show()
 
         getOutbound()
-
-        val name = mSpUtil.getString(SharedPreferencesUtil.Key.NameTemp, "未知")
-        mOutboundBinding.tvOperator.text = name
     }
 
     override fun countDownTimerOnTick(millisUntilFinished: Long) {
@@ -99,45 +108,68 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
     }
 
     private fun getOutbound() {
+        mProgressDialog.setMessage("正在获取待出库档案列表...")
+        mProgressDialog.show()
+        mOutboundList.clear()
+
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET,
             "${NetworkRequest.instance.mOutboundList}?orgCode=${mSpUtil.getString(
-                SharedPreferencesUtil.Key.OrgCodeTemp,
-                "00000000"
+                SharedPreferencesUtil.Key.OrgCodeTemp, ""
             )!!}",
             Response.Listener { response ->
                 try {
-                    DossierOperatingService.getInstance().deleteAll()
+                    Log.e("获取出库列表-请求结果：", Gson().toJson(response));
+                    val resultGetOutBound = JSON.parseObject<ResultGetOutBound>(
+                        Gson().toJson(response),
+                        ResultGetOutBound::class.java
+                    )
+                    if (resultGetOutBound.nameValuePairs.isSuccess) {
+                        val values = resultGetOutBound.nameValuePairs.data.values
+                        if (values.size > 0) {
+                            // 剔除不属于我的柜子权限的出库条目
+                            val canOperateCabinetList =
+                                mSpUtil.getString(SharedPreferencesUtil.Key.CanOperateCabinet, "")
+                            val gson = Gson()
+                            val deviceList = gson.fromJson<List<Device>>(
+                                canOperateCabinetList,
+                                object : TypeToken<List<Device?>?>() {}.type
+                            )
+                            val deviceSet = HashSet<String>()
+                            for (device in deviceList) {
+                                deviceSet.add(device.deviceName)
+                            }
 
-                    val werehousingList = DossierOperatingService.getInstance().nullList
-                    val success = response.getBoolean("success")
-                    if (success) {
-                        val dataJsonArray = response.getJSONArray("data")
-                        for (i in 0 until dataJsonArray.length()) {
-                            val jsonObject: JSONObject = dataJsonArray.getJSONObject(i)
-                            val tools = DossierOperating()
-                            tools.warrantNum = jsonObject.getString("warrantNum")
-                            tools.rfidNum = jsonObject.getString("rfidNum")
-                            tools.warrantName = jsonObject.getString("warrantName")
-                            tools.warrantNo = jsonObject.getString("warrantNo")
-                            tools.warranCate = jsonObject.getString("warranCate")
-                            tools.operatingType = jsonObject.getInt("outStorageType")
-                            tools.warranType = jsonObject.getInt("warranType")
-                            tools.cabinetId = jsonObject.getString("cabCode")
-                            tools.floor = jsonObject.getInt("position")
-                            tools.light = jsonObject.getInt("light")
+                            var mCanOutboundList =
+                                ArrayList<ResultGetOutBound.NameValuePairsBeanX.DataBean.ValuesBean>()
+                            for (value in values) {
+                                if (deviceSet.contains(value.nameValuePairs.cabcode)) {
+                                    mCanOutboundList.add(value)
+                                }
+                            }
 
-                            werehousingList.add(tools)
+                            if (mCanOutboundList.size > 0) {
+                                val msg = Message.obtain()
+                                msg.what = GET_OUTBOUND_SUCCESS
+                                msg.obj = mCanOutboundList
+                                mHandler.sendMessageDelayed(msg, 800)
+                            } else {
+                                val msg = Message.obtain()
+                                msg.what = GET_OUTBOUND_NO_DATA
+                                msg.obj = "没有需要出库的档案"
+                                mHandler.sendMessageDelayed(msg, 800)
+                            }
+                        } else {
+                            val msg = Message.obtain()
+                            msg.what = GET_OUTBOUND_NO_DATA
+                            msg.obj = "没有需要出库的档案"
+                            mHandler.sendMessageDelayed(msg, 800)
                         }
-                        DossierOperatingService.getInstance().insertOrReplace(werehousingList)
-                        val msg = Message.obtain()
-                        msg.what = GET_OUTBOUND_SUCCESS
-                        msg.obj = werehousingList
-                        mHandler.sendMessageDelayed(msg, 800)
+
                     } else {
                         val msg = Message.obtain()
                         msg.what = GET_OUTBOUND_FAIL
-                        msg.obj = response.getString("message")
+                        msg.obj = resultGetOutBound.nameValuePairs.message
                         mHandler.sendMessageDelayed(msg, 800)
                     }
 
@@ -177,33 +209,21 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
                 mProgressDialog.setMessage("正在开柜，请稍后...")
                 if (!mProgressDialog.isShowing) mProgressDialog.show()
 
-                var device: String? = null
-                var isOK = true
-                for (dossierOperating in mOutboundList) {
-                    if (dossierOperating.selected) {
-                        if (device == null) {
-                            device = dossierOperating.cabinetId
-                        } else {
-                            if (device != dossierOperating.cabinetId) {
-                                isOK = false
-                                break
-                            }
-                        }
+                // 传递被选择的数据
+                var selectList =
+                    ArrayList<ResultGetOutBound.NameValuePairsBeanX.DataBean.ValuesBean>()
+                for (select in mOutboundList) {
+                    if (select.nameValuePairs.isSelected) {
+                        selectList.add(select)
                     }
                 }
-                if (isOK) {
-                    if (device != null) {
-                        if (mProgressDialog.isShowing) mProgressDialog.dismiss()
-                        intentActivity(OutboundOperatingActivity.newIntent(this))
-                    } else {
-                        if (mProgressDialog.isShowing) mProgressDialog.dismiss()
-                        showToast("请选择出库档案！")
-                    }
-                } else {
-                    if (mProgressDialog.isShowing) mProgressDialog.dismiss()
-                    showToast("请选中相同的柜体档案操作！")
-                }
+
+                intentActivity(
+                    OutboundOperatingActivity.newIntent(this)
+                        .putExtra("OutBoundList", selectList)
+                )
             }
+
             R.id.btn_back -> {
                 finish()
             }
@@ -215,24 +235,48 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
         mOutboundBinding.btnOpenDoor.background =
             resources.getDrawable(R.drawable.shape_btn_un_enable)
         mOutboundBinding.btnOpenDoor.isEnabled = false
+
+        if (mProgressDialog.isShowing)
+            mProgressDialog.dismiss()
+
+        // 若是出库成功返回这个界面数据刷新会更新最新的数据,自动删除掉已经出库的数据
         getOutbound()
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        val dossierOperating =
-            DossierOperatingService.getInstance().queryByEPC(mOutboundList[position].rfidNum)
-        dossierOperating.selected = !dossierOperating.selected
-        DossierOperatingService.getInstance().update(dossierOperating)
-        mOutboundList[position].selected = !mOutboundList[position].selected
+        mOutboundList[position].nameValuePairs.isSelected =
+            !mOutboundList[position].nameValuePairs.isSelected
 
-        if (dossierOperating.selected) {
-            mOutboundBinding.btnOpenDoor.background =
-                resources.getDrawable(R.drawable.selector_menu_green)
-            mOutboundBinding.btnOpenDoor.isEnabled = true
+        if (mOutboundList[position].nameValuePairs.isSelected) {
+            var device: String? = null
+            var isOK = true
+            for (entity in mOutboundList) {
+                if (entity.nameValuePairs.isSelected) {
+                    if (device == null) {
+                        device = entity.nameValuePairs.cabcode
+                    } else {
+                        if (device != entity.nameValuePairs.cabcode) {
+                            isOK = false
+                            break
+                        }
+                    }
+                }
+            }
+
+            if (isOK) {
+                mOutboundBinding.btnOpenDoor.background =
+                    resources.getDrawable(R.drawable.selector_menu_green)
+                mOutboundBinding.btnOpenDoor.isEnabled = true
+            } else {
+                showToast("请选中相同的柜体档案操作！")
+                mOutboundBinding.btnOpenDoor.background =
+                    resources.getDrawable(R.drawable.shape_btn_un_enable)
+                mOutboundBinding.btnOpenDoor.isEnabled = false
+            }
         } else {
             var hasSelect = false
             for (dossierOperating in mOutboundList) {
-                if (dossierOperating.selected) {
+                if (dossierOperating.nameValuePairs.isSelected) {
                     hasSelect = true
                     break
                 } else {
@@ -241,9 +285,31 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
             }
 
             if (hasSelect) {
-                mOutboundBinding.btnOpenDoor.background =
-                    resources.getDrawable(R.drawable.selector_menu_green)
-                mOutboundBinding.btnOpenDoor.isEnabled = true
+                var device: String? = null
+                var isOK = true
+                for (entity in mOutboundList) {
+                    if (entity.nameValuePairs.isSelected) {
+                        if (device == null) {
+                            device = entity.nameValuePairs.cabcode
+                        } else {
+                            if (device != entity.nameValuePairs.cabcode) {
+                                isOK = false
+                                break
+                            }
+                        }
+                    }
+                }
+
+                if (isOK) {
+                    mOutboundBinding.btnOpenDoor.background =
+                        resources.getDrawable(R.drawable.selector_menu_green)
+                    mOutboundBinding.btnOpenDoor.isEnabled = true
+                } else {
+                    showToast("请选中相同的柜体档案操作！")
+                    mOutboundBinding.btnOpenDoor.background =
+                        resources.getDrawable(R.drawable.shape_btn_un_enable)
+                    mOutboundBinding.btnOpenDoor.isEnabled = false
+                }
             } else {
                 mOutboundBinding.btnOpenDoor.background =
                     resources.getDrawable(R.drawable.shape_btn_un_enable)

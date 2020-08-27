@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/adapter_demo_interface_ll"
-    android:layout_width="50dp"
+    android:layout_width="30dp"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:layout_margin="15dp"
+    android:layout_marginLeft="5dp"
+    android:layout_marginTop="10dp"
+    android:layout_marginRight="5dp"
+    android:layout_marginBottom="10dp"
     android:background="@drawable/shape_line"
     android:gravity="center"
     android:orientation="vertical">
@@ -19,8 +22,8 @@
         android:letterSpacing="0.2"
         android:paddingBottom="10dp"
         android:text="空 余"
-        android:textColor="@color/md_light_blue_300"
-        android:textSize="18sp"
+        android:textColor="@color/md_cyan_A400"
+        android:textSize="14sp"
         android:textStyle="bold" />
 
     <TextView
@@ -31,6 +34,6 @@
         android:paddingBottom="7dp"
         android:text="0-0"
         android:textColor="@color/white"
-        android:textSize="15sp" />
+        android:textSize="12sp" />
 
 </FrameLayout>

@@ -136,14 +136,14 @@
             android:layout_width="match_parent"
             android:layout_height="950dp"
             android:layout_gravity="center"
-            android:layout_marginLeft="30dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="30dp"
-            android:layout_marginRight="30dp"
+            android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/shape_list_trans_bg"
             android:descendantFocusability="blocksDescendants"
             android:gravity="center"
-            android:padding="30dp"
+            android:padding="20dp"
             android:saveEnabled="false"
             android:scrollbarThumbHorizontal="@drawable/shape_scrollbar"
             android:scrollbars="horizontal" />
@@ -211,7 +211,8 @@
                 android:text="提 交"
                 android:textColor="@color/white"
                 android:textSize="24sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
 
             <Button
                 android:id="@+id/btn_open_door"

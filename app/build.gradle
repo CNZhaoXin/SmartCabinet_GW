@@ -11,8 +11,8 @@ android {
         applicationId "com.zk.cabinet"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 6
-        versionName "1.0.6"
+        versionCode 7
+        versionName "1.0.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -26,22 +26,33 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("FileManagementCabinet")
-            storePassword "zhukun"
-            keyAlias "nopower"
-            keyPassword "zhukun"
+            storeFile file('wbl.jks')
+            storePassword 'wbl123'
+            keyAlias 'wbl'
+            keyPassword 'wbl123'
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def outputFile = output.outputFile
+            def fileName
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                if (variant.buildType.name == 'release') {
+                    fileName = "FileManagementCabinet_v${versionName}_release_${buildTime()}.apk"
+                } else if (variant.buildType.name == 'debug') {
+                    fileName = "FileManagementCabinet_v${versionName}_debug_${buildTime()}.apk"
+                }
+                outputFileName = fileName
+            }
         }
     }
 
     buildTypes {
-
-        debug {
-            signingConfig signingConfigs.release
-        }
-
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
@@ -66,6 +77,11 @@ android {
         pickFirst '**/*.so'
         exclude("android_serialport_api.*")
     }
+}
+
+static def buildTime() {
+    // return new Date().format("yyyy-MM-dd_HH-mm", TimeZone.getTimeZone("GMT+8",))
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("GMT+8",))
 }
 
 dependencies {
@@ -98,5 +114,9 @@ dependencies {
     implementation 'com.tencent.bugly:crashreport:3.0.0'
     //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
     implementation 'com.tencent.bugly:nativecrashreport:3.7.1'
+
+    implementation 'me.jessyan:autosize:1.2.1'
+    // 未混淆处理，FastJson (https://github.com/alibaba/fastjson 目前最新：检查日期 2020.8.24)
+    implementation 'com.alibaba:fastjson:1.1.72.android'
 
 }

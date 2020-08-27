@@ -25,7 +25,7 @@ public class DossierOperating {
     private String warrantNo;
 
     @Property(nameInDb = "WarranCate")
-    private String warranCate;
+    private int warranCate;
 
     @Property(nameInDb = "OperatingType")
     private int operatingType;
@@ -33,8 +33,8 @@ public class DossierOperating {
     @Property(nameInDb = "WarranType")
     private int warranType;
 
-    @Property(nameInDb = "CabinetId")
-    private String cabinetId;
+    @Property(nameInDb = "Cabcode")
+    private String cabcode;
 
     @Property(nameInDb = "Floor")
     private int floor;
@@ -45,11 +45,19 @@ public class DossierOperating {
     @Property(nameInDb = "Selected")
     private boolean selected;
 
-    @Generated(hash = 1839932352)
-    public DossierOperating(Long id, String warrantNum, String rfidNum,
-            String warrantName, String warrantNo, String warranCate,
-            int operatingType, int warranType, String cabinetId, int floor,
-            int light, boolean selected) {
+    @Property(nameInDb = "QuarNo")
+    private String quarNo;
+
+    @Property(nameInDb = "InputId")
+    private String inputId;
+
+    @Property(nameInDb = "InputName")
+    private String inputName;
+
+    @Generated(hash = 1548062891)
+    public DossierOperating(Long id, String warrantNum, String rfidNum, String warrantName,
+            String warrantNo, int warranCate, int operatingType, int warranType, String cabcode,
+            int floor, int light, boolean selected, String quarNo, String inputId, String inputName) {
         this.id = id;
         this.warrantNum = warrantNum;
         this.rfidNum = rfidNum;
@@ -58,10 +66,13 @@ public class DossierOperating {
         this.warranCate = warranCate;
         this.operatingType = operatingType;
         this.warranType = warranType;
-        this.cabinetId = cabinetId;
+        this.cabcode = cabcode;
         this.floor = floor;
         this.light = light;
         this.selected = selected;
+        this.quarNo = quarNo;
+        this.inputId = inputId;
+        this.inputName = inputName;
     }
 
     @Generated(hash = 1883903289)
@@ -108,11 +119,11 @@ public class DossierOperating {
         this.warrantNo = warrantNo;
     }
 
-    public String getWarranCate() {
+    public int getWarranCate() {
         return this.warranCate;
     }
 
-    public void setWarranCate(String warranCate) {
+    public void setWarranCate(int warranCate) {
         this.warranCate = warranCate;
     }
 
@@ -132,12 +143,12 @@ public class DossierOperating {
         this.warranType = warranType;
     }
 
-    public String getCabinetId() {
-        return this.cabinetId;
+    public void setCabcode(String cabcode) {
+        this.cabcode = cabcode;
     }
 
-    public void setCabinetId(String cabinetId) {
-        this.cabinetId = cabinetId;
+    public String getCabcode() {
+        return cabcode;
     }
 
     public int getFloor() {
@@ -162,5 +173,29 @@ public class DossierOperating {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public void setInputId(String inputId) {
+        this.inputId = inputId;
+    }
+
+    public String getInputId() {
+        return inputId;
+    }
+
+    public void setInputName(String inputName) {
+        this.inputName = inputName;
+    }
+
+    public String getInputName() {
+        return inputName;
+    }
+
+    public void setQuarNo(String quarNo) {
+        this.quarNo = quarNo;
+    }
+
+    public String getQuarNo() {
+        return quarNo;
     }
 }

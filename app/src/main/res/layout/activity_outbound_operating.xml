@@ -144,7 +144,7 @@
                 android:layout_marginLeft="60dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginRight="60dp"
-                android:layout_marginBottom="60dp"
+                android:layout_marginBottom="220dp"
                 android:background="@drawable/shape_list_trans_bg"
                 android:orientation="vertical"
                 android:paddingLeft="20dp"
@@ -165,7 +165,7 @@
                         android:gravity="center"
                         android:text="「权证编号」"
                         android:textColor="#1ABDE6"
-                        android:textSize="18sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -174,7 +174,7 @@
                         android:gravity="center"
                         android:text="「权证名称」"
                         android:textColor="#1ABDE6"
-                        android:textSize="18sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -183,7 +183,7 @@
                         android:gravity="center"
                         android:text="「权证号码」"
                         android:textColor="#1ABDE6"
-                        android:textSize="18sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -192,7 +192,16 @@
                         android:gravity="center"
                         android:text="「权证类别」"
                         android:textColor="#1ABDE6"
-                        android:textSize="18sp" />
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/title_medium_l_spacing"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="「权证类型」"
+                        android:textColor="#1ABDE6"
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -201,7 +210,7 @@
                         android:gravity="center"
                         android:text="「RFID标签」"
                         android:textColor="#1ABDE6"
-                        android:textSize="18sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -210,7 +219,7 @@
                         android:gravity="center"
                         android:text="「出库类型」"
                         android:textColor="#1ABDE6"
-                        android:textSize="18sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -219,7 +228,7 @@
                         android:gravity="center"
                         android:text="「所在位置」"
                         android:textColor="#1ABDE6"
-                        android:textSize="18sp" />
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 
@@ -236,7 +245,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="100dp"
+                android:layout_marginBottom="60dp"
                 android:orientation="horizontal">
 
                 <Button
@@ -259,9 +268,10 @@
                     android:id="@+id/btn_out_storage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/selector_menu_green"
+                    android:background="@drawable/shape_btn_un_enable"
                     android:drawableLeft="@mipmap/ic_out_storage"
                     android:drawablePadding="20dp"
+                    android:enabled="false"
                     android:gravity="center"
                     android:onClick="@{onClickListener}"
                     android:padding="30dp"

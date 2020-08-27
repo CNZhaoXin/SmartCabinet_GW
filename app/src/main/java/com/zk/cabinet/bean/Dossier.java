@@ -1,14 +1,10 @@
 package com.zk.cabinet.bean;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Property;
 import org.greenrobot.greendao.annotation.Transient;
-import org.greenrobot.greendao.annotation.Unique;
 
 @Entity(nameInDb = "Dossier")
 public class Dossier {
@@ -30,7 +26,7 @@ public class Dossier {
     private String warrantNo;
 
     @Property(nameInDb = "WarranCate")
-    private String warranCate;
+    private int warranCate;
 
     @Property(nameInDb = "OperatingType")
     private int operatingType;
@@ -50,10 +46,10 @@ public class Dossier {
     @Transient
     private boolean selected;
 
-    @Generated(hash = 503006806)
+    @Generated(hash = 513445929)
     public Dossier(Long id, String warrantNum, String rfidNum, String warrantName,
-            String warrantNo, String warranCate, int operatingType, int warranType,
-            String cabinetId, int floor, int light) {
+                   String warrantNo, int warranCate, int operatingType, int warranType,
+                   String cabinetId, int floor, int light) {
         this.id = id;
         this.warrantNum = warrantNum;
         this.rfidNum = rfidNum;
@@ -111,11 +107,11 @@ public class Dossier {
         this.warrantNo = warrantNo;
     }
 
-    public String getWarranCate() {
+    public int getWarranCate() {
         return this.warranCate;
     }
 
-    public void setWarranCate(String warranCate) {
+    public void setWarranCate(int warranCate) {
         this.warranCate = warranCate;
     }
 

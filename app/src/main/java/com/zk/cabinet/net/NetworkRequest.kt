@@ -1,18 +1,11 @@
 package com.zk.cabinet.net
 
 import android.content.Context
-import com.google.gson.*
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.hik.cabinet.net.VolleyRequest
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
-import com.zk.common.utils.LogUtil
-import com.zk.common.utils.TimeUtil
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
-import java.lang.reflect.Type
-import java.util.*
-import kotlin.collections.MutableMap as MutableMap1
 
 class NetworkRequest : VolleyRequest() {
     private val mGson: Gson = GsonBuilder().create()
@@ -24,6 +17,7 @@ class NetworkRequest : VolleyRequest() {
     lateinit var mOutboundSubmission: String
     lateinit var mInventoryRequest: String
     lateinit var mInventoryReport: String
+    lateinit var mList: String
 
     companion object {
         private const val URL_HEAD = "http://"
@@ -38,7 +32,7 @@ class NetworkRequest : VolleyRequest() {
         private const val OUTBOUND_SUBMISSION = "/cabinet/sku/out"
         private const val INVENTORY_REQUEST = "/cabinet/inventory/order/page?cabCode="
         private const val INVENTORY_REPORT = "/cabinet/inventory/order/add"
-
+        private const val LIST = "/cabinet/sku/list"
 
         val instance: NetworkRequest by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
             NetworkRequest()
@@ -63,6 +57,7 @@ class NetworkRequest : VolleyRequest() {
         mOutboundSubmission = URL_HEAD + url + URL_COLON + port + OUTBOUND_SUBMISSION
         mInventoryRequest = URL_HEAD + url + URL_COLON + port + INVENTORY_REQUEST
         mInventoryReport = URL_HEAD + url + URL_COLON + port + INVENTORY_REPORT
+        mList = URL_HEAD + url + URL_COLON + port + LIST
     }
 
 
@@ -119,7 +114,6 @@ class NetworkRequest : VolleyRequest() {
 //        add(jsonObjectRequest)
 //
 //    }
-
 
 
     interface ResponseListener {

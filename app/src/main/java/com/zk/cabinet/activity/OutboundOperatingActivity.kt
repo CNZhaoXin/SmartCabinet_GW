@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
@@ -18,14 +19,12 @@ import com.zk.cabinet.R
 import com.zk.cabinet.adapter.OutboundAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.Device
-import com.zk.cabinet.bean.DossierOperating
+import com.zk.cabinet.bean.ResultGetOutBound
 import com.zk.cabinet.databinding.ActivityOutboundOperatingBinding
 import com.zk.cabinet.db.DeviceService
-import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.common.utils.LogUtil
-import com.zk.common.utils.TimeUtil
 import com.zk.rfid.bean.LabelInfo
 import com.zk.rfid.bean.UR880SendInfo
 import com.zk.rfid.callback.CabinetInfoListener
@@ -42,12 +41,12 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
     private lateinit var mHandler: OutboundOperatingHandler
     private lateinit var mProgressDialog: ProgressDialog
     private var mDevice: Device? = null
-    private var dossierList = ArrayList<DossierOperating>()
+    private var outBoundList =
+        ArrayList<ResultGetOutBound.NameValuePairsBeanX.DataBean.ValuesBean>()
     private lateinit var mDossierAdapter: OutboundAdapter
     private val labelInfoList = ArrayList<LabelInfo>()
     private var mFloor = -1
     private var mDoorIsOpen = false
-    private lateinit var mOrgCode :String
 
     companion object {
         private const val OPEN_DOOR_RESULT = 0x01
@@ -91,24 +90,24 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
             END_INVENTORY -> {
                 Toast.makeText(this, "盘点结束", Toast.LENGTH_SHORT).show()
 
-                if (dossierList.isNotEmpty()) {
-                    for (dossier in dossierList) {
-                        if (dossier.floor == mFloor) {
+                if (outBoundList.isNotEmpty()) {
+                    for (dossier in outBoundList) {
+                        if (dossier.nameValuePairs.position.toInt() == mFloor) {
                             var isExit = false
                             for (labelInfo in labelInfoList) {
-                                if (labelInfo.epc == dossier.rfidNum) {
+                                if (labelInfo.epc == dossier.nameValuePairs.rfidNum) {
                                     isExit = true
-                                    dossier.selected = true
+                                    dossier.nameValuePairs.isSelected = true
                                     break
                                 }
                             }
-                            if (!isExit) dossier.selected = false
+                            if (!isExit) dossier.nameValuePairs.isSelected = false
                         }
                     }
                 } else {
-                    for (dossier in dossierList) {
-                        if (dossier.floor == mFloor) {
-                            dossier.selected = false
+                    for (dossier in outBoundList) {
+                        if (dossier.nameValuePairs.position.toInt() == mFloor) {
+                            dossier.nameValuePairs.isSelected = false
                         }
                     }
                 }
@@ -139,9 +138,22 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
                 }
             }
             SUBMITTED_SUCCESS -> {
-                Toast.makeText(this, "数据提交成功", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "出库成功", Toast.LENGTH_SHORT).show()
                 mProgressDialog.dismiss()
-                finish()
+
+                val mIterator = outBoundList.iterator()
+                while (mIterator.hasNext()) {
+                    val next = mIterator.next()
+                    if (next.nameValuePairs.isSelected) {
+                        mIterator.remove()
+                    }
+                }
+
+                if (outBoundList.size > 0) {
+                    mDossierAdapter.notifyDataSetChanged()
+                } else {
+                    finish()
+                }
             }
             SUBMITTED_FAIL -> {
                 Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
@@ -162,41 +174,41 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
 
         mHandler = OutboundOperatingHandler(this)
 
-        mOrgCode = mSpUtil.getString(SharedPreferencesUtil.Key.OrgCodeTemp, "00000000")!!
-
         UR880Entrance.getInstance().addOnCabinetInfoListener(mCabinetInfoListener)
         UR880Entrance.getInstance().addOnInventoryListener(mInventoryListener)
 
         mProgressDialog = ProgressDialog(this, R.style.mLoadingDialog)
         mProgressDialog.setCancelable(false)
 
-        dossierList =
-            DossierOperatingService.getInstance().queryBySelected() as ArrayList<DossierOperating>
-        mDevice = DeviceService.getInstance().queryByDeviceName(dossierList[0].cabinetId)
-        if (mDevice == null) {
-            showToast("未查询到该柜体！")
-            finish()
-            return
-        }
+        outBoundList =
+            intent.getSerializableExtra("OutBoundList") as ArrayList<ResultGetOutBound.NameValuePairsBeanX.DataBean.ValuesBean>
+        mDevice =
+            DeviceService.getInstance().queryByDeviceName(outBoundList[0].nameValuePairs.cabcode)
+
 //        mOutboundBinding.outboundBoxNumberTv.text = "柜体名称：${mDevice!!.deviceName}(${mDevice!!.deviceId})"
         mOutboundBinding.outboundBoxNumberTv.text = "${mDevice!!.deviceName}"
 
-        mDossierAdapter = OutboundAdapter(this, dossierList)
+        // 将选中的待出库的条目的选中状态置为false
+        for (dossier in outBoundList) {
+            dossier.nameValuePairs.isSelected = false
+        }
+
+        mDossierAdapter = OutboundAdapter(this, outBoundList)
         mOutboundBinding.outboundOperatingLv.adapter = mDossierAdapter
 
-        UR880Entrance.getInstance()
-            .send(UR880SendInfo.Builder().openDoor(mDevice!!.deviceId, 0).build())
+        UR880Entrance.getInstance().send(
+            UR880SendInfo.Builder().openDoor(mDevice!!.deviceId, 0).build()
+        )
         for (index in 1..5) {
             val lights = ArrayList<Int>()
-            for (dossierOperating in dossierList) {
-                if (dossierOperating.floor == index) {
-                    lights.add(dossierOperating.light)
+            for (dossierOperating in outBoundList) {
+                if (dossierOperating.nameValuePairs.position.toInt() == index) {
+                    lights.add(dossierOperating.nameValuePairs.light.toInt())
                 }
             }
-            UR880Entrance.getInstance()
-                .send(
-                    UR880SendInfo.Builder().turnOnLight(mDevice!!.deviceId, index, lights).build()
-                )
+            UR880Entrance.getInstance().send(
+                UR880SendInfo.Builder().turnOnLight(mDevice!!.deviceId, index, lights).build()
+            )
         }
 
     }
@@ -301,37 +313,35 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
     }
 
     private fun outboundSubmission() {
-        var isOK = false
-        for (dossier in dossierList) {
-            if (!dossier.selected) {
-                isOK = true
-                break
-            }
-        }
-        if (!isOK) {
-            finish()
-            return
-        }
         mProgressDialog.setMessage("正在提交出库列表，请稍后...")
         if (!mProgressDialog.isShowing) mProgressDialog.show()
 
         val jsonObject = JSONObject()
         try {
             val orderItemsJsonArray = JSONArray()
-            for (dossierChanged in dossierList) {
-                if (!dossierChanged.selected) {
+            for (dossierChanged in outBoundList) {
+                if (dossierChanged.nameValuePairs.isSelected) {
                     val changedObject = JSONObject()
-                    changedObject.put("warrantNum", dossierChanged.warrantNum)
-                    changedObject.put("rfidNum", dossierChanged.rfidNum)
+
+                    changedObject.put("rfidNum", dossierChanged.nameValuePairs.rfidNum)
                     changedObject.put("cabCode", mDevice!!.deviceName)
-                    changedObject.put("inputDate", TimeUtil.nowTimeOfSeconds())
-                    changedObject.put("position", dossierChanged.floor)
-                    changedObject.put("light", dossierChanged.light)
+                    changedObject.put(
+                        "outOrg",
+                        mSpUtil.getString(SharedPreferencesUtil.Key.OrgCodeTemp, "")!!
+                    )
+                    changedObject.put(
+                        "operatorId",
+                        mSpUtil.getString(SharedPreferencesUtil.Key.IdTemp, "")!!
+                    )
+                    changedObject.put("warrantNum", dossierChanged.nameValuePairs.warrantNum)
+                    changedObject.put("inputId", dossierChanged.nameValuePairs.inputId)
+
                     orderItemsJsonArray.put(changedObject)
                 }
             }
-            jsonObject.put("orgCode", mOrgCode)
             jsonObject.put("orderItems", orderItemsJsonArray)
+
+            Log.e("zx-出库提交参数:", "$jsonObject")
         } catch (e: JSONException) {
             e.printStackTrace()
         }
@@ -339,7 +349,8 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
             Request.Method.POST, NetworkRequest.instance.mOutboundSubmission,
             jsonObject, Response.Listener { response ->
                 try {
-                    LogUtil.instance.d("----------------------------$response")
+                    Log.e("zx-出库提交结果:", "$response")
+
                     val success = response!!.getBoolean("success")
                     if (success) {
                         val msg = Message.obtain()
@@ -381,7 +392,34 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        dossierList[position].selected = !dossierList[position].selected
+        outBoundList[position].nameValuePairs.isSelected = !outBoundList[position].nameValuePairs.isSelected
+
+        if (outBoundList[position].nameValuePairs.isSelected) {
+            mOutboundBinding.btnOutStorage.background =
+                resources.getDrawable(R.drawable.selector_menu_green)
+            mOutboundBinding.btnOutStorage.isEnabled = true
+        } else {
+            var hasSelect = false
+            for (dossierOperating in outBoundList) {
+                if (dossierOperating.nameValuePairs.isSelected) {
+                    hasSelect = true
+                    break
+                } else {
+                    hasSelect = false
+                }
+            }
+
+            if (hasSelect) {
+                mOutboundBinding.btnOutStorage.background =
+                    resources.getDrawable(R.drawable.selector_menu_green)
+                mOutboundBinding.btnOutStorage.isEnabled = true
+            } else {
+                mOutboundBinding.btnOutStorage.background =
+                    resources.getDrawable(R.drawable.shape_btn_un_enable)
+                mOutboundBinding.btnOutStorage.isEnabled = false
+            }
+        }
+
         mDossierAdapter.notifyDataSetChanged()
     }
 }

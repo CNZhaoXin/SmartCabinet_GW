@@ -3,6 +3,7 @@ package com.zk.cabinet.service
 import android.app.Service
 import android.content.Intent
 import android.os.*
+import android.util.Log
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
@@ -10,7 +11,6 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.zk.cabinet.constant.SelfComm
 import com.zk.cabinet.db.DeviceService
 import com.zk.cabinet.net.NetworkRequest
-import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.common.utils.ActivityUtil
 import com.zk.common.utils.LogUtil
 import org.json.JSONException
@@ -51,13 +51,26 @@ class NetService : Service() {
 
         mTaskHeartbeat = object : TimerTask() {
             override fun run() {
+                val mCabinetList = DeviceService.getInstance().loadAll()
+                val sb = StringBuffer()
+
+                for ((index, device) in mCabinetList.withIndex()) {
+                    if (index != mCabinetList.size - 1) {
+                        sb.append(device.deviceId)
+                        sb.append(",")
+                    } else
+                        sb.append(device.deviceId)
+                }
+
                 val jsonObjectRequest = JsonObjectRequest(
                     Request.Method.GET,
-                    NetworkRequest.instance.mInventoryRequest + SharedPreferencesUtil.instance.getString(
-                        SharedPreferencesUtil.Key.DeviceCode, "000000"
-                    ),
+                    NetworkRequest.instance.mInventoryRequest + sb.toString(),
+                    // + SharedPreferencesUtil.instance.getString(SharedPreferencesUtil.Key.DeviceCode, ""),
                     Response.Listener { response ->
-                        LogUtil.instance.d("----------------------------$response")
+                        // {"success":true,"message":"OK","data":[{"inventoryId":"1","cabCode":"1234567801","batch":null,"inOrg":"02","status":1}
+                        // ,{"inventoryId":"2","cabCode":"1234567803","batch":null,"inOrg":"02","status":0}]}
+                        Log.e("zx--获取盘点任务单--", "$response")
+
                         try {
                             val success = response.getBoolean("success")
                             if (success) {
@@ -99,7 +112,7 @@ class NetService : Service() {
                             e.printStackTrace()
 //                            val msg = Message.obtain()
 //                            msg.what = GET_OUTBOUND_FAIL
-//                            msg.obj = "数据解析失败。"
+//                            msg.obj = "数据解析失败"
 //                            mHandler.sendMessage(msg)
                         }
                     },
@@ -128,7 +141,6 @@ class NetService : Service() {
         }
         mScheduledExecutorService = Executors.newScheduledThreadPool(3)
         mScheduledExecutorService.scheduleAtFixedRate(mTaskHeartbeat, 1, 1, TimeUnit.MINUTES)
-
 
         return Messenger(mNetHandler).binder
     }

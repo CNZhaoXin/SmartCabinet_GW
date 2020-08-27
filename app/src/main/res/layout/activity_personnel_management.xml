@@ -113,7 +113,7 @@
                 android:layout_marginLeft="60dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginRight="60dp"
-                android:layout_marginBottom="60dp"
+                android:layout_marginBottom="220dp"
                 android:background="@drawable/shape_list_trans_bg"
                 android:orientation="vertical"
                 android:paddingLeft="20dp"
@@ -129,6 +129,15 @@
 
                     <TextView
                         android:layout_width="0dp"
+                        android:layout_height="@dimen/title_medium_l_spacing"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="「登录账号」"
+                        android:textColor="#1ABDE6"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
@@ -138,10 +147,19 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_height="@dimen/title_medium_l_spacing"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="「登录账号」"
+                        android:text="「角色名称」"
+                        android:textColor="#1ABDE6"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="「部门名称」"
                         android:textColor="#1ABDE6"
                         android:textSize="22sp" />
 
@@ -163,16 +181,6 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/tv_user_name"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="[用户名称]"
-                        android:textColor="@color/white"
-                        android:textSize="24sp" />
-
-                    <TextView
                         android:id="@+id/tv_login_code"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -180,7 +188,37 @@
                         android:gravity="center"
                         android:text="[登录账号]"
                         android:textColor="@color/white"
-                        android:textSize="24sp" />
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:id="@+id/tv_user_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="[用户名称]"
+                        android:textColor="@color/white"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:id="@+id/tv_role_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="[角色名称]"
+                        android:textColor="@color/white"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:id="@+id/tv_org_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="[部门名称]"
+                        android:textColor="@color/white"
+                        android:textSize="22sp" />
 
                     <TextView
                         android:id="@+id/tv_fingerprint"
@@ -190,7 +228,7 @@
                         android:gravity="center"
                         android:text="[用户指纹]"
                         android:textColor="@color/white"
-                        android:textSize="24sp" />
+                        android:textSize="22sp" />
 
                 </LinearLayout>
 
@@ -207,7 +245,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="100dp"
+                android:layout_marginBottom="60dp"
                 android:orientation="horizontal">
 
                 <Button

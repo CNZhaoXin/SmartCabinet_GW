@@ -8,7 +8,6 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Property;
 import org.greenrobot.greendao.annotation.Transient;
-import org.greenrobot.greendao.annotation.Unique;
 
 import java.util.ArrayList;
 
@@ -43,9 +42,15 @@ public class Cabinet {
     @Transient
     private long elementCount;
 
+    @Transient
+    public boolean isStock;
+
+    @Transient
+    public ArrayList<ResultGetList.DataBean> stockList;
+
     @Generated(hash = 1747457399)
     public Cabinet(Long id, String deviceId, int floor, int position,
-            int proportion, int antennaNumber) {
+                   int proportion, int antennaNumber) {
         this.id = id;
         this.deviceId = deviceId;
         this.floor = floor;
@@ -120,5 +125,13 @@ public class Cabinet {
 
     public void setAntennaNumber(int antennaNumber) {
         this.antennaNumber = antennaNumber;
+    }
+
+    public void setStock(boolean stock) {
+        isStock = stock;
+    }
+
+    public boolean isStock() {
+        return isStock;
     }
 }

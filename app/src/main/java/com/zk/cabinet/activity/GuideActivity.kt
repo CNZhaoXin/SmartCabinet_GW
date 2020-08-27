@@ -19,6 +19,7 @@ import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
+import com.google.gson.Gson
 import com.zk.cabinet.R
 import com.zk.cabinet.adapter.CabinetOnlineAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
@@ -50,6 +51,10 @@ private const val LOGIN_BY_PWD_FAIL = 0x06
 private const val FINGER_LOGIN_SUCCESS = 0x07
 private const val FINGER_LOGIN_ERROR = 0x08
 
+private const val SYS_SETTING_NO_SET_CABINET = 0x09
+private const val WEB_NO_SET_CABINET = 0x10
+private const val CABINET_NO_MATCH = 0x11
+
 class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongClickListener {
     private lateinit var mGuideBinding: ActivityGuideBinding
     private lateinit var mHandler: MainHandler
@@ -67,16 +72,15 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
     private fun handleMessage(msg: Message) {
         when (msg.what) {
             DEVICE_REGISTERED, DEVICE_REMOVED -> {
+                // 前来注册的读写器设备ID
                 val deviceID = msg.obj.toString()
-
 //                if (SelfComm.ONLINE_DEVICE.contains(deviceID)){
 //                    if (msg.what == DEVICE_REMOVED) SelfComm.ONLINE_DEVICE.remove(deviceID)
 //                } else {
 //                    if (msg.what == DEVICE_REGISTERED) SelfComm.ONLINE_DEVICE.add(deviceID)
 //                }
-
                 for (cabinetOnlineInfo in mCabinetOnlineList) {
-                    if (cabinetOnlineInfo.mCode == deviceID) {
+                    if (cabinetOnlineInfo.mCode == deviceID) { // 设置界面配置的读写器设备ID
                         cabinetOnlineInfo.isOnLine = msg.what == DEVICE_REGISTERED
                         break
                     }
@@ -114,6 +118,19 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             FINGER_LOGIN_ERROR -> {
                 showToast(msg.obj.toString())
             }
+
+            SYS_SETTING_NO_SET_CABINET -> {
+                mProgressDialog.dismiss()
+                showToast(msg.obj.toString())
+            }
+            WEB_NO_SET_CABINET -> {
+                mProgressDialog.dismiss()
+                showToast(msg.obj.toString())
+            }
+            CABINET_NO_MATCH -> {
+                mProgressDialog.dismiss()
+                showToast(msg.obj.toString())
+            }
         }
     }
 
@@ -135,10 +152,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         if (deviceList != null && deviceList.size > 0) {
             for (device in deviceList) {
                 mCabinetOnlineList.add(
-                    CabinetOnlineInfo(
-                        device.deviceId,
-                        device.deviceName, false
-                    )
+                    CabinetOnlineInfo(device.deviceId, device.deviceName, false)
                 )
             }
         }
@@ -151,6 +165,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
         UR880Entrance.getInstance().init(UR880Entrance.CONNECTION_TCP_IP, 7880, null)
         UR880Entrance.getInstance().addOnDeviceInformationListener(mDeviceInformationListener)
+        // 启动自己等待读写器连接(服务器已启动)
         UR880Entrance.getInstance().connect()
 
         val netServiceIntent = Intent(this, NetService::class.java)
@@ -274,11 +289,14 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         mDialogLoginBinding!!.dialogOtherLoginAccountEdt.isFocusable = true
         mDialogLoginBinding!!.dialogOtherLoginAccountEdt.isFocusableInTouchMode = true
         mDialogLoginBinding!!.dialogOtherLoginAccountEdt.requestFocus()
+        mDialogLogin!!.show()
 
         val window = mDialogLogin!!.window
         window!!.setBackgroundDrawable(ColorDrawable(0))
-
-        mDialogLogin!!.show()
+        window!!.setLayout(
+            resources.displayMetrics.widthPixels * 2 / 3,
+            resources.displayMetrics.heightPixels * 2 / 5
+        )
     }
 
     //关闭登录弹窗
@@ -307,23 +325,28 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                     val success = response!!.getBoolean("success")
                     if (success) {
                         val data = response.getJSONObject("data")
-                        Log.e("TAG", data.toString())
-                        // {"id":"1","name":"彭发红2","gender":0,"phoneNumber":"13368118440","loginCode":"admin","roleId":"1","roleName":"管理员","rootMember":true,"orgCode":"6665","orgName":"6665",
-                        // "orgList":[{"id":"7cace0829663d4a43f224017b2a4acfa","name":"17774016396","code":"6665","parentOrgCode":null,"childOrgCode":null,"orgCabinet":"1234567801\/1234567801_1,a-b111\/a-b111_3"}]}
+                        Log.e("zx-登录返回数据:", "$response")
+                        // {"id":"4f16a72b2d6ef791e2c380e80d845c97","name":"赵鑫-管理员-顶级部门","gender":1,"phoneNumber":"15067105195","loginCode":"zx","roleId":"1","roleName":"管理员","rootMember":false
+                        // ,"orgCode":"111","orgName":"111","orgList":[{"id":"2410f5d845c775fd4b8d9b6abebcf903","name":"顶级部门","code":"111","parentOrgCode":"","childOrgCode":"","orgCabinet":"ZG\/ZG_1,ZG\/ZG_2,ZG\/ZG_3,ZG\/ZG_4,ZG\/ZG_5,FG1\/FG1_1,FG1\/FG1_2,FG1\/FG1_3,FG2\/FG2_3,FG2\/FG2_2,FG2\/FG2_1"}]}
 
+                        // {"id":"51a1cad89d1d9cc79f0e4c285103d74b","name":"赵鑫-档案主管-子部门1","gender":1,"phoneNumber":"15067105195","loginCode":"zx1","roleId":"3ec4acaa6c2752cb4619f9de7add089e","roleName":"档案主管","rootMember":false
+                        // ,"orgCode":"222","orgName":"222","orgList":[{"id":"7cace0829663d4a43f224017b2a4acfa","name":"子部门1","code":"222","parentOrgCode":"111","childOrgCode":"","orgCabinet":"FG1\/FG1_1,FG1\/FG1_2,FG1\/FG1_3,FG2\/FG2_1,FG2\/FG2_2,FG2\/FG2_3"}]}
+
+                        // {"id":"136e38e922c8f17bd3477a9d6563ffa4","name":"赵鑫-档案管理员-子部门2","gender":1,"phoneNumber":"15067105195","loginCode":"zx2","roleId":"4c34d2b9a6589381b82176974210c734","roleName":"档案管理员","rootMember":false
+                        // ,"orgCode":"333","orgName":"333","orgList":[{"id":"2ff342cb4b0c4293b0669e6a60deeac5","name":"子部门2","code":"333","parentOrgCode":"222","childOrgCode":"","orgCabinet":"FG2\/FG2_1,FG2\/FG2_2,FG2\/FG2_3"}]}
                         val recordList = ArrayList<Record>()
                         var id = data.getString("id")
                         var name = data.getString("name") // 用户昵称
                         var gender = data.getString("gender")
                         var phoneNumber = data.getString("phoneNumber")
                         var loginCode = data.getString("loginCode") // 登录账号
-                        var roleId = data.getString("roleId") // 用户类型
-                        var roleName = data.getString("roleName")
+                        var roleId = data.getString("roleId") // 角色类型,注意:返回的是String类型,不一定是int类型的字符串
+                        var roleName = data.getString("roleName") // 角色名称
                         var rootMember = data.getString("rootMember")
-                        var orgCode = data.getString("orgCode")
-                        var orgName = data.getString("orgName")
+                        var orgCode = data.getString("orgCode") // 部门编号
+                        var orgName = data.getString("orgName") // 部门名称
                         val orgList = data.getJSONArray("orgList")
-                        var orgCabinet = (orgList[0] as JSONObject).getString("orgCabinet")
+                        var orgCabinets = (orgList[0] as JSONObject).getString("orgCabinet")
 
                         recordList.add(Record(Key.IdTemp, id))
                         recordList.add(Record(Key.NameTemp, name))
@@ -335,35 +358,120 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                         recordList.add(Record(Key.RootMemberTemp, rootMember))
                         recordList.add(Record(Key.OrgCodeTemp, orgCode))
                         recordList.add(Record(Key.OrgNameTemp, orgName))
-                        recordList.add(Record(Key.OrgCabinet, orgCabinet))
+                        recordList.add(Record(Key.OrgCabinet, orgCabinets))
                         mSpUtil.applyValue(recordList)
 
-                        // 登录成功, 存在: 更新用户信息, 不存在:创建新用户
-                        val user = UserService.getInstance().queryByUserUuId(id)
-                        if (user == null) {
-                            val newUser = User()
-                            newUser.uuId = id
-                            newUser.userCode = loginCode
-                            newUser.password = pwd
-                            newUser.userName = name
-                            newUser.userType = roleId.toInt()
-                            newUser.cabinet = orgCabinet
-                            UserService.getInstance().insert(newUser)
+                        // 判断用户有哪些柜体操作权限并保存
+                        // 登录时平台分配给用户的柜子权限
+                        // "orgList":[{"id":"2ff342cb4b0c4293b0669e6a60deeac5","name":"子部门","code":"222","parentOrgCode":"","childOrgCode":""
+                        // ,"orgCabinet":"1234567803\/1234567803_1,1234567803\/1234567803_2,1234567803\/1234567803_3,1234567803\/1234567803_4,1234567803\/1234567803_5"}]}
+                        // 系统设置界面配置的柜子列表(需要和平台一致)
+                        val deviceList = DeviceService.getInstance().loadAll()
+                        if (deviceList.size == 0) {
+                            val msg = Message.obtain()
+                            msg.what = SYS_SETTING_NO_SET_CABINET
+                            msg.obj = "系统设置中未配置柜体参数"
+                            mHandler.sendMessageDelayed(msg, 1000)
                         } else {
-                            user.uuId = id
-                            user.userCode = loginCode
-                            user.password = pwd
-                            user.userName = name
-                            user.userType = roleId.toInt()
-                            user.cabinet = orgCabinet
-                            UserService.getInstance().update(user)
-                            FingerprintParsingLibrary.getInstance().upUserList()
-                        }
+                            // val orgCabinets = mSpUtil.getString(SharedPreferencesUtil.Key.OrgCabinet, "")!!
+                            if (orgCabinets.isNotEmpty()) {
+                                val mCanOperationCabinets = HashMap<String, ArrayList<Int>>()
 
-                        val msg = Message.obtain()
-                        msg.what = LOGIN_BY_PWD_SUCCESS
-                        msg.obj = data.getString("name")
-                        mHandler.sendMessageDelayed(msg, 1000)
+                                val cabinets = orgCabinets.split(",").toTypedArray()
+                                for (cabinet in cabinets) {
+                                    val device =
+                                        cabinet.subSequence(0, cabinet.indexOf("/", 0)).toString()
+                                    val floor =
+                                        cabinet.subSequence(
+                                            cabinet.indexOf("_", 0) + 1,
+                                            cabinet.length
+                                        )
+                                            .toString()
+                                    if (mCanOperationCabinets.containsKey(device)) {
+                                        mCanOperationCabinets.getValue(device).add(floor.toInt())
+                                    } else {
+                                        val a = ArrayList<Int>()
+                                        a.add(floor.toInt())
+                                        mCanOperationCabinets[device] = a
+                                    }
+                                }
+
+                                val mIterator = deviceList.iterator()
+                                while (mIterator.hasNext()) {
+                                    val next = mIterator.next()
+                                    if (!mCanOperationCabinets.containsKey(next.deviceName)) {
+                                        mIterator.remove()
+                                    }
+                                }
+
+                                if (deviceList.isEmpty()) {
+                                    val msg = Message.obtain()
+                                    msg.what = CABINET_NO_MATCH
+                                    msg.obj = "您所在部门配置的柜体与系统设置中配置的柜体参数不匹配"
+                                    mHandler.sendMessageDelayed(msg, 1000)
+                                } else {
+                                    // 保存当前登录人员可以操作的柜体List
+                                    val deviceListJson = Gson().toJson(deviceList)
+                                    mSpUtil.applyValue(
+                                        Record(
+                                            Key.CanOperateCabinet,
+                                            deviceListJson
+                                        )
+                                    )
+
+                                    // 保存当前登录人员可以操作的 柜体 + 可操作层 数据, 这个也只能是当前主柜体能操作的柜子
+                                    val nameList = ArrayList<String>()
+                                    for (device in deviceList) {
+                                        nameList.add(device.deviceName)
+                                    }
+
+                                    val mCanOperationCabinetsNew = HashMap<String, ArrayList<Int>>()
+                                    for ((key, value) in mCanOperationCabinets) {
+                                        if (nameList.contains(key)) {
+                                            mCanOperationCabinetsNew.put(key, value)
+                                        }
+                                    }
+
+                                    val canOperateCabinetFloorJson =
+                                        Gson().toJson(mCanOperationCabinetsNew)
+                                    Log.e("zx-登录人员可操作的柜子:", canOperateCabinetFloorJson)
+
+                                    mSpUtil.applyValue(
+                                        Record(
+                                            Key.CanOperateCabinetFloor,
+                                            canOperateCabinetFloorJson
+                                        )
+                                    )
+
+                                    // 登录成功, 存在: 更新用户信息, 不存在:创建新用户
+                                    val user = UserService.getInstance().queryByUserUuId(id)
+                                    if (user == null) {
+                                        val newUser = User()
+                                        newUser.uuId = id
+                                        newUser.userCode = loginCode
+                                        newUser.password = pwd
+                                        UserService.getInstance().insert(newUser)
+                                    } else {
+                                        user.uuId = id
+                                        user.userCode = loginCode
+                                        user.password = pwd
+                                        UserService.getInstance().update(user)
+                                        FingerprintParsingLibrary.getInstance().upUserList()
+                                    }
+
+                                    val msg = Message.obtain()
+                                    msg.what = LOGIN_BY_PWD_SUCCESS
+                                    msg.obj = data.getString("name")
+                                    mHandler.sendMessageDelayed(msg, 1000)
+                                }
+
+                            } else {
+                                val msg = Message.obtain()
+                                msg.what = WEB_NO_SET_CABINET
+                                msg.obj = "您所在部门未给您分配任何柜体权限"
+                                mHandler.sendMessageDelayed(msg, 1000)
+                            }
+                        }
                     } else {
                         val msg = Message.obtain()
                         msg.what = LOGIN_BY_PWD_FAIL

@@ -46,15 +46,39 @@ class DemoInterfaceAdapter(cabinetList: List<Cabinet>, context: Context) :
         val cabinet = mCabinetList[position]
         holder.mTvLineNumber.text = cabinet.floor.toString() + "-" + cabinet.position.toString()
 
-        if (cabinet.labelInfoList != null && cabinet.labelInfoList.size > 0) {
-            holder.mDemoInterfaceLl.setBackgroundDrawable(mContext.resources.getDrawable(R.drawable.shape_line_fill))
-            holder.mDemoInterfaceTv.setTextColor(mContext.resources.getColor(R.color.white))
-            holder.mDemoInterfaceTv.text = "${cabinet.labelInfoList.size}份档案"
+        // 显示库存里的档案数据
+        if (cabinet.isStock) {
+            if (cabinet.labelInfoList != null && cabinet.labelInfoList.size > 0) {
+                holder.mDemoInterfaceLl.setBackgroundDrawable(mContext.resources.getDrawable(R.drawable.shape_line_fill))
+                holder.mDemoInterfaceTv.setTextColor(mContext.resources.getColor(R.color.white))
+                // 这里因为一个格子只有一个RFID盒子,通过扫描EPC,永远只会显示一本档案
+                // holder.mDemoInterfaceTv.text = "${cabinet.labelInfoList.size}份档案"
+                if (cabinet.stockList != null)
+                    holder.mDemoInterfaceTv.text = "${cabinet.stockList.size}份档案"
+                else
+                    holder.mDemoInterfaceTv.text = "档 案"
+            } else {
+                holder.mDemoInterfaceLl.setBackgroundDrawable(mContext.resources.getDrawable(R.drawable.shape_line_stock))
+                holder.mDemoInterfaceTv.setTextColor(mContext.resources.getColor(R.color.white))
+                holder.mDemoInterfaceTv.text = "${cabinet.stockList.size}份档案"
+            }
         } else {
-            holder.mDemoInterfaceLl.setBackgroundDrawable(mContext.resources.getDrawable(R.drawable.shape_line))
-            holder.mDemoInterfaceTv.setTextColor(mContext.resources.getColor(R.color.md_light_blue_300))
-            holder.mDemoInterfaceTv.text = "空 余"
+            if (cabinet.labelInfoList != null && cabinet.labelInfoList.size > 0) {
+                holder.mDemoInterfaceLl.setBackgroundDrawable(mContext.resources.getDrawable(R.drawable.shape_line_red))
+                holder.mDemoInterfaceTv.setTextColor(mContext.resources.getColor(R.color.white))
+                // 这里因为一个格子只有一个RFID盒子,通过扫描EPC,永远只会显示一本档案
+                // holder.mDemoInterfaceTv.text = "${cabinet.labelInfoList.size}份档案"
+                if (cabinet.stockList != null)
+                    holder.mDemoInterfaceTv.text = "${cabinet.stockList.size}份档案"
+                else
+                    holder.mDemoInterfaceTv.text = "异 常"
+            } else {
+                holder.mDemoInterfaceLl.setBackgroundDrawable(mContext.resources.getDrawable(R.drawable.shape_line))
+                holder.mDemoInterfaceTv.setTextColor(mContext.resources.getColor(R.color.md_cyan_A400))
+                holder.mDemoInterfaceTv.text = "空 余"
+            }
         }
+
         if (mOnItemClickListener != null) {
             holder.itemView.setOnClickListener {
                 val positionTemp: Int = holder.adapterPosition

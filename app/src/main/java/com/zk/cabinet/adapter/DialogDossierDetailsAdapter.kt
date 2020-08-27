@@ -8,13 +8,17 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import com.zk.cabinet.R
-import com.zk.cabinet.bean.DossierEntity
+import com.zk.cabinet.bean.ResultGetList
+import com.zk.cabinet.bean.ResultGetOutBound
 import com.zk.cabinet.constant.SelfComm
 
-class DossierAdapter(context: Context, dossierList: List<DossierEntity>) :
+class DialogDossierDetailsAdapter(
+    context: Context,
+    stockList:ArrayList<ResultGetList.DataBean>
+) :
     BaseAdapter() {
     private val mContext = context
-    private var mDossierList = dossierList
+    private var mDossierList = stockList
     private val mLayoutInflater = LayoutInflater.from(context)
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -22,37 +26,26 @@ class DossierAdapter(context: Context, dossierList: List<DossierEntity>) :
         var view = convertView
         val dossier = mDossierList[position]
         if (view == null) {
-            view = mLayoutInflater.inflate(R.layout.adapter_outbound_item, null)
+            view = mLayoutInflater.inflate(R.layout.adapter_dossier_details_item, null)
             viewHolder = ViewHolder(
-                view.findViewById(R.id.adapter_outbound_iv),
                 view.findViewById(R.id.adapter_outbound_number_tv),
                 view.findViewById(R.id.adapter_outbound_rfid_tv),
                 view.findViewById(R.id.adapter_outbound_name_tv),
                 view.findViewById(R.id.adapter_outbound_no_tv),
                 view.findViewById(R.id.adapter_outbound_cate_tv),
-                view.findViewById(R.id.tv_warranType),
-                view.findViewById(R.id.adapter_outbound_type_tv),
-                view.findViewById(R.id.adapter_outbound_position_tv)
+                view.findViewById(R.id.tv_position)
             )
             view.tag = viewHolder
         } else {
             viewHolder = view.tag as ViewHolder
         }
+
         viewHolder.mAdapterOutboundNumberTv.text = dossier.warrantNum
         viewHolder.mAdapterOutboundRfidTv.text = dossier.rfidNum
         viewHolder.mAdapterOutboundNameTv.text = dossier.warrantName
         viewHolder.mAdapterOutboundNoTv.text = dossier.warrantNo
         viewHolder.mAdapterOutboundCateTv.text = SelfComm.WARRANT_CATE[dossier.warranCate]
-        viewHolder.tv_warranType.text = SelfComm.WARRANT_TYPE[dossier.warranType]
-        viewHolder.mAdapterOutboundTypeTv.text = SelfComm.OPERATING_TYPE[dossier.inStorageType]
-        viewHolder.mAdapterOutboundPositionTv.text =
-            "${dossier.cabiCode} - ${dossier.floor}-${dossier.light}"
-
-        if (dossier.isSelected) {
-            viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.mipmap.ic_check))
-        } else {
-            viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.mipmap.ic_check_no))
-        }
+        viewHolder.mTvPosition.text = "${dossier.cabCode} - ${dossier.position}-${dossier.light}"
 
         return view!!
     }
@@ -70,18 +63,15 @@ class DossierAdapter(context: Context, dossierList: List<DossierEntity>) :
     }
 
     private class ViewHolder(
-        var mAdapterOutboundIv: ImageView,
         var mAdapterOutboundNumberTv: TextView,
         var mAdapterOutboundRfidTv: TextView,
         var mAdapterOutboundNameTv: TextView,
         var mAdapterOutboundNoTv: TextView,
         var mAdapterOutboundCateTv: TextView,
-        var tv_warranType: TextView,
-        var mAdapterOutboundTypeTv: TextView,
-        var mAdapterOutboundPositionTv: TextView
+        var mTvPosition: TextView
     )
 
-    fun setList(dossierList: List<DossierEntity>) {
+    fun setList(dossierList : ArrayList<ResultGetList.DataBean>) {
         mDossierList = dossierList
     }
 }

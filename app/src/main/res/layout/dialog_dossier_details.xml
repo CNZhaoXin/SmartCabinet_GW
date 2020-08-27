@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="onItemClickListener"
+            type="android.widget.AdapterView.OnItemClickListener" />
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_login_dialog_bg"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="70dp"
+            android:text="「档案详情」"
+            android:textColor="@color/white"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/ll_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/shape_list_trans_bg"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingTop="20dp"
+            android:paddingRight="20dp"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/title_medium_l_spacing"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="「权证编号」"
+                    android:textColor="#1ABDE6"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/title_medium_l_spacing"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="「权证名称」"
+                    android:textColor="#1ABDE6"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/title_medium_spacing"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="「权证号码」"
+                    android:textColor="#1ABDE6"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/title_medium_l_spacing"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="「权证类别」"
+                    android:textColor="#1ABDE6"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/title_medium_spacing"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="「RFID标签」"
+                    android:textColor="#1ABDE6"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/title_medium_spacing"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="「所在位置」"
+                    android:textColor="#1ABDE6"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <ListView
+                android:id="@+id/listView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:OnItemClickListener="@{onItemClickListener}" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginLeft="100dp"
+            android:layout_marginRight="100dp"
+            android:layout_marginBottom="70dp"
+            android:background="@drawable/selector_menu_orange"
+            android:onClick="@{onClickListener}"
+            android:text="关 闭"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</layout>

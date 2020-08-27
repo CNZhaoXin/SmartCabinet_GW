@@ -8,10 +8,13 @@ import android.widget.BaseAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.zk.cabinet.R
-import com.zk.cabinet.bean.DossierOperating
+import com.zk.cabinet.bean.ResultGetInStorage
 import com.zk.cabinet.constant.SelfComm
 
-class WarehousingAdapter(context: Context, dossierList: List<DossierOperating>) :
+class WarehousingAdapter(
+    context: Context,
+    dossierList: ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean>
+) :
     BaseAdapter() {
     private val mContext = context
     private var mDossierList = dossierList
@@ -30,18 +33,22 @@ class WarehousingAdapter(context: Context, dossierList: List<DossierOperating>) 
                 view.findViewById(R.id.adapter_warehousing_name_tv),
                 view.findViewById(R.id.adapter_warehousing_no_tv),
                 view.findViewById(R.id.adapter_warehousing_cate_tv),
+                view.findViewById(R.id.tv_warranType),
                 view.findViewById(R.id.adapter_warehousing_type_tv)
             )
             view.tag = viewHolder
         } else {
             viewHolder = view.tag as ViewHolder
         }
-        viewHolder.mAdapterWarehousingNumberTv.text = dossier.warrantNum
-        viewHolder.mAdapterWarehousingRfidTv.text = dossier.rfidNum
-        viewHolder.mAdapterWarehousingNameTv.text = dossier.warrantName
-        viewHolder.mAdapterWarehousingNoTv.text = dossier.warrantNo
-        viewHolder.mAdapterWarehousingCateTv.text = dossier.warranCate
-        viewHolder.mAdapterWarehousingTypeTv.text = SelfComm.OPERATING_TYPE[dossier.operatingType]
+        viewHolder.mAdapterWarehousingNumberTv.text = dossier.nameValuePairs.warrantNum
+        viewHolder.mAdapterWarehousingRfidTv.text = dossier.nameValuePairs.rfidNum
+        viewHolder.mAdapterWarehousingNameTv.text = dossier.nameValuePairs.warrantName
+        viewHolder.mAdapterWarehousingNoTv.text = dossier.nameValuePairs.warrantNo
+        viewHolder.mAdapterWarehousingCateTv.text =
+            SelfComm.WARRANT_CATE[dossier.nameValuePairs.warranCate]
+        viewHolder.tv_warranType.text = SelfComm.WARRANT_TYPE[dossier.nameValuePairs.warranType]
+        viewHolder.mAdapterWarehousingTypeTv.text =
+            SelfComm.OPERATING_TYPE[dossier.nameValuePairs.inStorageType]
 
 //        if (position % 2 == 0) {
 ////            viewHolder.mAdapterWarehousingLl.setBackgroundColor(
@@ -74,10 +81,11 @@ class WarehousingAdapter(context: Context, dossierList: List<DossierOperating>) 
         var mAdapterWarehousingNameTv: TextView,
         var mAdapterWarehousingNoTv: TextView,
         var mAdapterWarehousingCateTv: TextView,
+        var tv_warranType: TextView,
         var mAdapterWarehousingTypeTv: TextView
     )
 
-    fun setList(dossierList: List<DossierOperating>) {
+    fun setList(dossierList: ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean>) {
         mDossierList = dossierList
     }
 }

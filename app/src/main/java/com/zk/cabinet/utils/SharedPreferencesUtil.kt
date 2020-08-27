@@ -108,7 +108,7 @@ class SharedPreferencesUtil {
             TypeInt,
             TypeBoolean,
             TypeString,
-            TypeLong
+            TypeLong,
         }
     }
 
@@ -129,6 +129,8 @@ class SharedPreferencesUtil {
         OrgCodeTemp,
         OrgNameTemp,
         OrgCabinet,
+        CanOperateCabinet,  // 登录人员可以操作的柜子
+        CanOperateCabinetFloor,  // 登录人员可以操作的柜子+层数数据
 
         DeviceIdTemp,
 

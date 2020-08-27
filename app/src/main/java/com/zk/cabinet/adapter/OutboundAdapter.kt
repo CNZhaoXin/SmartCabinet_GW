@@ -6,13 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.zk.cabinet.R
-import com.zk.cabinet.bean.DossierOperating
+import com.zk.cabinet.bean.ResultGetOutBound
 import com.zk.cabinet.constant.SelfComm
 
-class OutboundAdapter(context: Context, dossierList: List<DossierOperating>) :
+class OutboundAdapter(
+    context: Context,
+    dossierList: ArrayList<ResultGetOutBound.NameValuePairsBeanX.DataBean.ValuesBean>
+) :
     BaseAdapter() {
     private val mContext = context
     private var mDossierList = dossierList
@@ -25,13 +27,13 @@ class OutboundAdapter(context: Context, dossierList: List<DossierOperating>) :
         if (view == null) {
             view = mLayoutInflater.inflate(R.layout.adapter_outbound_item, null)
             viewHolder = ViewHolder(
-                view.findViewById(R.id.adapter_outbound_ll),
                 view.findViewById(R.id.adapter_outbound_iv),
                 view.findViewById(R.id.adapter_outbound_number_tv),
                 view.findViewById(R.id.adapter_outbound_rfid_tv),
                 view.findViewById(R.id.adapter_outbound_name_tv),
                 view.findViewById(R.id.adapter_outbound_no_tv),
                 view.findViewById(R.id.adapter_outbound_cate_tv),
+                view.findViewById(R.id.tv_warranType),
                 view.findViewById(R.id.adapter_outbound_type_tv),
                 view.findViewById(R.id.adapter_outbound_position_tv)
             )
@@ -39,16 +41,20 @@ class OutboundAdapter(context: Context, dossierList: List<DossierOperating>) :
         } else {
             viewHolder = view.tag as ViewHolder
         }
-        viewHolder.mAdapterOutboundNumberTv.text = dossier.warrantNum
-        viewHolder.mAdapterOutboundRfidTv.text = dossier.rfidNum
-        viewHolder.mAdapterOutboundNameTv.text = dossier.warrantName
-        viewHolder.mAdapterOutboundNoTv.text = dossier.warrantNo
-        viewHolder.mAdapterOutboundCateTv.text = dossier.warranCate
-        viewHolder.mAdapterOutboundTypeTv.text = SelfComm.OPERATING_TYPE[dossier.operatingType]
-        viewHolder.mAdapterOutboundPositionTv.text =
-            "${dossier.cabinetId} - ${dossier.floor} -${dossier.light}"
 
-        if (dossier.selected) {
+        viewHolder.mAdapterOutboundNumberTv.text = dossier.nameValuePairs.warrantNum
+        viewHolder.mAdapterOutboundRfidTv.text = dossier.nameValuePairs.rfidNum
+        viewHolder.mAdapterOutboundNameTv.text = dossier.nameValuePairs.warrantName
+        viewHolder.mAdapterOutboundNoTv.text = dossier.nameValuePairs.warrantNo
+        viewHolder.mAdapterOutboundCateTv.text =
+            SelfComm.WARRANT_CATE[dossier.nameValuePairs.warranCate]
+        viewHolder.tv_warranType.text = SelfComm.WARRANT_TYPE[dossier.nameValuePairs.warranType]
+        viewHolder.mAdapterOutboundTypeTv.text =
+            SelfComm.OUT_OPERATING_TYPE[dossier.nameValuePairs.outStorageType]
+        viewHolder.mAdapterOutboundPositionTv.text =
+            "${dossier.nameValuePairs.cabcode} - ${dossier.nameValuePairs.position}-${dossier.nameValuePairs.light}"
+
+        if (dossier.nameValuePairs.isSelected) {
             viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.mipmap.ic_check))
         } else {
             viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.mipmap.ic_check_no))
@@ -69,18 +75,18 @@ class OutboundAdapter(context: Context, dossierList: List<DossierOperating>) :
     }
 
     private class ViewHolder(
-        var mAdapterOutboundLl: LinearLayout,
         var mAdapterOutboundIv: ImageView,
         var mAdapterOutboundNumberTv: TextView,
         var mAdapterOutboundRfidTv: TextView,
         var mAdapterOutboundNameTv: TextView,
         var mAdapterOutboundNoTv: TextView,
         var mAdapterOutboundCateTv: TextView,
+        var tv_warranType: TextView,
         var mAdapterOutboundTypeTv: TextView,
         var mAdapterOutboundPositionTv: TextView
     )
 
-    fun setList(dossierList: List<DossierOperating>) {
+    fun setList(dossierList: ArrayList<ResultGetOutBound.NameValuePairsBeanX.DataBean.ValuesBean>) {
         mDossierList = dossierList
     }
 }

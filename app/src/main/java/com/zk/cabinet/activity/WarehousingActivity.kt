@@ -6,35 +6,38 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import com.alibaba.fastjson.JSON
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
+import com.google.gson.Gson
 import com.zk.cabinet.R
 import com.zk.cabinet.adapter.WarehousingAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
-import com.zk.cabinet.bean.DossierOperating
+import com.zk.cabinet.bean.ResultGetInStorage
 import com.zk.cabinet.databinding.ActivityWarehousingBinding
-import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.net.NetworkRequest
-import com.zk.cabinet.utils.SharedPreferencesUtil.Key
 import com.zk.cabinet.utils.SharedPreferencesUtil
+import com.zk.cabinet.utils.SharedPreferencesUtil.Key
 import org.json.JSONException
-import org.json.JSONObject
 import java.lang.ref.WeakReference
 
 private const val GET_WAREHOUSING_SUCCESS = 0x01
 private const val GET_WAREHOUSING_FAIL = 0x02
+private const val GET_WAREHOUSING_NO_DATA = 0x03
 
 class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private lateinit var mWarehousingBinding: ActivityWarehousingBinding
     private lateinit var mHandler: WarehousingHandler
     private lateinit var mProgressDialog: ProgressDialog
 
-    private var mWarehousingList = ArrayList<DossierOperating>()
+    private var mWarehousingList =
+        ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean>()
     private lateinit var mWarehousingAdapter: WarehousingAdapter
 
     companion object {
@@ -47,13 +50,30 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         when (msg.what) {
             GET_WAREHOUSING_SUCCESS -> {
                 mProgressDialog.dismiss()
-                mWarehousingList = msg.obj as ArrayList<DossierOperating>
+                mWarehousingList =
+                    msg.obj as ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean>
+
+                // 测试列表显示
+//                var testList = msg.obj as ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean>
+//                for ((index, entity) in testList.withIndex()) {
+//                    if (index < 5)
+//                        mWarehousingList.add(entity)
+//                    else
+//                        break
+//                }
+
                 mWarehousingAdapter.setList(mWarehousingList)
                 mWarehousingAdapter.notifyDataSetChanged()
             }
             GET_WAREHOUSING_FAIL -> {
                 mProgressDialog.dismiss()
                 Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
+                finish()
+            }
+            GET_WAREHOUSING_NO_DATA -> {
+                mProgressDialog.dismiss()
+                Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
+                finish()
             }
         }
     }
@@ -65,6 +85,9 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
 
         mWarehousingBinding.onClickListener = this
 
+        val name = mSpUtil.getString(SharedPreferencesUtil.Key.NameTemp, "xxx")
+        mWarehousingBinding.tvOperator.text = name
+
         mHandler = WarehousingHandler(this)
 
         mWarehousingAdapter = WarehousingAdapter(this, mWarehousingList)
@@ -72,12 +95,8 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
 
         mProgressDialog = ProgressDialog(this, R.style.mLoadingDialog)
         mProgressDialog.setCancelable(false)
-        mProgressDialog.setMessage("正在获取档案列表，请稍后...")
-        if (!mProgressDialog.isShowing) mProgressDialog.show()
-        getWarehousing()
 
-        val name = mSpUtil.getString(SharedPreferencesUtil.Key.NameTemp, "未知")
-        mWarehousingBinding.tvOperator.text = name
+        getWarehousing()
     }
 
     override fun countDownTimerOnTick(millisUntilFinished: Long) {
@@ -95,41 +114,39 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     }
 
     private fun getWarehousing() {
+        mProgressDialog.setMessage("正在获取待入库档案列表...")
+        mProgressDialog.show()
+        mWarehousingList.clear()
+
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET,
-            "${NetworkRequest.instance.mWarehousingList}?orgCode=${mSpUtil.getString(Key.OrgCodeTemp,
-                "00000000"
+            "${NetworkRequest.instance.mWarehousingList}?orgCode=${mSpUtil.getString(
+                Key.OrgCodeTemp, ""
             )!!}",
             Response.Listener { response ->
                 try {
-                    DossierOperatingService.getInstance().deleteAll()
-
-                    val werehousingList = DossierOperatingService.getInstance().nullList
-                    val success = response.getBoolean("success")
-                    if (success) {
-                        val dataJsonArray = response.getJSONArray("data")
-                        for (i in 0 until dataJsonArray.length()) {
-                            val jsonObject: JSONObject = dataJsonArray.getJSONObject(i)
-                            val tools = DossierOperating()
-                            tools.warrantNum = jsonObject.getString("warrantNum")
-                            tools.rfidNum = jsonObject.getString("rfidNum")
-                            tools.warrantName = jsonObject.getString("warrantName")
-                            tools.warrantNo = jsonObject.getString("warrantNo")
-                            tools.warranCate = jsonObject.getString("warranCate")
-                            tools.operatingType = jsonObject.getInt("inStorageType")
-                            tools.warranType = jsonObject.getInt("warranType")
-
-                            werehousingList.add(tools)
+                    Log.e("获取入库列表-请求结果:", Gson().toJson(response))
+                    val resultGetInStorage = JSON.parseObject<ResultGetInStorage>(
+                        Gson().toJson(response),
+                        ResultGetInStorage::class.java
+                    )
+                    if (resultGetInStorage.nameValuePairs.isSuccess) {
+                        val values = resultGetInStorage.nameValuePairs.data.values
+                        if (values.size > 0) {
+                            val msg = Message.obtain()
+                            msg.what = GET_WAREHOUSING_SUCCESS
+                            msg.obj = values
+                            mHandler.sendMessageDelayed(msg, 800)
+                        } else {
+                            val msg = Message.obtain()
+                            msg.what = GET_WAREHOUSING_NO_DATA
+                            msg.obj = "没有需要入库的档案"
+                            mHandler.sendMessageDelayed(msg, 800)
                         }
-                        DossierOperatingService.getInstance().insertOrReplace(werehousingList)
-                        val msg = Message.obtain()
-                        msg.what = GET_WAREHOUSING_SUCCESS
-                        msg.obj = werehousingList
-                        mHandler.sendMessageDelayed(msg, 800)
                     } else {
                         val msg = Message.obtain()
                         msg.what = GET_WAREHOUSING_FAIL
-                        msg.obj = response.getString("message")
+                        msg.obj = resultGetInStorage.nameValuePairs.message
                         mHandler.sendMessageDelayed(msg, 800)
                     }
 
@@ -166,7 +183,10 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btn_open_door -> {
-                intentActivity(WarehousingOperatingActivity.newIntent(this))
+                intentActivity(
+                    WarehousingOperatingActivity.newIntent(this)
+                        .putExtra("InStorageList", mWarehousingList)
+                )
             }
 
             R.id.btn_back -> {

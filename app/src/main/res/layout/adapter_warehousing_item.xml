@@ -16,7 +16,7 @@
         android:gravity="center"
         android:text="[权证编号]"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/adapter_warehousing_name_tv"
@@ -26,7 +26,7 @@
         android:gravity="center"
         android:text="[权证名称]"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/adapter_warehousing_no_tv"
@@ -36,7 +36,7 @@
         android:gravity="center"
         android:text="[权证号码]"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/adapter_warehousing_cate_tv"
@@ -46,7 +46,17 @@
         android:gravity="center"
         android:text="[权证类别]"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_warranType"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="[权证类型]"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/adapter_warehousing_rfid_tv"
@@ -56,7 +66,7 @@
         android:gravity="center"
         android:text="[RFID标签]"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/adapter_warehousing_type_tv"
@@ -66,6 +76,6 @@
         android:gravity="center"
         android:text="[入库类型]"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="16sp" />
 
 </LinearLayout>

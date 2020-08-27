@@ -29,13 +29,16 @@ public class DossierOperatingDao extends AbstractDao<DossierOperating, Long> {
         public final static Property RfidNum = new Property(2, String.class, "rfidNum", false, "RfidNum");
         public final static Property WarrantName = new Property(3, String.class, "warrantName", false, "WarrantName");
         public final static Property WarrantNo = new Property(4, String.class, "warrantNo", false, "WarrantNo");
-        public final static Property WarranCate = new Property(5, String.class, "warranCate", false, "WarranCate");
+        public final static Property WarranCate = new Property(5, int.class, "warranCate", false, "WarranCate");
         public final static Property OperatingType = new Property(6, int.class, "operatingType", false, "OperatingType");
         public final static Property WarranType = new Property(7, int.class, "warranType", false, "WarranType");
-        public final static Property CabinetId = new Property(8, String.class, "cabinetId", false, "CabinetId");
+        public final static Property Cabcode = new Property(8, String.class, "cabcode", false, "Cabcode");
         public final static Property Floor = new Property(9, int.class, "floor", false, "Floor");
         public final static Property Light = new Property(10, int.class, "light", false, "Light");
         public final static Property Selected = new Property(11, boolean.class, "selected", false, "Selected");
+        public final static Property QuarNo = new Property(12, String.class, "quarNo", false, "QuarNo");
+        public final static Property InputId = new Property(13, String.class, "inputId", false, "InputId");
+        public final static Property InputName = new Property(14, String.class, "inputName", false, "InputName");
     }
 
 
@@ -56,13 +59,16 @@ public class DossierOperatingDao extends AbstractDao<DossierOperating, Long> {
                 "\"RfidNum\" TEXT," + // 2: rfidNum
                 "\"WarrantName\" TEXT," + // 3: warrantName
                 "\"WarrantNo\" TEXT," + // 4: warrantNo
-                "\"WarranCate\" TEXT," + // 5: warranCate
+                "\"WarranCate\" INTEGER NOT NULL ," + // 5: warranCate
                 "\"OperatingType\" INTEGER NOT NULL ," + // 6: operatingType
                 "\"WarranType\" INTEGER NOT NULL ," + // 7: warranType
-                "\"CabinetId\" TEXT," + // 8: cabinetId
+                "\"Cabcode\" TEXT," + // 8: cabcode
                 "\"Floor\" INTEGER NOT NULL ," + // 9: floor
                 "\"Light\" INTEGER NOT NULL ," + // 10: light
-                "\"Selected\" INTEGER NOT NULL );"); // 11: selected
+                "\"Selected\" INTEGER NOT NULL ," + // 11: selected
+                "\"QuarNo\" TEXT," + // 12: quarNo
+                "\"InputId\" TEXT," + // 13: inputId
+                "\"InputName\" TEXT);"); // 14: inputName
     }
 
     /** Drops the underlying database table. */
@@ -99,21 +105,32 @@ public class DossierOperatingDao extends AbstractDao<DossierOperating, Long> {
         if (warrantNo != null) {
             stmt.bindString(5, warrantNo);
         }
- 
-        String warranCate = entity.getWarranCate();
-        if (warranCate != null) {
-            stmt.bindString(6, warranCate);
-        }
+        stmt.bindLong(6, entity.getWarranCate());
         stmt.bindLong(7, entity.getOperatingType());
         stmt.bindLong(8, entity.getWarranType());
  
-        String cabinetId = entity.getCabinetId();
-        if (cabinetId != null) {
-            stmt.bindString(9, cabinetId);
+        String cabcode = entity.getCabcode();
+        if (cabcode != null) {
+            stmt.bindString(9, cabcode);
         }
         stmt.bindLong(10, entity.getFloor());
         stmt.bindLong(11, entity.getLight());
         stmt.bindLong(12, entity.getSelected() ? 1L: 0L);
+ 
+        String quarNo = entity.getQuarNo();
+        if (quarNo != null) {
+            stmt.bindString(13, quarNo);
+        }
+ 
+        String inputId = entity.getInputId();
+        if (inputId != null) {
+            stmt.bindString(14, inputId);
+        }
+ 
+        String inputName = entity.getInputName();
+        if (inputName != null) {
+            stmt.bindString(15, inputName);
+        }
     }
 
     @Override
@@ -144,21 +161,32 @@ public class DossierOperatingDao extends AbstractDao<DossierOperating, Long> {
         if (warrantNo != null) {
             stmt.bindString(5, warrantNo);
         }
- 
-        String warranCate = entity.getWarranCate();
-        if (warranCate != null) {
-            stmt.bindString(6, warranCate);
-        }
+        stmt.bindLong(6, entity.getWarranCate());
         stmt.bindLong(7, entity.getOperatingType());
         stmt.bindLong(8, entity.getWarranType());
  
-        String cabinetId = entity.getCabinetId();
-        if (cabinetId != null) {
-            stmt.bindString(9, cabinetId);
+        String cabcode = entity.getCabcode();
+        if (cabcode != null) {
+            stmt.bindString(9, cabcode);
         }
         stmt.bindLong(10, entity.getFloor());
         stmt.bindLong(11, entity.getLight());
         stmt.bindLong(12, entity.getSelected() ? 1L: 0L);
+ 
+        String quarNo = entity.getQuarNo();
+        if (quarNo != null) {
+            stmt.bindString(13, quarNo);
+        }
+ 
+        String inputId = entity.getInputId();
+        if (inputId != null) {
+            stmt.bindString(14, inputId);
+        }
+ 
+        String inputName = entity.getInputName();
+        if (inputName != null) {
+            stmt.bindString(15, inputName);
+        }
     }
 
     @Override
@@ -174,13 +202,16 @@ public class DossierOperatingDao extends AbstractDao<DossierOperating, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // rfidNum
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // warrantName
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // warrantNo
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // warranCate
+            cursor.getInt(offset + 5), // warranCate
             cursor.getInt(offset + 6), // operatingType
             cursor.getInt(offset + 7), // warranType
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // cabinetId
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // cabcode
             cursor.getInt(offset + 9), // floor
             cursor.getInt(offset + 10), // light
-            cursor.getShort(offset + 11) != 0 // selected
+            cursor.getShort(offset + 11) != 0, // selected
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // quarNo
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // inputId
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14) // inputName
         );
         return entity;
     }
@@ -192,13 +223,16 @@ public class DossierOperatingDao extends AbstractDao<DossierOperating, Long> {
         entity.setRfidNum(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setWarrantName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setWarrantNo(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setWarranCate(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setWarranCate(cursor.getInt(offset + 5));
         entity.setOperatingType(cursor.getInt(offset + 6));
         entity.setWarranType(cursor.getInt(offset + 7));
-        entity.setCabinetId(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setCabcode(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setFloor(cursor.getInt(offset + 9));
         entity.setLight(cursor.getInt(offset + 10));
         entity.setSelected(cursor.getShort(offset + 11) != 0);
+        entity.setQuarNo(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setInputId(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setInputName(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
      }
     
     @Override

@@ -29,7 +29,7 @@ public class DossierDao extends AbstractDao<Dossier, Long> {
         public final static Property RfidNum = new Property(2, String.class, "rfidNum", false, "RfidNum");
         public final static Property WarrantName = new Property(3, String.class, "warrantName", false, "WarrantName");
         public final static Property WarrantNo = new Property(4, String.class, "warrantNo", false, "WarrantNo");
-        public final static Property WarranCate = new Property(5, String.class, "warranCate", false, "WarranCate");
+        public final static Property WarranCate = new Property(5, int.class, "warranCate", false, "WarranCate");
         public final static Property OperatingType = new Property(6, int.class, "operatingType", false, "OperatingType");
         public final static Property WarranType = new Property(7, int.class, "warranType", false, "WarranType");
         public final static Property CabinetId = new Property(8, String.class, "cabinetId", false, "CabinetId");
@@ -55,7 +55,7 @@ public class DossierDao extends AbstractDao<Dossier, Long> {
                 "\"RfidNum\" TEXT," + // 2: rfidNum
                 "\"WarrantName\" TEXT," + // 3: warrantName
                 "\"WarrantNo\" TEXT," + // 4: warrantNo
-                "\"WarranCate\" TEXT," + // 5: warranCate
+                "\"WarranCate\" INTEGER NOT NULL ," + // 5: warranCate
                 "\"OperatingType\" INTEGER NOT NULL ," + // 6: operatingType
                 "\"WarranType\" INTEGER NOT NULL ," + // 7: warranType
                 "\"CabinetId\" TEXT," + // 8: cabinetId
@@ -97,11 +97,7 @@ public class DossierDao extends AbstractDao<Dossier, Long> {
         if (warrantNo != null) {
             stmt.bindString(5, warrantNo);
         }
- 
-        String warranCate = entity.getWarranCate();
-        if (warranCate != null) {
-            stmt.bindString(6, warranCate);
-        }
+        stmt.bindLong(6, entity.getWarranCate());
         stmt.bindLong(7, entity.getOperatingType());
         stmt.bindLong(8, entity.getWarranType());
  
@@ -141,11 +137,7 @@ public class DossierDao extends AbstractDao<Dossier, Long> {
         if (warrantNo != null) {
             stmt.bindString(5, warrantNo);
         }
- 
-        String warranCate = entity.getWarranCate();
-        if (warranCate != null) {
-            stmt.bindString(6, warranCate);
-        }
+        stmt.bindLong(6, entity.getWarranCate());
         stmt.bindLong(7, entity.getOperatingType());
         stmt.bindLong(8, entity.getWarranType());
  
@@ -170,7 +162,7 @@ public class DossierDao extends AbstractDao<Dossier, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // rfidNum
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // warrantName
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // warrantNo
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // warranCate
+            cursor.getInt(offset + 5), // warranCate
             cursor.getInt(offset + 6), // operatingType
             cursor.getInt(offset + 7), // warranType
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // cabinetId
@@ -187,7 +179,7 @@ public class DossierDao extends AbstractDao<Dossier, Long> {
         entity.setRfidNum(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setWarrantName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setWarrantNo(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setWarranCate(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setWarranCate(cursor.getInt(offset + 5));
         entity.setOperatingType(cursor.getInt(offset + 6));
         entity.setWarranType(cursor.getInt(offset + 7));
         entity.setCabinetId(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));

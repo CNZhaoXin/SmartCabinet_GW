@@ -62,7 +62,7 @@ public class PersonnelManagementActivity extends TimeOffAppCompatActivity {
 
                     binding.tvFingerprint.setText("已录入");
                     binding.tvFingerprint.setTextColor(getResources().getColor(R.color.md_teal_A400));
-                    showToast(curUser.getUserName() + " ,您的指纹已成功录入！");
+                    showToast(getMSpUtil().getString(SharedPreferencesUtil.Key.NameTemp, "") + " , 您的指纹已成功录入！");
                 }
                 break;
         }
@@ -89,11 +89,13 @@ public class PersonnelManagementActivity extends TimeOffAppCompatActivity {
 //    }
 
     private void init() {
+        binding.tvLoginCode.setText(getMSpUtil().getString(SharedPreferencesUtil.Key.LoginCodeTemp, ""));
+        binding.tvUserName.setText(getMSpUtil().getString(SharedPreferencesUtil.Key.NameTemp, ""));
+        binding.tvRoleName.setText(getMSpUtil().getString(SharedPreferencesUtil.Key.RoleNameTemp, ""));
+        binding.tvOrgName.setText(getMSpUtil().getString(SharedPreferencesUtil.Key.OrgNameTemp, ""));
+
         String uuId = getMSpUtil().getString(SharedPreferencesUtil.Key.IdTemp, "");
         curUser = UserService.getInstance().queryByUserUuId(uuId);
-
-        binding.tvUserName.setText(curUser.getUserName());
-        binding.tvLoginCode.setText(curUser.getUserCode());
 
         if (curUser.getFingerPrint() == null) {
             binding.tvFingerprint.setText("未录入");

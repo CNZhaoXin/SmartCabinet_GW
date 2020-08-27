@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,16 +18,17 @@ import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.zk.cabinet.R
 import com.zk.cabinet.adapter.DeviceAdapter
 import com.zk.cabinet.adapter.DossierAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.Device
-import com.zk.cabinet.bean.Dossier
+import com.zk.cabinet.bean.DossierEntity
+import com.zk.cabinet.bean.ResultGetInStorage
 import com.zk.cabinet.databinding.ActivityWarehousingOperatingBinding
 import com.zk.cabinet.databinding.DialogDeviceSingleSelectWarehousingBinding
-import com.zk.cabinet.db.DeviceService
-import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
@@ -48,11 +50,11 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
     private lateinit var mHandler: WarehousingOperatingHandler
     private lateinit var mProgressDialog: ProgressDialog
     private lateinit var mDevice: Device
-    private val dossierList = ArrayList<Dossier>()
+    private val dossierList = ArrayList<DossierEntity>()
     private lateinit var mDossierAdapter: DossierAdapter
     private var mDoorIsOpen = false
-    private val mCabinet = HashMap<String, ArrayList<Int>>()
-    private lateinit var mOrgCode :String
+    private lateinit var mCabinet: HashMap<String, ArrayList<Int>>
+    private lateinit var inStorageList: ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean>
 
     companion object {
         private const val OPEN_DOOR_RESULT = 0x01
@@ -69,14 +71,25 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
         }
     }
 
+    private fun getListFromInStorageListByEpc(epc: String): ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean> {
+        val newList = ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean>()
+        for (entity in inStorageList) {
+            if (entity.nameValuePairs.rfidNum == epc) {
+                newList.add(entity)
+            }
+        }
+        Log.e("zx", "zx: 入库-相同的epc待入库档案数据:" + newList.size)
+        return newList
+    }
+
     private fun handleMessage(msg: Message) {
         when (msg.what) {
             OPEN_DOOR_RESULT -> {
-                LogUtil.instance.d("zx---开锁成功")
+                Log.e("zx", "开门成功")
                 showToast(msg.obj.toString())
             }
             START_INVENTORY -> {
-                LogUtil.instance.d("zx---开始盘点")
+                Log.e("zx", "开始盘点")
                 Toast.makeText(this, "开始盘点", Toast.LENGTH_SHORT).show()
             }
             INVENTORY_VALUE -> {
@@ -91,46 +104,51 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
                 LogUtil.instance.d("-------------labelInfo.tid: ${labelInfo.tid}")
                 LogUtil.instance.d("-------------labelInfo.inventoryNumber: ${labelInfo.inventoryNumber}")
                 labelInfo.antennaNumber = labelInfo.antennaNumber + 1
-                val dossierOperatingList =
-                    DossierOperatingService.getInstance().queryListByEPC(labelInfo.epc)
-                if (dossierOperatingList != null) {
+
+                // 识别到的标签数据,根据EPC,去待入库列表里面获取要入库的相同的EPC数据(一本档案可有多本数据)
+                // todo 首先得过滤掉这个人不能操作的位置的入库文档
+                // todo 两种情况. 1:待入库档案指明了位置或者拥有RFID标签号,也就相当于入库位置明确,需要亮对应位置的灯 2:待入库档案未指明位置,可根据柜子权限,亮灯让他自由入库
+                // todo 有位置和没有位置因可确定亮灯位置,和不可确定亮灯位置,这个要分开入库 不然 无法操作
+                // val dossierOperatingList = DossierOperatingService.getInstance().queryListByEPC(labelInfo.epc)
+                val dossierOperatingList = getListFromInStorageListByEpc(labelInfo.epc)
+
+                if (dossierOperatingList.size > 0) {
                     for (dossierOperating in dossierOperatingList) {
                         var isExit = false
                         for (dossier in dossierList) {
-                            if (dossier.rfidNum == dossierOperating.rfidNum && dossier.warrantNum == dossierOperating.warrantNum) {
-                                dossier.cabinetId = mDevice.deviceName
+                            if (dossier.rfidNum == dossierOperating.nameValuePairs.rfidNum && dossier.warrantNum == dossierOperating.nameValuePairs.warrantNum) {
+                                dossier.cabiCode = mDevice.deviceName
                                 val light =
                                     if (labelInfo.antennaNumber % 24 == 0) 24 else labelInfo.antennaNumber % 24
                                 val floor =
                                     if (labelInfo.antennaNumber % 24 == 0) labelInfo.antennaNumber / 24 else (labelInfo.antennaNumber / 24 + 1)
                                 dossier.floor = floor
                                 dossier.light = light
-                                dossier.isSelected = true
+                                // dossier.isSelected = true
                                 isExit = true
                                 break
                             }
                         }
                         if (!isExit) {
-                            val dossier = Dossier()
-                            dossier.warrantNum = dossierOperating.warrantNum
-                            dossier.rfidNum = dossierOperating.rfidNum
-                            dossier.warrantName = dossierOperating.warrantName
-                            dossier.warrantNo = dossierOperating.warrantNo
-                            dossier.warranCate = dossierOperating.warranCate
-                            dossier.operatingType = dossierOperating.operatingType
-                            dossier.warranType = dossierOperating.warranType
-                            dossier.cabinetId = mDevice.deviceName
+                            val dossier = DossierEntity()
+                            dossier.warrantNum = dossierOperating.nameValuePairs.warrantNum
+                            dossier.rfidNum = dossierOperating.nameValuePairs.rfidNum
+                            dossier.warrantName = dossierOperating.nameValuePairs.warrantName
+                            dossier.warrantNo = dossierOperating.nameValuePairs.warrantNo
+                            dossier.warranCate = dossierOperating.nameValuePairs.warranCate
+                            dossier.inStorageType = dossierOperating.nameValuePairs.inStorageType
+                            dossier.warranType = dossierOperating.nameValuePairs.warranType
+                            dossier.cabiCode = mDevice.deviceName
                             val light =
                                 if (labelInfo.antennaNumber % 24 == 0) 24 else labelInfo.antennaNumber % 24
                             val floor =
                                 if (labelInfo.antennaNumber % 24 == 0) labelInfo.antennaNumber / 24 else (labelInfo.antennaNumber / 24 + 1)
                             dossier.floor = floor
                             dossier.light = light
-                            dossier.isSelected = true
+                            // dossier.isSelected = true
                             dossierList.add(dossier)
                         }
                         mDossierAdapter.notifyDataSetChanged()
-
                     }
 
                     for (index in 1..5) {
@@ -150,17 +168,30 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
 
             }
             CANCEL_INVENTORY -> {
-                LogUtil.instance.d("zx---停止盘点")
+                Log.e("zx", "停止盘点")
                 Toast.makeText(this, "停止盘点", Toast.LENGTH_SHORT).show()
             }
             END_INVENTORY -> {
-                LogUtil.instance.d("zx---盘点结束")
+                Log.e("zx", "盘点结束")
                 Toast.makeText(this, "盘点结束", Toast.LENGTH_SHORT).show()
             }
             SUBMITTED_SUCCESS -> {
                 Toast.makeText(this, "数据提交成功", Toast.LENGTH_SHORT).show()
                 mProgressDialog.dismiss()
-                finish()
+
+                val mIterator = dossierList.iterator()
+                while (mIterator.hasNext()) {
+                    val next = mIterator.next()
+                    if (next.isSelected) {
+                        mIterator.remove()
+                    }
+                }
+
+                if (dossierList.size > 0) {
+                    mDossierAdapter.notifyDataSetChanged()
+                } else {
+                    finish()
+                }
             }
             SUBMITTED_FAIL -> {
                 Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
@@ -193,6 +224,7 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
                         timerCancel()
                         showToast("门开启")
 
+                        // 开门亮对应柜体权限层数的灯
                         val floors = mCabinet[mDevice.deviceName]!!
                         for (index in floors) {
                             val lights = ArrayList<Int>()
@@ -226,37 +258,26 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
         mProgressDialog = ProgressDialog(this, R.style.mLoadingDialog)
         mProgressDialog.setCancelable(false)
 
+        inStorageList =
+            intent.getSerializableExtra("InStorageList") as ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean>
+
         mDossierAdapter = DossierAdapter(this, dossierList)
         mWarehousingBinding.warehousingOperatingLv.adapter = mDossierAdapter
 
-        mOrgCode = mSpUtil.getString(Key.OrgCodeTemp, "00000000")!!
-        val cabinets = mSpUtil.getString(Key.OrgCabinet, "")!!.split(",").toTypedArray()
-        for (cabinet in cabinets) {
-            val device = cabinet.subSequence(0, cabinet.indexOf("/", 0)).toString()
-            val floor = cabinet.subSequence(cabinet.indexOf("_", 0) + 1, cabinet.length).toString()
-            if (mCabinet.containsKey(device)) {
-                mCabinet.getValue(device).add(floor.toInt())
-            } else {
-                val a = ArrayList<Int>()
-                a.add(floor.toInt())
-                mCabinet[device] = a
-            }
-        }
-        val deviceList = DeviceService.getInstance().loadAll()
-        val mIterator = deviceList.iterator()
-        while (mIterator.hasNext()) {
-            val next = mIterator.next()
-            if (!mCabinet.containsKey(next.deviceName)) {
-                mIterator.remove()
-            }
-        }
-        if (deviceList.isEmpty()) {
-            showToast("您无权限操作本柜体")
-            finish()
-            return
-        }
+        val gson = Gson()
+        val canOperateCabinetList = mSpUtil.getString(Key.CanOperateCabinet, "")
+        val deviceList = gson.fromJson<List<Device>>(
+            canOperateCabinetList,
+            object : TypeToken<List<Device?>?>() {}.type
+        )
 
-        showSingleSelectDialog()
+        val canOperateCabinetFloor = mSpUtil.getString(Key.CanOperateCabinetFloor, "")
+        mCabinet = gson.fromJson<HashMap<String, ArrayList<Int>>>(
+            canOperateCabinetFloor,
+            object : TypeToken<HashMap<String, ArrayList<Int>?>?>() {}.type
+        )
+
+        showSingleSelectDialog(deviceList)
 
         UR880Entrance.getInstance().addOnCabinetInfoListener(mCabinetInfoListener)
         UR880Entrance.getInstance().addOnInventoryListener(mInventoryListener)
@@ -267,7 +288,7 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
     private lateinit var mDialogDeviceAdapter: DeviceAdapter
 
     // 柜体单选弹窗
-    private fun showSingleSelectDialog() {
+    private fun showSingleSelectDialog(deviceList: List<Device>) {
         if (mSingleSelectDialog == null) {
             mDeviceSingleSelectDialogBinding = DataBindingUtil.inflate(
                 LayoutInflater.from(this),
@@ -285,9 +306,7 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
             window!!.setBackgroundDrawable(ColorDrawable(0))
         }
 
-        val deviceList = DeviceService.getInstance().loadAll()
         var selectPosition = 0
-
         mDialogDeviceAdapter = DeviceAdapter(this, deviceList)
         mDeviceSingleSelectDialogBinding!!.listView.adapter = mDialogDeviceAdapter
         mDeviceSingleSelectDialogBinding!!.listView.descendantFocusability =
@@ -368,7 +387,6 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
 
     }
 
-
     override fun countDownTimerOnTick(millisUntilFinished: Long) {
         super.countDownTimerOnTick(millisUntilFinished)
         mWarehousingBinding.warehousingOperatingCountdownTv.text = millisUntilFinished.toString()
@@ -412,10 +430,6 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
     }
 
     private fun warehousingSubmission() {
-        if (dossierList.isEmpty()) {
-            finish()
-            return
-        }
         mProgressDialog.setMessage("正在进行档案入库，请稍后...")
         if (!mProgressDialog.isShowing) mProgressDialog.show()
 
@@ -429,18 +443,21 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
                     changedObject.put("rfidNum", dossierChanged.rfidNum)
                     changedObject.put("cabCode", mDevice.deviceName)
                     changedObject.put("inputDate", TimeUtil.nowTimeOfSeconds())
-                    changedObject.put("position", dossierChanged.floor)
-                    changedObject.put("light", dossierChanged.light)
+                    changedObject.put("position", dossierChanged.floor.toString())
+                    changedObject.put("light", dossierChanged.light.toString())
+                    changedObject.put("inOrg", dossierChanged.inOrg)
+                    changedObject.put(
+                        "operatorId",
+                        mSpUtil.getString(SharedPreferencesUtil.Key.IdTemp, "")!!
+                    )
+                    changedObject.put("inputId", dossierChanged.inputId)
+
                     orderItemsJsonArray.put(changedObject)
                 }
             }
-            if (orderItemsJsonArray.length() == 0) {
-                if (mProgressDialog.isShowing) mProgressDialog.dismiss()
-                finish()
-                return
-            }
-            jsonObject.put("orgCode", mOrgCode)
             jsonObject.put("orderItems", orderItemsJsonArray)
+
+            Log.e("zx-入库提交参数:", "$jsonObject")
         } catch (e: JSONException) {
             e.printStackTrace()
         }
@@ -448,7 +465,8 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
             Request.Method.POST, NetworkRequest.instance.mWarehousingSubmission,
             jsonObject, Response.Listener { response ->
                 try {
-                    LogUtil.instance.d("----------------------------$response")
+                    Log.e("zx-入库提交结果:", "$response")
+
                     val success = response!!.getBoolean("success")
                     if (success) {
                         val msg = Message.obtain()
@@ -491,6 +509,33 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         dossierList[position].isSelected = !dossierList[position].isSelected
+
+        if (dossierList[position].isSelected) {
+            mWarehousingBinding.btnInStorage.background =
+                resources.getDrawable(R.drawable.selector_menu_green)
+            mWarehousingBinding.btnInStorage.isEnabled = true
+        } else {
+            var hasSelect = false
+            for (dossierOperating in dossierList) {
+                if (dossierOperating.isSelected) {
+                    hasSelect = true
+                    break
+                } else {
+                    hasSelect = false
+                }
+            }
+
+            if (hasSelect) {
+                mWarehousingBinding.btnInStorage.background =
+                    resources.getDrawable(R.drawable.selector_menu_green)
+                mWarehousingBinding.btnInStorage.isEnabled = true
+            } else {
+                mWarehousingBinding.btnInStorage.background =
+                    resources.getDrawable(R.drawable.shape_btn_un_enable)
+                mWarehousingBinding.btnInStorage.isEnabled = false
+            }
+        }
+
         mDossierAdapter.notifyDataSetChanged()
     }
 
