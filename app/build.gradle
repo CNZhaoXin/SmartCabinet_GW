@@ -11,8 +11,8 @@ android {
         applicationId "com.zk.cabinet"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 7
-        versionName "1.0.7"
+        versionCode 8
+        versionName "1.0.8"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -39,9 +39,11 @@ android {
             def fileName
             if (outputFile != null && outputFile.name.endsWith('.apk')) {
                 if (variant.buildType.name == 'release') {
-                    fileName = "FileManagementCabinet_v${versionName}_release_${buildTime()}.apk"
+//                    fileName = "FileManagementCabinet_v${versionName}_release_${buildTime()}.apk"
+                    fileName = "FileManagementCabinet_v${versionName}_release.apk"
                 } else if (variant.buildType.name == 'debug') {
-                    fileName = "FileManagementCabinet_v${versionName}_debug_${buildTime()}.apk"
+//                    fileName = "FileManagementCabinet_v${versionName}_debug_${buildTime()}.apk"
+                    fileName = "FileManagementCabinet_v${versionName}_debug.apk"
                 }
                 outputFileName = fileName
             }

@@ -202,6 +202,15 @@
                         android:textColor="#1ABDE6"
                         android:textSize="16sp" />
 
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/title_medium_spacing"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="「所在位置」"
+                        android:textColor="#1ABDE6"
+                        android:textSize="16sp" />
+
                 </LinearLayout>
 
                 <ListView

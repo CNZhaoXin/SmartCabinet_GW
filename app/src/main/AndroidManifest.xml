@@ -78,7 +78,7 @@
             android:theme="@style/NoActionBarAppTheme" />
         <activity
             android:name=".activity.CabinetConfigurationActivity"
-            android:label="@string/title_cabinet_parameters"
+            android:label="@string/title_cabinet"
             android:theme="@style/NoActionBarAppTheme" />
         <activity
             android:name=".activity.WarehousingOperatingActivity"

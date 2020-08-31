@@ -58,13 +58,12 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private lateinit var mHandler: DemoInterfaceHandler
     private lateinit var mDevice: Device
     private var floor = 1
-
-    // private var isSubmitData = false
     private var inventoryId = "-1"
+    private var inOrg = "-1"
     private var isAutomatic by Delegates.notNull<Boolean>()
     private var mInventoryIdList = ArrayList<String>()
     private val mDeviceList = ArrayList<Device>()
-    private var stockList = ArrayList<ResultGetList.DataBean>()
+    private var mInOrgList = ArrayList<String>()
 
     companion object {
         private const val START_INVENTORY = 0x01
@@ -80,25 +79,34 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         private const val AUTOMATIC = "isAutomatic"
         private const val CAB_CODE_LIST = "cabCodeList"
         private const val INVENTORY_ID = "inventoryId"
+        private const val IN_ORG = "inOrg"
         fun newIntent(
             packageContext: Context,
             isAutomatic: Boolean,
             cabCodeList: ArrayList<String>? = null,
-            inventoryId: ArrayList<String>? = null
+            inventoryId: ArrayList<String>? = null,
+            inOrg: ArrayList<String>? = null
         ): Intent {
             val intent = Intent(packageContext, DemoInterfaceActivity::class.java)
             intent.putExtra(AUTOMATIC, isAutomatic)
             intent.putExtra(CAB_CODE_LIST, cabCodeList)
             intent.putExtra(INVENTORY_ID, inventoryId)
+            intent.putExtra(IN_ORG, inOrg)
             return intent
         }
+    }
+
+    private val finishHandler = Handler()
+    private val finishRunnable = Runnable {
+        Log.e("zx-盘点倒计时关闭界面-", "----------------------------------------------")
+        if (mProgressDialog.isShowing) mProgressDialog.dismiss()
+        finish()
     }
 
     private fun handleMessage(msg: Message) {
         when (msg.what) {
             START_INVENTORY -> {
                 mProgressDialog.setMessage("正在盘点第『 ${floor + 1} 』层...")
-                // showToast("开始盘点${floor + 1}层")
             }
             INVENTORY_VALUE -> {
                 val labelInfo = msg.obj as LabelInfo
@@ -129,52 +137,39 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                 }
             }
             CANCEL_INVENTORY -> {
-                showToast("停止盘点")
+                Log.e("zx-盘点-", "取消盘点")
             }
             END_INVENTORY -> {
+                Log.e("zx-盘点-", "停止盘点")
+                finishHandler.removeCallbacks(finishRunnable)
+
                 floor++
-                // showToast("${floor}层盘点结束")
                 if (floor < 5) {
+                    // 柜子一层盘点时间限制为10S,假如10S内没有结束一层盘点,说明读写器掉线了,需要关闭界面
+                    finishHandler.postDelayed(finishRunnable, 1000 * 10)
                     UR880Entrance.getInstance().send(
                         UR880SendInfo.Builder().inventory(mDevice.deviceId, 0, floor, 0).build()
                     )
                 } else {
-                    mDemoInterfaceBinding.btnInventoryStorage.isEnabled = true
                     if (mProgressDialog.isShowing) mProgressDialog.dismiss()
                     if (isAutomatic) {
                         warehousingSubmission()
-//                        isSubmitData = false
-//                        if (mProgressDialog.isShowing) mProgressDialog.dismiss()
-//                        // showToast(msg.obj.toString())
-//
-//                        if (mDeviceList.size > 0) {
-//                            mDevice = mDeviceList.removeAt(0)
-//                            inventoryId = mInventoryIdList.removeAt(0)
-//                            // 盘点盘点单中的多个柜体
-//                            mDemoInterfaceBinding.demoInterfaceBoxNumberTv.text =
-//                                "${mDevice.deviceName}"
-//                            // "柜体名称：${mDevice.deviceName} (${mDevice.deviceId})"
-//
-//                            startInventory()
-//                        } else {
-//                            finish()
-//                        }
                     }
                 }
             }
             SUBMITTED_SUCCESS -> {
-//                isSubmitData = false
                 if (mProgressDialog.isShowing) mProgressDialog.dismiss()
                 showToast(msg.obj.toString())
                 if (isAutomatic) {
                     if (mDeviceList.size > 0) {
                         mDevice = mDeviceList.removeAt(0)
                         inventoryId = mInventoryIdList.removeAt(0)
+                        inOrg = mInOrgList.removeAt(0)
                         // 盘点盘点单中的多个柜体
                         mDemoInterfaceBinding.demoInterfaceBoxNumberTv.text =
                             "${mDevice.deviceName}"
                         // "柜体名称：${mDevice.deviceName} (${mDevice.deviceId})"
-                        showStockList(mDevice)
+                        getAndShowStockList(mDevice)
                     } else {
                         finish()
                     }
@@ -183,9 +178,7 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
             SUBMITTED_FAIL -> {
                 if (mProgressDialog.isShowing) mProgressDialog.dismiss()
                 showToast(msg.obj.toString())
-//                if (isAutomatic) {
                 finish()
-//                }
             }
 
             GET_LIST_FAIL -> {
@@ -253,33 +246,32 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
 
             showSingleSelectDialog(deviceList)
             initView()
-
-        } else {   // 自动盘点时界面
+        } else {
             // 自动盘点时关闭倒计时
             isAutoFinish = false
-
+            // 自动盘点时部分UI隐藏
             mDemoInterfaceBinding.tvOperatorText.visibility = View.GONE
             mDemoInterfaceBinding.llCountClock.visibility = View.GONE
             mDemoInterfaceBinding.tvOperator.visibility = View.GONE
 
             mDemoInterfaceBinding.btnBack.visibility = View.GONE
             mDemoInterfaceBinding.btnInventoryStorage.visibility = View.GONE
-            mDemoInterfaceBinding.btnSubmit.visibility = View.GONE
             mDemoInterfaceBinding.btnOpenDoor.visibility = View.GONE
-            mDemoInterfaceBinding.btnInventoryStop.visibility = View.GONE
 
             mInventoryIdList = intent.getStringArrayListExtra(INVENTORY_ID)!!
+            mInOrgList = intent.getStringArrayListExtra(IN_ORG)!!
             val cabCodeList = intent.getStringArrayListExtra(CAB_CODE_LIST)!!
             for (deviceId in cabCodeList) {
                 mDeviceList.add(DeviceService.getInstance().queryByDeviceName(deviceId))
             }
             mDevice = mDeviceList.removeAt(0)
             inventoryId = mInventoryIdList.removeAt(0)
+            inOrg = mInOrgList.removeAt(0)
             // mDemoInterfaceBinding.demoInterfaceBoxNumberTv.text = "柜体名称：${mDevice.deviceName}(${mDevice.deviceId})"
             mDemoInterfaceBinding.demoInterfaceBoxNumberTv.text = "${mDevice.deviceName}"
 
             initView()
-            showStockList(mDevice)
+            getAndShowStockList(mDevice)
         }
     }
 
@@ -361,7 +353,7 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                 mDevice = deviceList[selectPosition]
                 mDemoInterfaceBinding.demoInterfaceBoxNumberTv.text = "${mDevice.deviceName}"
                 mSingleSelectDialog!!.dismiss()
-                showStockList(mDevice)
+                getAndShowStockList(mDevice)
             }
         }
 
@@ -371,7 +363,7 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     /**
      * 获取柜子库存数据
      */
-    private fun showStockList(mDevice: Device) {
+    private fun getAndShowStockList(mDevice: Device) {
         mProgressDialog.setMessage("正在获取库存数据，请稍后...")
         if (!mProgressDialog.isShowing) mProgressDialog.show()
 
@@ -435,7 +427,6 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         NetworkRequest.instance.add(jsonObjectRequest)
     }
 
-
     private var mDossierDetailsDialogBinding: DialogDossierDetailsBinding? = null
     private var mDossierDetailsDialog: AlertDialog? = null
     private lateinit var mDossierDetailsAdapter: DialogDossierDetailsAdapter
@@ -472,7 +463,6 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         mDossierDetailsDialog!!.show()
     }
 
-
     override fun countDownTimerOnTick(millisUntilFinished: Long) {
         super.countDownTimerOnTick(millisUntilFinished)
         mDemoInterfaceBinding.demoInterfaceCountdownTv.text = millisUntilFinished.toString()
@@ -505,21 +495,11 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
             R.id.btn_back -> {
                 finish()
             }
-//            R.id.btn_submit -> {
-//                warehousingSubmission()
-//            }
             R.id.btn_inventory_storage -> {
-//                if (isSubmitData) {
-//                    showToast("请先提交数据！")
-//                    return
-//                }
                 startInventory()
             }
             // 停止盘点
-            R.id.btn_inventory_stop -> {
-                UR880Entrance.getInstance()
-                    .send(UR880SendInfo.Builder().cancel(mDevice.deviceId).build())
-            }
+            // UR880Entrance.getInstance().send(UR880SendInfo.Builder().cancel(mDevice.deviceId).build())
             R.id.btn_open_door -> {
                 UR880Entrance.getInstance()
                     .send(UR880SendInfo.Builder().openDoor(mDevice.deviceId, 0).build())
@@ -537,11 +517,7 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     }
 
     private fun startInventory() {
-        // isSubmitData = true
-        mDemoInterfaceBinding.btnInventoryStorage.isEnabled = false
-
         mProgressDialog.setMessage("准备开始盘点，请稍后...")
-
         if (!mProgressDialog.isShowing) mProgressDialog.show()
 
         floor = 0
@@ -552,15 +528,14 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
             }
         }
         mDemoInterfaceAdapter.notifyDataSetChanged()
+
+        // 柜子一层盘点时间限制为10S,假如10S内没有结束一层盘点,说明读写器掉线了,需要关闭界面
+        finishHandler.postDelayed(finishRunnable, 1000 * 10)
         UR880Entrance.getInstance()
             .send(UR880SendInfo.Builder().inventory(mDevice.deviceId, 0, floor, 0).build())
     }
 
     private fun warehousingSubmission() {
-//        if (!isSubmitData) {
-//            showToast("无需提交数据")
-//            return
-//        }
         mProgressDialog.setMessage("正在提交盘库数据，请稍后...")
         if (!mProgressDialog.isShowing) mProgressDialog.show()
 
@@ -580,10 +555,7 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                             if (labelInfo.antennaNumber % 24 == 0) labelInfo.antennaNumber / 24 else (labelInfo.antennaNumber / 24 + 1)
                         changedObject.put("position", floor)
                         changedObject.put("light", light)
-                        changedObject.put(
-                            "inputOrg",
-                            mSpUtil.getString(SharedPreferencesUtil.Key.OrgCodeTemp, "")!!
-                        )
+                        changedObject.put("inputOrg", inOrg)
                         orderItemsJsonArray.put(changedObject)
                     }
                 }
@@ -603,12 +575,12 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         } catch (e: JSONException) {
             e.printStackTrace()
         }
-        Log.e("zx-提交的盘库数据:", "--------------$jsonObject")
+        Log.e("zx-自动盘库提交参数-", "$jsonObject")
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.POST, NetworkRequest.instance.mInventoryReport,
             jsonObject, Response.Listener { response ->
                 try {
-                    LogUtil.instance.d("----------------------------$response")
+                    Log.e("zx-自动盘库盘库提交结果-", "$response")
                     val success = response!!.getBoolean("success")
                     if (success) {
                         val msg = Message.obtain()
@@ -653,7 +625,6 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     override fun onDestroy() {
 //        UR880Entrance.getInstance().removeCabinetInfoListener(mCabinetInfoListener)
         UR880Entrance.getInstance().removeInventoryListener(mInventoryListener)
-
         super.onDestroy()
     }
 

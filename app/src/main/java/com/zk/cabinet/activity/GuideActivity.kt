@@ -15,6 +15,7 @@ import android.view.View.OnClickListener
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.alibaba.fastjson.JSON
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
@@ -36,7 +37,6 @@ import com.zk.cabinet.service.NetService
 import com.zk.cabinet.utils.FingerprintParsingLibrary
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
 import com.zk.cabinet.utils.SharedPreferencesUtil.Record
-import com.zk.common.utils.LogUtil
 import com.zk.rfid.callback.DeviceInformationListener
 import com.zk.rfid.ur880.UR880Entrance
 import org.json.JSONException
@@ -97,17 +97,41 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                 Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
             }
             SelfComm.NET_SERVICE_INVENTORY -> {
+                // 接收盘点任务单数据
                 val data = msg.data
                 val cabCodeList: ArrayList<String> = data.getStringArrayList("cabCodeList")!!
                 val inventoryId: ArrayList<String> = data.getStringArrayList("inventoryIdList")!!
-                intentActivity(
-                    DemoInterfaceActivity.newIntent(
-                        this,
-                        true,
-                        cabCodeList,
-                        inventoryId
-                    )
-                )
+                val inOrg: ArrayList<String> = data.getStringArrayList("inOrgList")!!
+
+                // 拉取到盘点任务,判断设备是否在线,不在线不盘点
+                if (mCabinetOnlineList.size > 0) {
+                    val cabCodeListOnLine = ArrayList<String>()
+                    for (device in mCabinetOnlineList) {
+                        if (device.isOnLine) {
+                            for (cabcode in cabCodeList) {
+                                if (device.mCodeName == cabcode) {
+                                    cabCodeListOnLine.add(cabcode)
+                                }
+                            }
+                        }
+                    }
+
+                    // 有盘点单中存在的在线设备.才去盘点
+                    if (cabCodeListOnLine.size > 0) {
+                        intentActivity(
+                            DemoInterfaceActivity.newIntent(
+                                this,
+                                true,
+                                cabCodeListOnLine,
+                                inventoryId,
+                                inOrg
+                            )
+                        )
+                    }
+
+                    Log.e("zx-盘点任务单中需要自动盘点的在线设备-", JSON.toJSONString(cabCodeListOnLine))
+                }
+
             }
             FINGER_LOGIN_SUCCESS -> {
                 if (!mProgressDialog.isShowing) {
@@ -163,10 +187,13 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         mCabinetOnlineAdapter = CabinetOnlineAdapter(this, mCabinetOnlineList)
         mGuideBinding.guideCabinetOnlineStatusRv.adapter = mCabinetOnlineAdapter
 
-        UR880Entrance.getInstance().init(UR880Entrance.CONNECTION_TCP_IP, 7880, null)
-        UR880Entrance.getInstance().addOnDeviceInformationListener(mDeviceInformationListener)
         // 启动自己等待读写器连接(服务器已启动)
-        UR880Entrance.getInstance().connect()
+        val serverPort = mSpUtil.getInt(Key.CabinetServicePort, -1)
+        if (serverPort != -1) {
+            UR880Entrance.getInstance().init(UR880Entrance.CONNECTION_TCP_IP, serverPort, null)
+            UR880Entrance.getInstance().addOnDeviceInformationListener(mDeviceInformationListener)
+            UR880Entrance.getInstance().connect()
+        }
 
         val netServiceIntent = Intent(this, NetService::class.java)
         val netServiceConnection = object : ServiceConnection {
@@ -248,15 +275,15 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     private val mDeviceInformationListener = object : DeviceInformationListener {
         override fun heartbeat(p0: String?) {
-            LogUtil.instance.d("heartbeat -----p0: $p0")
+            Log.w("zx-设备-心跳-", "heartbeat -----p0: $p0")
         }
 
         override fun versionInformation(p0: String?, p1: String?, p2: String?) {
-            LogUtil.instance.d("versionInformation -----p0: $p0 ---p1: $p1 ---p2: $p2")
+            Log.e("zx-设备-信息-", "versionInformation -----p0: $p0 ---p1: $p1 ---p2: $p2")
         }
 
         override fun registered(p0: String?, p1: String?, p2: String?) {
-            LogUtil.instance.d("registered -----p0: $p0 ---p1: $p1 ---p2: $p2")
+            Log.e("zx-设备-注册-", "registered -----p0: $p0 ---p1: $p1 ---p2: $p2")
             val message = Message.obtain()
             message.what = DEVICE_REGISTERED
             message.obj = p0
@@ -264,7 +291,11 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         }
 
         override fun removed(p0: String?) {
-            LogUtil.instance.d("removed -----p0: $p0 ")
+            Log.e("zx-设备-移除-", "removed -----p0: $p0 ")
+            val message = Message.obtain()
+            message.what = DEVICE_REMOVED
+            message.obj = p0
+            mHandler.sendMessage(message)
         }
 
     }
@@ -326,12 +357,6 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                     if (success) {
                         val data = response.getJSONObject("data")
                         Log.e("zx-登录返回数据:", "$response")
-                        // {"id":"4f16a72b2d6ef791e2c380e80d845c97","name":"赵鑫-管理员-顶级部门","gender":1,"phoneNumber":"15067105195","loginCode":"zx","roleId":"1","roleName":"管理员","rootMember":false
-                        // ,"orgCode":"111","orgName":"111","orgList":[{"id":"2410f5d845c775fd4b8d9b6abebcf903","name":"顶级部门","code":"111","parentOrgCode":"","childOrgCode":"","orgCabinet":"ZG\/ZG_1,ZG\/ZG_2,ZG\/ZG_3,ZG\/ZG_4,ZG\/ZG_5,FG1\/FG1_1,FG1\/FG1_2,FG1\/FG1_3,FG2\/FG2_3,FG2\/FG2_2,FG2\/FG2_1"}]}
-
-                        // {"id":"51a1cad89d1d9cc79f0e4c285103d74b","name":"赵鑫-档案主管-子部门1","gender":1,"phoneNumber":"15067105195","loginCode":"zx1","roleId":"3ec4acaa6c2752cb4619f9de7add089e","roleName":"档案主管","rootMember":false
-                        // ,"orgCode":"222","orgName":"222","orgList":[{"id":"7cace0829663d4a43f224017b2a4acfa","name":"子部门1","code":"222","parentOrgCode":"111","childOrgCode":"","orgCabinet":"FG1\/FG1_1,FG1\/FG1_2,FG1\/FG1_3,FG2\/FG2_1,FG2\/FG2_2,FG2\/FG2_3"}]}
-
                         // {"id":"136e38e922c8f17bd3477a9d6563ffa4","name":"赵鑫-档案管理员-子部门2","gender":1,"phoneNumber":"15067105195","loginCode":"zx2","roleId":"4c34d2b9a6589381b82176974210c734","roleName":"档案管理员","rootMember":false
                         // ,"orgCode":"333","orgName":"333","orgList":[{"id":"2ff342cb4b0c4293b0669e6a60deeac5","name":"子部门2","code":"333","parentOrgCode":"222","childOrgCode":"","orgCabinet":"FG2\/FG2_1,FG2\/FG2_2,FG2\/FG2_3"}]}
                         val recordList = ArrayList<Record>()
@@ -434,7 +459,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
                                     val canOperateCabinetFloorJson =
                                         Gson().toJson(mCanOperationCabinetsNew)
-                                    Log.e("zx-登录人员可操作的柜子:", canOperateCabinetFloorJson)
+                                    Log.e("zx-登录人员可操作的柜子+层:", canOperateCabinetFloorJson)
 
                                     mSpUtil.applyValue(
                                         Record(

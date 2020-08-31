@@ -2,13 +2,13 @@
 <resources>
 
     <string-array name="dialog_number_of_boxes_array">
-        <item>A柜</item>
-        <item>A柜+1个副柜</item>
-        <item>A柜+2个副柜</item>
-        <item>A柜+3个副柜</item>
-        <item>A柜+4个副柜</item>
-        <item>A柜+5个副柜</item>
-        <item>A柜+6个副柜</item>
+        <item>1个柜体</item>
+        <item>2个柜体</item>
+        <item>3个柜体</item>
+        <item>4个柜体</item>
+        <item>5个柜体</item>
+        <item>6个柜体</item>
+        <item>7个柜体</item>
     </string-array>
 
     <string-array name="dialog_not_closed_door_alarm_time_array">

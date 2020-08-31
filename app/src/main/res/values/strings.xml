@@ -11,7 +11,7 @@
     <string name="modify">修改</string>
     <string name="opinion">查看</string>
     <string name="air"></string>
-    <string name="null_prompt">您暂未设置该信息，请点击完成设置。</string>
+    <string name="null_prompt">您暂未设置该信息，请点击完成设置!</string>
     <string name="set">设置</string>
     <string name="cancel">取 消</string>
     <string name="sure">确定</string>
@@ -131,7 +131,7 @@
     <string name="device_ethernet">设备以太网-外网（部分服务需设备重启生效）</string>
     <string name="device_internal_ethernet">设备以太网-内网（部分服务需设备重启生效）</string>
     <string name="web_api_service">平台服务(webAPI)</string>
-    <string name="cabinet_service_port">柜体服务端口（重启生效）</string>
+    <string name="cabinet_service_port">柜体端口（重启App生效）</string>
     <string name="title_ip">IP地址：</string>
     <string name="title_subnet_mask">子网掩码：</string>
     <string name="title_gateway">网关：</string>
@@ -141,12 +141,14 @@
     <string name="eth_0_caption_text">IP地址：%1$s 子网掩码：%2$s 网关：%3$s DNS：%4$s</string>
     <string name="eth_1_caption_text">IP地址：%1$s 子网掩码：%2$s</string>
     <string name="web_api_caption_text">%1$s:%2$d</string>
+    <string name="cabinet_port_caption_text">%1$s</string>
     <!--服务参数- end-->
 
     <!--柜体参数- start-->
     <string name="title_cabinet_parameters">柜体参数</string>
-    <string name="number_of_boxes">箱体数量（部分服务需设备重启生效）</string>
-    <string name="number_of_boxes_caption_text">箱体数量：%1$s</string>
+    <string name="title_cabinet">柜体配置</string>
+    <string name="number_of_boxes">柜体配置（重启App生效）</string>
+    <string name="number_of_boxes_caption_text">柜体数量：%1$s</string>
     <string name="title_cabinet_in_order">柜体排列顺序</string>
     <string name="cabinet_name">%1$s柜</string>
     <string name="not_closed_door_alarm_time">未关门报警时间</string>

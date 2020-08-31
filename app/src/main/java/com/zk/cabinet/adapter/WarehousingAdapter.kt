@@ -34,7 +34,8 @@ class WarehousingAdapter(
                 view.findViewById(R.id.adapter_warehousing_no_tv),
                 view.findViewById(R.id.adapter_warehousing_cate_tv),
                 view.findViewById(R.id.tv_warranType),
-                view.findViewById(R.id.adapter_warehousing_type_tv)
+                view.findViewById(R.id.adapter_warehousing_type_tv),
+                view.findViewById(R.id.adapter_outbound_position_tv)
             )
             view.tag = viewHolder
         } else {
@@ -49,6 +50,9 @@ class WarehousingAdapter(
         viewHolder.tv_warranType.text = SelfComm.WARRANT_TYPE[dossier.nameValuePairs.warranType]
         viewHolder.mAdapterWarehousingTypeTv.text =
             SelfComm.OPERATING_TYPE[dossier.nameValuePairs.inStorageType]
+
+        viewHolder.mAdapterOutboundPositionTv.text =
+            "${dossier.nameValuePairs.cabCode} - ${dossier.nameValuePairs.position}-${dossier.nameValuePairs.light}"
 
 //        if (position % 2 == 0) {
 ////            viewHolder.mAdapterWarehousingLl.setBackgroundColor(
@@ -82,7 +86,8 @@ class WarehousingAdapter(
         var mAdapterWarehousingNoTv: TextView,
         var mAdapterWarehousingCateTv: TextView,
         var tv_warranType: TextView,
-        var mAdapterWarehousingTypeTv: TextView
+        var mAdapterWarehousingTypeTv: TextView,
+        var mAdapterOutboundPositionTv: TextView
     )
 
     fun setList(dossierList: ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean>) {

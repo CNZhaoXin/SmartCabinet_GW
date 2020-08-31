@@ -44,6 +44,7 @@
             android:text="请在亮灯的柜层进行入库操作"
             android:textColor="@color/md_red_500"
             android:textSize="24sp"
+            android:visibility="gone"
             android:textStyle="bold" />
 
         <ListView

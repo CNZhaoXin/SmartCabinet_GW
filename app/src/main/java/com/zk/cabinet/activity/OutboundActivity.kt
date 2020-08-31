@@ -90,7 +90,9 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
         mProgressDialog = ProgressDialog(this, R.style.mLoadingDialog)
         mProgressDialog.setCancelable(false)
 
-        getOutbound()
+        mProgressDialog.setMessage("正在获取待出库档案列表...")
+        mProgressDialog.show()
+        handler.post(runnable)
     }
 
     override fun countDownTimerOnTick(millisUntilFinished: Long) {
@@ -108,8 +110,6 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
     }
 
     private fun getOutbound() {
-        mProgressDialog.setMessage("正在获取待出库档案列表...")
-        mProgressDialog.show()
         mOutboundList.clear()
 
         val jsonObjectRequest = JsonObjectRequest(
@@ -230,6 +230,13 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
         }
     }
 
+    private val handler = Handler()
+    private val runnable = Runnable {
+        run {
+            getOutbound()
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         mOutboundBinding.btnOpenDoor.background =
@@ -240,7 +247,9 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
             mProgressDialog.dismiss()
 
         // 若是出库成功返回这个界面数据刷新会更新最新的数据,自动删除掉已经出库的数据
-        getOutbound()
+        mProgressDialog.setMessage("正在获取待出库档案列表...")
+        mProgressDialog.show()
+        handler.postDelayed(runnable, 2000)
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

@@ -193,27 +193,6 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-
-            <Button
-                android:id="@+id/btn_submit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="30dp"
-                android:background="@drawable/selector_menu_blue"
-                android:drawableLeft="@mipmap/ic_submit_small"
-                android:drawablePadding="15dp"
-                android:gravity="center"
-                android:onClick="@{onClickListener}"
-                android:paddingLeft="30dp"
-                android:paddingTop="20dp"
-                android:paddingRight="30dp"
-                android:paddingBottom="20dp"
-                android:text="提 交"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:visibility="gone" />
-
             <Button
                 android:id="@+id/btn_open_door"
                 android:layout_width="wrap_content"
@@ -231,26 +210,6 @@
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/btn_inventory_stop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="30dp"
-                android:background="@drawable/selector_menu_red"
-                android:drawableLeft="@mipmap/ic_stop_small"
-                android:drawablePadding="15dp"
-                android:gravity="center"
-                android:onClick="@{onClickListener}"
-                android:paddingLeft="30dp"
-                android:paddingTop="20dp"
-                android:paddingRight="30dp"
-                android:paddingBottom="20dp"
-                android:text="停 止"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:visibility="gone" />
 
         </LinearLayout>
 

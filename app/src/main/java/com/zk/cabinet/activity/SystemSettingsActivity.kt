@@ -13,6 +13,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.os.Process
 import android.provider.Settings
 import android.text.InputType
 import android.text.TextUtils
@@ -160,6 +161,7 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
         mUnitAddress =
             mSpUtil.getString(Key.UnitAddress, resources.getString(R.string.null_prompt))!!
 
+        // 服务器配置
         mEth0IP = mSpUtil.getString(Key.Eth0IP, resources.getString(R.string.air))!!
         mEth0SubnetMask = mSpUtil.getString(Key.Eth0SubnetMask, resources.getString(R.string.air))!!
         mEth0Gateway = mSpUtil.getString(Key.Eth0Gateway, resources.getString(R.string.air))!!
@@ -169,10 +171,12 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
         mWebApiServiceIp =
             mSpUtil.getString(Key.WebApiServiceIp, resources.getString(R.string.air))!!
         mWebApiServicePort = mSpUtil.getInt(Key.WebApiServicePort, -1)
-        mCabinetServicePort = mSpUtil.getInt(Key.CabinetServicePort, 7880)
+        mCabinetServicePort = mSpUtil.getInt(Key.CabinetServicePort, -1)
 
+        // 柜体配置
         mNumberBoxesItems = resources.getStringArray(R.array.dialog_number_of_boxes_array)
-        mNumberBoxesItemSelected = mSpUtil.getInt(Key.NumberOfBoxesSelected, 1)
+        mNumberBoxesItemSelected = mSpUtil.getInt(Key.NumberOfBoxesSelected, 0)
+
         mAlarmTimeItems = resources.getStringArray(R.array.dialog_not_closed_door_alarm_time_array)
         mAlarmTimeValueItems =
             resources.getIntArray(R.array.dialog_not_closed_door_alarm_time_value_array)
@@ -227,7 +231,6 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
         mSystemSettingsBinding.systemSettingRestartLl.visibility =
             if (isShowRestartNowForSet) View.VISIBLE else View.GONE
 
-
         mSystemSettingsBinding.systemSettingDeviceCodeSb.setCaptionText(mDeviceCode)
         mSystemSettingsBinding.systemSettingUnitNumberSb.setCaptionText(mUnitNumber)
         mSystemSettingsBinding.systemSettingUnitAddressSb.setCaptionText(mUnitAddress)
@@ -256,15 +259,24 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
         mSystemSettingsBinding.systemSettingWebApiServiceSb.setCaptionText(
             if (mWebApiServicePort == -1) resources.getString(
                 R.string.null_prompt
-            ) else String.format(
+            )
+            else String.format(
                 resources.getString(R.string.web_api_caption_text),
                 mWebApiServiceIp,
                 mWebApiServicePort
             )
         )
-        mSystemSettingsBinding.systemSettingCabinetServicePortSb.setCaptionText(mCabinetServicePort.toString())
+        // 柜体端口
+        mSystemSettingsBinding.systemSettingCabinetServicePortSb.setCaptionText(
+            if (mCabinetServicePort == -1) resources.getString(
+                R.string.null_prompt
+            ) else String.format(
+                resources.getString(R.string.cabinet_port_caption_text),
+                mCabinetServicePort
+            )
+        )
 
-
+        // 柜体数量
         mSystemSettingsBinding.systemSettingNumberOfBoxesSb.setCaptionText(
             String.format(
                 resources.getString(R.string.number_of_boxes_caption_text),
@@ -555,9 +567,14 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                                             )
                                         )
                                         mSystemSettingsBinding.systemSettingCabinetServicePortSb.setCaptionText(
-                                            mCabinetServicePort.toString()
+                                            String.format(
+                                                resources.getString(R.string.cabinet_port_caption_text),
+                                                mCabinetServicePort
+                                            )
                                         )
-                                        showRestartNowForSet()
+                                        // todo 柜体端口配置后,重启APP生效
+                                        restartApp()
+                                        // showRestartNowForSet()
                                     }
                                 }
                             })
@@ -567,40 +584,23 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                 mCabinetServicePortDialog!!.show(supportFragmentManager, "CabinetServicePort")
             }
 
-
+            // 柜体配置
             R.id.system_setting_number_of_boxes_sb -> {
                 AlertDialog.Builder(this)
                     .setTitle(getString(R.string.number_of_boxes))
                     .setSingleChoiceItems(
                         mNumberBoxesItems, mNumberBoxesItemSelected
                     ) { dialogInterface, i ->
-                        mNumberBoxesItemSelected = i
-                        showRestartNowForSet()
                         dialogInterface.dismiss()
-                        mSpUtil.applyValue(
-                            Record(
-                                Key.NumberOfBoxesSelected,
-                                mNumberBoxesItemSelected
-                            )
-                        )
-                        mSystemSettingsBinding.systemSettingNumberOfBoxesSb.setCaptionText(
-                            String.format(
-                                resources.getString(R.string.number_of_boxes_caption_text),
-                                mNumberBoxesItems[mNumberBoxesItemSelected]
-                            )
-                        )
-                        intentActivity(
-                            CabinetConfigurationActivity.newInstance(
-                                this,
-                                mDeviceCode,
-                                mNumberBoxesItemSelected + 1
-                            )
-                        )
+
+                        var intent: Intent = Intent(this, CabinetConfigurationActivity::class.java)
+                        intent.putExtra("NumberOfBoxesSelected", i)
+                        startActivity(intent)
                     }
                     .setNegativeButton(getString(R.string.cancel), null)
                     .show()
-
             }
+
             R.id.system_setting_not_closed_door_alarm_time_sb -> {
                 AlertDialog.Builder(this)
                     .setTitle(getString(R.string.not_closed_door_alarm_time))
@@ -772,7 +772,7 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                     .setTitle(getString(R.string.title_restart_now))
                     .setMessage(getString(R.string.restart_now_sure))
                     .setPositiveButton(getString(R.string.sure)) { _, _ ->
-//                        SmdtUtil.instance.reboot()
+                        // SmdtUtil.instance.reboot()
                     }
                     .setNegativeButton(getString(R.string.cancel), null)
                     .show()
@@ -861,7 +861,7 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                         if (ActivityUtil.getLauncherPackageName(this@SystemSettingsActivity)
                                 .equals("android")
                         ) {
-                            //todo 关闭看门狗
+                            // 关闭看门狗
                             ActivityUtil.uninstallApk(
                                 this@SystemSettingsActivity, "com.zk.cabinet"
                             )
@@ -980,5 +980,12 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
 //                )
 //            )
         }
+    }
+
+    private fun restartApp() {
+        val intent = Intent(this, GuideActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        Process.killProcess(Process.myPid())
     }
 }

@@ -77,15 +77,18 @@ class NetService : Service() {
                                 val dataJsonArray = response.getJSONArray("data")
                                 val cabCodeList = ArrayList<String>()
                                 val inventoryIdList = ArrayList<String>()
+                                val inOrgList = ArrayList<String>()
                                 for (i in 0 until dataJsonArray.length()) {
                                     val jsonObject: JSONObject = dataJsonArray.getJSONObject(i)
                                     val inventoryId = jsonObject.getString("inventoryId")
                                     val cabCode = jsonObject.getString("cabCode")
+                                    val inOrg = jsonObject.getString("inOrg")
                                     if (DeviceService.getInstance()
                                             .queryByDeviceName(cabCode) != null
                                     ) {
                                         cabCodeList.add(cabCode)
                                         inventoryIdList.add(inventoryId)
+                                        inOrgList.add(inOrg)
                                     }
                                 }
                                 if (inventoryIdList.size > 0 && ActivityUtil.isTopActivity(
@@ -98,6 +101,7 @@ class NetService : Service() {
                                     val data = Bundle()
                                     data.putStringArrayList("cabCodeList", cabCodeList)
                                     data.putStringArrayList("inventoryIdList", inventoryIdList)
+                                    data.putStringArrayList("inOrgList", inOrgList)
                                     msg.data = data
                                     mGuideMessenger?.send(msg)
                                 }
@@ -136,10 +140,16 @@ class NetService : Service() {
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
                 )
                 NetworkRequest.instance.add(jsonObjectRequest)
-
             }
         }
         mScheduledExecutorService = Executors.newScheduledThreadPool(3)
+
+        /**
+        command：执行线程
+        initialDelay：初始化延时
+        period：前一次执行结束到下一次执行开始的间隔时间（间隔执行延迟时间）
+        unit：计时单位
+         */
         mScheduledExecutorService.scheduleAtFixedRate(mTaskHeartbeat, 1, 1, TimeUnit.MINUTES)
 
         return Messenger(mNetHandler).binder

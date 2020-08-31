@@ -49,17 +49,18 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private fun handleMessage(msg: Message) {
         when (msg.what) {
             GET_WAREHOUSING_SUCCESS -> {
-                mProgressDialog.dismiss()
+                if (mProgressDialog.isShowing) mProgressDialog.dismiss()
+
                 mWarehousingList =
                     msg.obj as ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean>
 
-                // 测试列表显示
-//                var testList = msg.obj as ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean>
-//                for ((index, entity) in testList.withIndex()) {
-//                    if (index < 5)
-//                        mWarehousingList.add(entity)
-//                    else
-//                        break
+                // 测试,自己加数据,可以模拟各种情况
+//                for ((index, entity) in mWarehousingList.withIndex()) {
+//                    if (index == 0 ||index == 1 ||index == 2 ||index == 3 || index == 4) {
+//                        entity.nameValuePairs.cabCode = ""
+//                        entity.nameValuePairs.position = ""
+//                        entity.nameValuePairs.light = ""
+//                    }
 //                }
 
                 mWarehousingAdapter.setList(mWarehousingList)
@@ -96,7 +97,9 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         mProgressDialog = ProgressDialog(this, R.style.mLoadingDialog)
         mProgressDialog.setCancelable(false)
 
-        getWarehousing()
+        mProgressDialog.setMessage("正在获取待入库档案列表...")
+        mProgressDialog.show()
+        handler.post(runnable)
     }
 
     override fun countDownTimerOnTick(millisUntilFinished: Long) {
@@ -114,8 +117,6 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     }
 
     private fun getWarehousing() {
-        mProgressDialog.setMessage("正在获取待入库档案列表...")
-        mProgressDialog.show()
         mWarehousingList.clear()
 
         val jsonObjectRequest = JsonObjectRequest(
@@ -195,8 +196,17 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         }
     }
 
+    private val handler = Handler()
+    private val runnable = Runnable {
+        run {
+            getWarehousing()
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        getWarehousing()
+        mProgressDialog.setMessage("正在获取待入库档案列表...")
+        mProgressDialog.show()
+        handler.postDelayed(runnable, 2000)
     }
 }

@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import com.alibaba.fastjson.JSON
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
@@ -24,7 +25,6 @@ import com.zk.cabinet.databinding.ActivityOutboundOperatingBinding
 import com.zk.cabinet.db.DeviceService
 import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.utils.SharedPreferencesUtil
-import com.zk.common.utils.LogUtil
 import com.zk.rfid.bean.LabelInfo
 import com.zk.rfid.bean.UR880SendInfo
 import com.zk.rfid.callback.CabinetInfoListener
@@ -46,7 +46,6 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
     private lateinit var mDossierAdapter: OutboundAdapter
     private val labelInfoList = ArrayList<LabelInfo>()
     private var mFloor = -1
-    private var mDoorIsOpen = false
 
     companion object {
         private const val OPEN_DOOR_RESULT = 0x01
@@ -65,8 +64,48 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
 
     private fun handleMessage(msg: Message) {
         when (msg.what) {
+            GET_INFRARED_AND_LOCK -> {
+                val data = msg.data
+                val boxStateList = data.getIntegerArrayList("lock")
+                val infraredStateList = data.getIntegerArrayList("infrared")
+
+                Log.e("zx-出库操作-boxStateList", "$boxStateList")
+                Log.e("zx-出库操作-infraredState", "$infraredStateList")
+
+                // 这里只要红外被触发都会被调用, 哪层的红外被触发 [1,2,3,4,5], 但是多层的时候不返回数据,只有一层不触发才返回数据
+                if (infraredStateList!!.isNotEmpty()) {
+                    mFloor = infraredStateList[0]
+                }
+
+                // 这里只要红外被触发都会被调用, 门开的状态 boxStateList: [1] , 门关闭的状态 boxStateList: []
+                if (boxStateList!!.isEmpty()) {
+                    isAutoFinish = true
+                    timerStart()
+                    Log.e("zx-出库操作-", "门关闭-开启界面倒计时")
+                }
+            }
             OPEN_DOOR_RESULT -> {
                 showToast(msg.obj.toString())
+                Log.e("zx-出库操作-", "门开启-关闭界面倒计时-出库的档案进行开灯-")
+                // 门开启后倒计时关闭
+                isAutoFinish = false
+                timerCancel()
+
+                // 亮出库列表数据的相应灯位
+                for (floor in 1..5) {
+                    val lights = ArrayList<Int>()
+                    for (dossierOperating in outBoundList) {
+                        if (dossierOperating.nameValuePairs.position != null && dossierOperating.nameValuePairs.position.toInt() == floor) {
+                            if (dossierOperating.nameValuePairs.light != null)
+                                lights.add(dossierOperating.nameValuePairs.light.toInt())
+                        }
+                    }
+                    UR880Entrance.getInstance().send(
+                        UR880SendInfo.Builder().turnOnLight(mDevice!!.deviceId, floor, lights)
+                            .build()
+                    )
+                }
+
             }
             START_INVENTORY -> {
                 Toast.makeText(this, "开始盘点", Toast.LENGTH_SHORT).show()
@@ -74,15 +113,18 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
             INVENTORY_VALUE -> {
                 val labelInfo = msg.obj as LabelInfo
                 labelInfoList.add(labelInfo)
-                LogUtil.instance.d("-------------labelInfo.deviceID: ${labelInfo.deviceID}")
-                LogUtil.instance.d("-------------labelInfo.antennaNumber: ${labelInfo.antennaNumber}")
-                LogUtil.instance.d("-------------labelInfo.fastID: ${labelInfo.fastID}")
-                LogUtil.instance.d("-------------labelInfo.rssi: ${labelInfo.rssi}")
-                LogUtil.instance.d("-------------labelInfo.operatingTime: ${labelInfo.operatingTime}")
-                LogUtil.instance.d("-------------labelInfo.epcLength: ${labelInfo.epcLength}")
-                LogUtil.instance.d("-------------labelInfo.epc: ${labelInfo.epc}")
-                LogUtil.instance.d("-------------labelInfo.tid: ${labelInfo.tid}")
-                LogUtil.instance.d("-------------labelInfo.inventoryNumber: ${labelInfo.inventoryNumber}")
+                Log.e("zx-出库-", "-------------labelInfo.deviceID: ${labelInfo.deviceID}")
+                Log.e("zx-出库-", "-------------labelInfo.antennaNumber: ${labelInfo.antennaNumber}")
+                Log.e("zx-出库-", "-------------labelInfo.fastID: ${labelInfo.fastID}")
+                Log.e("zx-出库-", "-------------labelInfo.rssi: ${labelInfo.rssi}")
+                Log.e("zx-出库-", "-------------labelInfo.operatingTime: ${labelInfo.operatingTime}")
+                Log.e("zx-出库-", "-------------labelInfo.epcLength: ${labelInfo.epcLength}")
+                Log.e("zx-出库-", "-------------labelInfo.epc: ${labelInfo.epc}")
+                Log.e("zx-出库-", "-------------labelInfo.tid: ${labelInfo.tid}")
+                Log.e(
+                    "zx-出库-",
+                    "-------------labelInfo.inventoryNumber: ${labelInfo.inventoryNumber}"
+                )
             }
             CANCEL_INVENTORY -> {
                 Toast.makeText(this, "停止盘点", Toast.LENGTH_SHORT).show()
@@ -90,53 +132,48 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
             END_INVENTORY -> {
                 Toast.makeText(this, "盘点结束", Toast.LENGTH_SHORT).show()
 
-                if (outBoundList.isNotEmpty()) {
-                    for (dossier in outBoundList) {
-                        if (dossier.nameValuePairs.position.toInt() == mFloor) {
-                            var isExit = false
-                            for (labelInfo in labelInfoList) {
-                                if (labelInfo.epc == dossier.nameValuePairs.rfidNum) {
-                                    isExit = true
-                                    dossier.nameValuePairs.isSelected = true
-                                    break
-                                }
+                // 出库,一般操作是先拿出来,然后会触发红外,触发读写器进行读写,此时应该判断哪个RFID不在了,不在才进行勾选,只要发现不在就勾选,在发现在不处理,因为可能已经拿了一个盒子里其中一本又放回去了
+                for (dossier in outBoundList) {
+                    if (dossier.nameValuePairs.position.toInt() == mFloor) { // 是否是当前触发的层
+                        var isExit = false
+                        for (labelInfo in labelInfoList) {
+                            if (labelInfo.epc == dossier.nameValuePairs.rfidNum) {
+                                isExit = true
+                                // dossier.nameValuePairs.isSelected = false
+                                break
                             }
-                            if (!isExit) dossier.nameValuePairs.isSelected = false
                         }
-                    }
-                } else {
-                    for (dossier in outBoundList) {
-                        if (dossier.nameValuePairs.position.toInt() == mFloor) {
-                            dossier.nameValuePairs.isSelected = false
+                        if (!isExit) { // 没扫描到,说明原理天线了,可以判定为拿出来了
+                            dossier.nameValuePairs.isSelected = true
                         }
                     }
                 }
+
+                var hasSelect = false
+                for (dossier in outBoundList) {
+                    if (dossier.nameValuePairs.isSelected) {
+                        hasSelect = true
+                        break
+                    } else {
+                        hasSelect = false
+                    }
+                }
+
+                if (hasSelect) {
+                    mOutboundBinding.btnOutStorage.background =
+                        resources.getDrawable(R.drawable.selector_menu_green)
+                    mOutboundBinding.btnOutStorage.isEnabled = true
+                } else {
+                    mOutboundBinding.btnOutStorage.background =
+                        resources.getDrawable(R.drawable.shape_btn_un_enable)
+                    mOutboundBinding.btnOutStorage.isEnabled = false
+                }
+
+                Log.e("zx-出库操作-盘点到的标签数据-", JSON.toJSONString(labelInfoList))
                 mDossierAdapter.notifyDataSetChanged()
                 labelInfoList.clear()
             }
-            GET_INFRARED_AND_LOCK -> {
-                val data = msg.data
-                val boxStateList = data.getIntegerArrayList("lock")
-                val infraredStateList = data.getIntegerArrayList("infrared")
-                if (boxStateList!!.isEmpty()) {
-                    if (mDoorIsOpen) {
-                        mDoorIsOpen = false
-                        isAutoFinish = true
-                        timerStart()
-                        showToast("门关闭")
-                    }
-                } else {
-                    if (!mDoorIsOpen) {
-                        mDoorIsOpen = true
-                        isAutoFinish = false
-                        timerCancel()
-                        showToast("门开启")
-                    }
-                }
-                if (infraredStateList!!.isNotEmpty()) {
-                    mFloor = infraredStateList[0]
-                }
-            }
+
             SUBMITTED_SUCCESS -> {
                 Toast.makeText(this, "出库成功", Toast.LENGTH_SHORT).show()
                 mProgressDialog.dismiss()
@@ -199,18 +236,6 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
         UR880Entrance.getInstance().send(
             UR880SendInfo.Builder().openDoor(mDevice!!.deviceId, 0).build()
         )
-        for (index in 1..5) {
-            val lights = ArrayList<Int>()
-            for (dossierOperating in outBoundList) {
-                if (dossierOperating.nameValuePairs.position.toInt() == index) {
-                    lights.add(dossierOperating.nameValuePairs.light.toInt())
-                }
-            }
-            UR880Entrance.getInstance().send(
-                UR880SendInfo.Builder().turnOnLight(mDevice!!.deviceId, index, lights).build()
-            )
-        }
-
     }
 
     private val mCabinetInfoListener = object : CabinetInfoListener {
@@ -264,28 +289,9 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
         mOutboundBinding.outboundOperatingCountdownTv.text = millisUntilFinished.toString()
     }
 
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        when (item.itemId) {
-//            android.R.id.home -> {
-////                for (index in 1..5){
-////                    val lights = ArrayList<Int>()
-////                    UR880Entrance.getInstance()
-////                        .send(UR880SendInfo.Builder().turnOnLight(mDevice!!.deviceId, index, lights).build())
-////                }
-//                outboundSubmission()
-//            }
-//        }
-//        return super.onOptionsItemSelected(item)
-//    }
-
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btn_out_storage -> {
-//                 for (index in 1..5){
-//                    val lights = ArrayList<Int>()
-//                    UR880Entrance.getInstance()
-//                        .send(UR880SendInfo.Builder().turnOnLight(mDevice!!.deviceId, index, lights).build())
-//                }
                 outboundSubmission()
             }
 
@@ -392,7 +398,8 @@ class OutboundOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnItem
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        outBoundList[position].nameValuePairs.isSelected = !outBoundList[position].nameValuePairs.isSelected
+        outBoundList[position].nameValuePairs.isSelected =
+            !outBoundList[position].nameValuePairs.isSelected
 
         if (outBoundList[position].nameValuePairs.isSelected) {
             mOutboundBinding.btnOutStorage.background =

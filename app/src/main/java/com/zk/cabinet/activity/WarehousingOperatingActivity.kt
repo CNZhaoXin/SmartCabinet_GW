@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import com.alibaba.fastjson.JSON
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
@@ -32,7 +33,6 @@ import com.zk.cabinet.databinding.DialogDeviceSingleSelectWarehousingBinding
 import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
-import com.zk.common.utils.LogUtil
 import com.zk.common.utils.TimeUtil
 import com.zk.rfid.bean.LabelInfo
 import com.zk.rfid.bean.UR880SendInfo
@@ -52,7 +52,6 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
     private lateinit var mDevice: Device
     private val dossierList = ArrayList<DossierEntity>()
     private lateinit var mDossierAdapter: DossierAdapter
-    private var mDoorIsOpen = false
     private lateinit var mCabinet: HashMap<String, ArrayList<Int>>
     private lateinit var inStorageList: ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean>
 
@@ -74,19 +73,64 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
     private fun getListFromInStorageListByEpc(epc: String): ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean> {
         val newList = ArrayList<ResultGetInStorage.NameValuePairsBeanX.DataBean.ValuesBean>()
         for (entity in inStorageList) {
-            if (entity.nameValuePairs.rfidNum == epc) {
+            if (epc == entity.nameValuePairs.rfidNum.trim()) {
                 newList.add(entity)
             }
         }
-        Log.e("zx", "zx: 入库-相同的epc待入库档案数据:" + newList.size)
+        Log.e("zx-入库操作-", "inStorageList:" + JSON.toJSONString(inStorageList))
+        Log.e("zx-入库操作-", "相同的epc待入库档案数据:" + JSON.toJSONString(newList))
         return newList
     }
 
     private fun handleMessage(msg: Message) {
         when (msg.what) {
+            GET_INFRARED_AND_LOCK -> {
+                val data = msg.data
+                val boxStateList = data.getIntegerArrayList("lock")
+                val infraredStateList = data.getIntegerArrayList("infrared")
+
+                Log.e("zx-入库操作-boxStateList", "$boxStateList")
+                // 这里只要红外被触发都会被调用, 门开的状态 boxStateList: [1] , 门关闭的状态 boxStateList: []
+                if (boxStateList!!.isEmpty()) {
+                    isAutoFinish = true
+                    timerStart()
+                    Log.e("zx-入库操作-", "门关闭-开启界面倒计时")
+                }
+            }
             OPEN_DOOR_RESULT -> {
-                Log.e("zx", "开门成功")
                 showToast(msg.obj.toString())
+                Log.e("zx-入库操作-", "门开启-关闭界面倒计时-有位置参数的档案进行开灯-")
+                // 门开启后倒计时关闭
+                isAutoFinish = false
+                timerCancel()
+
+                // 开门亮对应柜体位置的灯,该人要有该层的操作权限,才会亮灯
+                // val floors = mCabinet[mDevice.deviceName]!!
+                // for (floor in floors) { // 1..5
+                for (floor in 1..5) { // 1..5
+                    val lights = ArrayList<Int>()
+                    for (entity in inStorageList) {
+                        if (entity.nameValuePairs.position != null && entity.nameValuePairs.position.isNotEmpty() && entity.nameValuePairs.position.toInt() == floor) {
+                            if (entity.nameValuePairs.light != null && entity.nameValuePairs.light.isNotEmpty())
+                                lights.add(entity.nameValuePairs.light.toInt())
+                        }
+                    }
+                    UR880Entrance.getInstance().send(
+                        UR880SendInfo.Builder()
+                            .turnOnLight(mDevice!!.deviceId, floor, lights).build()
+                    )
+                }
+
+//                for (index in floors) {  // for (index in 1..5)
+//                    val lights = ArrayList<Int>()
+//                    for (light in 1..24) {
+//                        lights.add(light)
+//                    }
+//                    UR880Entrance.getInstance().send(
+//                        UR880SendInfo.Builder().turnOnLight(mDevice.deviceId, index, lights).build()
+//                    )
+//                }
+
             }
             START_INVENTORY -> {
                 Log.e("zx", "开始盘点")
@@ -94,30 +138,38 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
             }
             INVENTORY_VALUE -> {
                 val labelInfo = msg.obj as LabelInfo
-                LogUtil.instance.d("-------------labelInfo.deviceID: ${labelInfo.deviceID}")
-                LogUtil.instance.d("-------------labelInfo.antennaNumber: ${labelInfo.antennaNumber}")
-                LogUtil.instance.d("-------------labelInfo.fastID: ${labelInfo.fastID}")
-                LogUtil.instance.d("-------------labelInfo.rssi: ${labelInfo.rssi}")
-                LogUtil.instance.d("-------------labelInfo.operatingTime: ${labelInfo.operatingTime}")
-                LogUtil.instance.d("-------------labelInfo.epcLength: ${labelInfo.epcLength}")
-                LogUtil.instance.d("-------------labelInfo.epc: ${labelInfo.epc}")
-                LogUtil.instance.d("-------------labelInfo.tid: ${labelInfo.tid}")
-                LogUtil.instance.d("-------------labelInfo.inventoryNumber: ${labelInfo.inventoryNumber}")
+                Log.e("zx-入库-", "-------------labelInfo.deviceID: ${labelInfo.deviceID}")
+                Log.e("zx-入库-", "-------------labelInfo.antennaNumber: ${labelInfo.antennaNumber}")
+                Log.e("zx-入库-", "-------------labelInfo.fastID: ${labelInfo.fastID}")
+                Log.e("zx-入库-", "-------------labelInfo.rssi: ${labelInfo.rssi}")
+                Log.e("zx-入库-", "-------------labelInfo.operatingTime: ${labelInfo.operatingTime}")
+                Log.e("zx-入库-", "-------------labelInfo.epcLength: ${labelInfo.epcLength}")
+                Log.e("zx-入库-", "-------------labelInfo.epc: ${labelInfo.epc}")
+                Log.e("zx-入库-", "-------------labelInfo.tid: ${labelInfo.tid}")
+                Log.e(
+                    "zx-入库-",
+                    "-------------labelInfo.inventoryNumber: ${labelInfo.inventoryNumber}"
+                )
                 labelInfo.antennaNumber = labelInfo.antennaNumber + 1
 
-                // 识别到的标签数据,根据EPC,去待入库列表里面获取要入库的相同的EPC数据(一本档案可有多本数据)
-                // todo 首先得过滤掉这个人不能操作的位置的入库文档
-                // todo 两种情况. 1:待入库档案指明了位置或者拥有RFID标签号,也就相当于入库位置明确,需要亮对应位置的灯 2:待入库档案未指明位置,可根据柜子权限,亮灯让他自由入库
-                // todo 有位置和没有位置因可确定亮灯位置,和不可确定亮灯位置,这个要分开入库 不然 无法操作
+                // 首先得过滤掉这个人不能操作的位置的入库文档 (假设请求入库列表的orgCode起到过滤作用,那么该人就一定只能获取到该组织的柜子权限,对应的入库档案肯定是能操作的位置)
+                // 两种情况. 1:待入库档案指明了位置或者拥有RFID标签号,也就相当于入库位置明确,需要亮对应位置的灯 2:待入库档案未指明位置,不亮灯,可根据柜子权限 文字提示可入库的层 让他自由入库
                 // val dossierOperatingList = DossierOperatingService.getInstance().queryListByEPC(labelInfo.epc)
+
+                // 识别到的标签数据,根据EPC,去待入库列表里面获取要入库的相同的EPC数据(一本档案可有多本数据)
                 val dossierOperatingList = getListFromInStorageListByEpc(labelInfo.epc)
 
                 if (dossierOperatingList.size > 0) {
                     for (dossierOperating in dossierOperatingList) {
                         var isExit = false
                         for (dossier in dossierList) {
-                            if (dossier.rfidNum == dossierOperating.nameValuePairs.rfidNum && dossier.warrantNum == dossierOperating.nameValuePairs.warrantNum) {
+                            // 三个参数都相同,说明识别到的是同一个文件,不然就不是同一个文件,虽然rfidNum一样,但可以有多本档案,都需要添加到集合当中
+                            if (dossier.rfidNum == dossierOperating.nameValuePairs.rfidNum && dossier.warrantNum == dossierOperating.nameValuePairs.warrantNum
+                                && dossier.warrantNo == dossierOperating.nameValuePairs.warrantNo
+                            ) {
                                 dossier.cabiCode = mDevice.deviceName
+                                dossier.inOrg = dossierOperating.nameValuePairs.inOrg
+                                dossier.inputId = dossierOperating.nameValuePairs.inputId
                                 val light =
                                     if (labelInfo.antennaNumber % 24 == 0) 24 else labelInfo.antennaNumber % 24
                                 val floor =
@@ -139,30 +191,19 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
                             dossier.inStorageType = dossierOperating.nameValuePairs.inStorageType
                             dossier.warranType = dossierOperating.nameValuePairs.warranType
                             dossier.cabiCode = mDevice.deviceName
+                            dossier.inOrg = dossierOperating.nameValuePairs.inOrg
+                            dossier.inputId = dossierOperating.nameValuePairs.inputId
                             val light =
                                 if (labelInfo.antennaNumber % 24 == 0) 24 else labelInfo.antennaNumber % 24
                             val floor =
                                 if (labelInfo.antennaNumber % 24 == 0) labelInfo.antennaNumber / 24 else (labelInfo.antennaNumber / 24 + 1)
                             dossier.floor = floor
                             dossier.light = light
+
                             // dossier.isSelected = true
                             dossierList.add(dossier)
                         }
                         mDossierAdapter.notifyDataSetChanged()
-                    }
-
-                    for (index in 1..5) {
-                        val lights = ArrayList<Int>()
-                        for (dossier in dossierList) {
-                            if (dossier.floor == index) {
-                                lights.add(dossier.light)
-                            }
-                        }
-                        UR880Entrance.getInstance()
-                            .send(
-                                UR880SendInfo.Builder()
-                                    .turnOnLight(mDevice.deviceId, index, lights).build()
-                            )
                     }
                 }
 
@@ -174,6 +215,21 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
             END_INVENTORY -> {
                 Log.e("zx", "盘点结束")
                 Toast.makeText(this, "盘点结束", Toast.LENGTH_SHORT).show()
+
+                // 这个是每次盘点完成之后都重新亮灯,亮操作过后的入库列表数据的灯
+                for (index in 1..5) {
+                    val lights = ArrayList<Int>()
+                    for (dossier in dossierList) {
+                        if (dossier.floor == index) {
+                            lights.add(dossier.light)
+                        }
+                    }
+                    UR880Entrance.getInstance()
+                        .send(
+                            UR880SendInfo.Builder()
+                                .turnOnLight(mDevice.deviceId, index, lights).build()
+                        )
+                }
             }
             SUBMITTED_SUCCESS -> {
                 Toast.makeText(this, "数据提交成功", Toast.LENGTH_SHORT).show()
@@ -184,6 +240,18 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
                     val next = mIterator.next()
                     if (next.isSelected) {
                         mIterator.remove()
+
+                        val mIterator1 = inStorageList.iterator()
+                        while (mIterator1.hasNext()) {
+                            val next1 = mIterator1.next()
+                            if (next.rfidNum == next1.nameValuePairs.rfidNum
+                                && next.warrantNum == next1.nameValuePairs.warrantNum
+                                && next.warrantNo == next1.nameValuePairs.warrantNo
+                            ) {
+                                mIterator1.remove()
+                                break
+                            }
+                        }
                     }
                 }
 
@@ -197,49 +265,7 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
                 Toast.makeText(this, msg.obj.toString(), Toast.LENGTH_SHORT).show()
                 mProgressDialog.dismiss()
             }
-            GET_INFRARED_AND_LOCK -> {
-                val data = msg.data
-                val boxStateList = data.getIntegerArrayList("lock")
-                val infraredStateList = data.getIntegerArrayList("infrared")
-                if (boxStateList!!.isEmpty()) {
-                    if (mDoorIsOpen) {
-                        mDoorIsOpen = false
-                        isAutoFinish = true
-                        timerStart()
-                        showToast("门关闭")
 
-//                        for (index in 1..5) {
-//                            val lights = ArrayList<Int>()
-//                            UR880Entrance.getInstance()
-//                                .send(
-//                                    UR880SendInfo.Builder()
-//                                        .turnOnLight(mDevice.deviceId, index, lights).build()
-//                                )
-//                        }
-                    }
-                } else {
-                    if (!mDoorIsOpen) {
-                        mDoorIsOpen = true
-                        isAutoFinish = false
-                        timerCancel()
-                        showToast("门开启")
-
-                        // 开门亮对应柜体权限层数的灯
-                        val floors = mCabinet[mDevice.deviceName]!!
-                        for (index in floors) {
-                            val lights = ArrayList<Int>()
-                            for (light in 1..24) {
-                                lights.add(light)
-                            }
-                            UR880Entrance.getInstance()
-                                .send(
-                                    UR880SendInfo.Builder()
-                                        .turnOnLight(mDevice.deviceId, index, lights).build()
-                                )
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -265,12 +291,14 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
         mWarehousingBinding.warehousingOperatingLv.adapter = mDossierAdapter
 
         val gson = Gson()
+        // 可以操作的柜子,对比配置和平台分配的
         val canOperateCabinetList = mSpUtil.getString(Key.CanOperateCabinet, "")
         val deviceList = gson.fromJson<List<Device>>(
             canOperateCabinetList,
             object : TypeToken<List<Device?>?>() {}.type
         )
 
+        // 可以操作的柜子+层数 封装,对比配置和平台分配的
         val canOperateCabinetFloor = mSpUtil.getString(Key.CanOperateCabinetFloor, "")
         mCabinet = gson.fromJson<HashMap<String, ArrayList<Int>>>(
             canOperateCabinetFloor,
@@ -332,6 +360,9 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
             } else if (view.id == R.id.btn_confirm) {
                 mDevice = deviceList[selectPosition]
                 mWarehousingBinding.accessingBoxNumberTv.text = "${mDevice.deviceName}"
+                val floors = mCabinet[mDevice.deviceName]!!
+                // 显示可操作的柜层
+                mWarehousingBinding.tvOperationFloors.text = "$floors"
 
                 UR880Entrance.getInstance()
                     .send(UR880SendInfo.Builder().openDoor(mDevice.deviceId, 0).build())
@@ -392,15 +423,6 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
         mWarehousingBinding.warehousingOperatingCountdownTv.text = millisUntilFinished.toString()
     }
 
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        when (item.itemId) {
-//            android.R.id.home -> {
-//              warehousingSubmission()
-//            }
-//        }
-//        return super.onOptionsItemSelected(item)
-//    }
-
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btn_back -> {
@@ -446,10 +468,12 @@ class WarehousingOperatingActivity : TimeOffAppCompatActivity(), AdapterView.OnI
                     changedObject.put("position", dossierChanged.floor.toString())
                     changedObject.put("light", dossierChanged.light.toString())
                     changedObject.put("inOrg", dossierChanged.inOrg)
+                    // 操作人ID(登录人员ID)
                     changedObject.put(
                         "operatorId",
                         mSpUtil.getString(SharedPreferencesUtil.Key.IdTemp, "")!!
                     )
+                    // 权证录入人ID
                     changedObject.put("inputId", dossierChanged.inputId)
 
                     orderItemsJsonArray.put(changedObject)
