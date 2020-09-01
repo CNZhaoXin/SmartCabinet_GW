@@ -133,7 +133,7 @@ class WarehousingActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                     )
                     if (resultGetInStorage.nameValuePairs.isSuccess) {
                         val values = resultGetInStorage.nameValuePairs.data.values
-                        if (values.size > 0) {
+                        if (resultGetInStorage.nameValuePairs.dataCount == "1" && values.size > 0) {
                             val msg = Message.obtain()
                             msg.what = GET_WAREHOUSING_SUCCESS
                             msg.obj = values

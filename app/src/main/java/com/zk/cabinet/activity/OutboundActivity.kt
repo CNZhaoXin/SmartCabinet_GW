@@ -126,7 +126,7 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
                     )
                     if (resultGetOutBound.nameValuePairs.isSuccess) {
                         val values = resultGetOutBound.nameValuePairs.data.values
-                        if (values.size > 0) {
+                        if (resultGetOutBound.nameValuePairs.dataCount == "1" && values.size > 0) {
                             // 剔除不属于我的柜子权限的出库条目
                             val canOperateCabinetList =
                                 mSpUtil.getString(SharedPreferencesUtil.Key.CanOperateCabinet, "")

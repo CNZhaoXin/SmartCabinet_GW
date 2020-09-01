@@ -67,13 +67,16 @@ class NetService : Service() {
                     NetworkRequest.instance.mInventoryRequest + sb.toString(),
                     // + SharedPreferencesUtil.instance.getString(SharedPreferencesUtil.Key.DeviceCode, ""),
                     Response.Listener { response ->
-                        // {"success":true,"message":"OK","data":[{"inventoryId":"1","cabCode":"1234567801","batch":null,"inOrg":"02","status":1}
-                        // ,{"inventoryId":"2","cabCode":"1234567803","batch":null,"inOrg":"02","status":0}]}
+
+                        // {"success":true,"message":"OK",
+                        // "data":[{"inventoryId":"1","cabCode":"1234567801","batch":null,"inOrg":"02","status":1}
+                        // ,{"inventoryId":"2","cabCode":"1234567803","batch":null,"inOrg":"02","status":1}],"dataCount":"1"}
                         Log.e("zx--获取盘点任务单--", "$response")
 
                         try {
                             val success = response.getBoolean("success")
-                            if (success) {
+                            val dataCount = response.getString("dataCount")
+                            if (success && dataCount == "1") {
                                 val dataJsonArray = response.getJSONArray("data")
                                 val cabCodeList = ArrayList<String>()
                                 val inventoryIdList = ArrayList<String>()

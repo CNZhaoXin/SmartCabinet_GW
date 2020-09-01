@@ -75,6 +75,7 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
 
         private const val GET_LIST_SUCCESS = 0x07
         private const val GET_LIST_FAIL = 0x08
+        private const val GET_LIST_NO_DATA = 0x09
 
         private const val AUTOMATIC = "isAutomatic"
         private const val CAB_CODE_LIST = "cabCodeList"
@@ -182,6 +183,12 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
             }
 
             GET_LIST_FAIL -> {
+                if (mProgressDialog.isShowing) mProgressDialog.dismiss()
+                showToast(msg.obj.toString())
+                finish()
+            }
+
+            GET_LIST_NO_DATA -> {
                 if (mProgressDialog.isShowing) mProgressDialog.dismiss()
                 showToast(msg.obj.toString())
                 finish()
@@ -383,11 +390,17 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
 
                     if (resultGetList.isSuccess) {
                         val stockList = resultGetList.data
-
-                        val msg = Message.obtain()
-                        msg.what = GET_LIST_SUCCESS
-                        msg.obj = stockList
-                        mHandler.sendMessageDelayed(msg, 800)
+                        if (resultGetList.dataCount == "1" && stockList.size > 0) {
+                            val msg = Message.obtain()
+                            msg.what = GET_LIST_SUCCESS
+                            msg.obj = stockList
+                            mHandler.sendMessageDelayed(msg, 800)
+                        } else {
+                            val msg = Message.obtain()
+                            msg.what = GET_LIST_NO_DATA
+                            msg.obj = "未获取到库存数据"
+                            mHandler.sendMessageDelayed(msg, 800)
+                        }
                     } else {
                         val msg = Message.obtain()
                         msg.what = GET_LIST_FAIL
