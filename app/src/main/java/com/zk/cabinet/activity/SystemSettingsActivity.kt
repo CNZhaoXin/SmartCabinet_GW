@@ -558,23 +558,32 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                         UniversalEdtDialog(R.string.cabinet_service_port,
                             object : UniversalEdtDialog.InputListener {
                                 override fun onInputComplete(input: String) {
-                                    if (mCabinetServicePort != input.toInt()) {
-                                        mCabinetServicePort = input.toInt()
-                                        mSpUtil.applyValue(
-                                            Record(
-                                                Key.CabinetServicePort,
-                                                mCabinetServicePort
+                                    if (mCabinetServicePort != input.trim().toInt()) {
+                                        // Socket编程中，IP+端口号就是套接字,端口号是由16比特进行编号，范围是0-65535
+                                        // ^[1-9]$|(^[1-9][0-9]$)|(^[1-9][0-9][0-9]$)|(^[1-9][0-9][0-9][0-9]$)|(^[1-6][0-5][0-5][0-3][0-5]$)
+                                        // 理应是0-65535.但是Netty sdk中封装可能限制了只能4位数-65535,经测试,有的4位数也不行比如1000,不然init Netty会报错 java.net.SocketException: Permission denied,崩溃
+                                        val regex =
+                                            Regex("(^[1-9][0-9][0-9][0-9]\$)|(^[1-6][0-5][0-5][0-3][0-5]\$)")
+                                        if (!input.trim().matches(regex)) {
+                                            showToast("端口输入不符合")
+                                        } else {
+                                            mCabinetServicePort = input.trim().toInt()
+                                            // commit()方法是同步执行,有返回值，apply()方法是异步执行,没有返回值
+                                            mSpUtil.commitValue(
+                                                Record(
+                                                    Key.CabinetServicePort,
+                                                    mCabinetServicePort
+                                                )
                                             )
-                                        )
-                                        mSystemSettingsBinding.systemSettingCabinetServicePortSb.setCaptionText(
-                                            String.format(
-                                                resources.getString(R.string.cabinet_port_caption_text),
-                                                mCabinetServicePort
+                                            mSystemSettingsBinding.systemSettingCabinetServicePortSb.setCaptionText(
+                                                String.format(
+                                                    resources.getString(R.string.cabinet_port_caption_text),
+                                                    mCabinetServicePort
+                                                )
                                             )
-                                        )
-                                        // todo 柜体端口配置后,重启APP生效
-                                        restartApp()
-                                        // showRestartNowForSet()
+                                            restartApp()
+                                            // showRestartNowForSet()
+                                        }
                                     }
                                 }
                             })
