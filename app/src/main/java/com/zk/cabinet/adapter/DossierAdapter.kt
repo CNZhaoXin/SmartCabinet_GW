@@ -43,7 +43,7 @@ class DossierAdapter(context: Context, dossierList: List<DossierEntity>) :
         viewHolder.mAdapterOutboundNameTv.text = dossier.warrantName
         viewHolder.mAdapterOutboundNoTv.text = dossier.warrantNo
         viewHolder.mAdapterOutboundCateTv.text = SelfComm.WARRANT_CATE[dossier.warranCate]
-        viewHolder.tv_warranType.text = SelfComm.WARRANT_TYPE[dossier.warranType]
+        viewHolder.tv_warranType.text = SelfComm.WARRANT_TYPE[dossier.warranType.toString()]
         viewHolder.mAdapterOutboundTypeTv.text = SelfComm.OPERATING_TYPE[dossier.inStorageType]
         viewHolder.mAdapterOutboundPositionTv.text =
             "${dossier.cabiCode} - ${dossier.floor}-${dossier.light}"

@@ -20,18 +20,19 @@
         android:background="@drawable/shape_login_dialog_bg"
         android:gravity="center"
         android:orientation="vertical"
+        android:paddingTop="55dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp">
 
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
-            android:text="「档案详情」"
-            android:textColor="@color/white"
-            android:textSize="28sp"
-            android:textStyle="bold" />
+<!--        <TextView-->
+<!--            android:id="@+id/tv_title"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="70dp"-->
+<!--            android:text="「档案详情」"-->
+<!--            android:textColor="@color/white"-->
+<!--            android:textSize="28sp"-->
+<!--            android:textStyle="bold" />-->
 
         <LinearLayout
             android:id="@+id/ll_content"
@@ -47,68 +48,6 @@
             android:paddingTop="20dp"
             android:paddingRight="20dp"
             android:visibility="visible">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/title_medium_l_spacing"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="「权证编号」"
-                    android:textColor="#1ABDE6"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/title_medium_l_spacing"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="「权证名称」"
-                    android:textColor="#1ABDE6"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/title_medium_spacing"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="「权证号码」"
-                    android:textColor="#1ABDE6"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/title_medium_l_spacing"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="「权证类别」"
-                    android:textColor="#1ABDE6"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/title_medium_spacing"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="「RFID标签」"
-                    android:textColor="#1ABDE6"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/title_medium_spacing"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="「所在位置」"
-                    android:textColor="#1ABDE6"
-                    android:textSize="16sp" />
-
-            </LinearLayout>
 
             <ListView
                 android:id="@+id/listView"

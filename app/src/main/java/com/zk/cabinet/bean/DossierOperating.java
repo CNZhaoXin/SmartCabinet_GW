@@ -56,8 +56,8 @@ public class DossierOperating {
 
     @Generated(hash = 1548062891)
     public DossierOperating(Long id, String warrantNum, String rfidNum, String warrantName,
-            String warrantNo, int warranCate, int operatingType, int warranType, String cabcode,
-            int floor, int light, boolean selected, String quarNo, String inputId, String inputName) {
+                            String warrantNo, int warranCate, int operatingType, int warranType, String cabcode,
+                            int floor, int light, boolean selected, String quarNo, String inputId, String inputName) {
         this.id = id;
         this.warrantNum = warrantNum;
         this.rfidNum = rfidNum;

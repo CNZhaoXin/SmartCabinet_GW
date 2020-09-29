@@ -15,7 +15,7 @@
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg2"
+        android:background="@mipmap/bg2"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -65,7 +65,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="『档案盘库』"
+                    android:text="『 预览 』"
                     android:textColor="@color/white"
                     android:textSize="22sp"
                     android:textStyle="bold" />
@@ -78,7 +78,8 @@
                     android:layout_marginRight="10dp"
                     android:text="柜体:"
                     android:textColor="@color/gray_light"
-                    android:textSize="22sp" />
+                    android:textSize="22sp"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/demo_interface_box_number_tv"
@@ -87,7 +88,8 @@
                     android:text="xxx"
                     android:textColor="@color/md_red_500"
                     android:textSize="24sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
@@ -131,22 +133,194 @@
 
         </RelativeLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/demo_interface_rv"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="950dp"
-            android:layout_gravity="center"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="30dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/shape_list_trans_bg"
-            android:descendantFocusability="blocksDescendants"
-            android:gravity="center"
-            android:padding="20dp"
-            android:saveEnabled="false"
-            android:scrollbarThumbHorizontal="@drawable/shape_scrollbar"
-            android:scrollbars="horizontal" />
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="总数"
+                        android:textColor="@color/white"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/tv_total"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="120"
+                        android:textColor="@color/md_orange_A200"
+                        android:textSize="30sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="已存"
+                        android:textColor="@color/white"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/tv_normal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/md_cyan_A400"
+                        android:textSize="30sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="空余"
+                        android:textColor="@color/white"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/tv_empty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/md_teal_A400"
+                        android:textSize="30sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="异常"
+                        android:textColor="@color/white"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:id="@+id/tv_error"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/md_red_A200"
+                        android:textSize="30sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/ll_floor_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="1F"
+                        android:textColor="@color/white"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="2F"
+                        android:textColor="@color/white"
+                        android:textSize="30sp" />
+
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="3F"
+                        android:textColor="@color/white"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="4F"
+                        android:textColor="@color/white"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="5F"
+                        android:textColor="@color/white"
+                        android:textSize="30sp" />
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/demo_interface_rv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:descendantFocusability="blocksDescendants"
+                    android:gravity="center"
+                    android:saveEnabled="false"
+                    android:scrollbarThumbHorizontal="@drawable/shape_scrollbar"
+                    android:scrollbars="horizontal" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -159,7 +333,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="30dp"
-                android:background="@drawable/selector_menu_orange"
+                android:background="@drawable/selector_menu_red"
                 android:drawableLeft="@mipmap/ic_back_small"
                 android:drawablePadding="15dp"
                 android:gravity="center"
@@ -172,7 +346,6 @@
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 android:textStyle="bold" />
-
 
             <Button
                 android:id="@+id/btn_inventory_storage"
@@ -188,25 +361,26 @@
                 android:paddingTop="20dp"
                 android:paddingRight="30dp"
                 android:paddingBottom="20dp"
-                android:text="盘 库"
+                android:text="盘 点"
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
             <Button
-                android:id="@+id/btn_open_door"
+                android:id="@+id/btn_qudang"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/selector_menu_green"
-                android:drawableLeft="@mipmap/ic_open_door_small"
+                android:background="@drawable/shape_btn_un_enable"
+                android:drawableLeft="@mipmap/ic_out_storage_small"
                 android:drawablePadding="15dp"
+                android:enabled="false"
                 android:gravity="center"
                 android:onClick="@{onClickListener}"
                 android:paddingLeft="30dp"
                 android:paddingTop="20dp"
                 android:paddingRight="30dp"
                 android:paddingBottom="20dp"
-                android:text="开 柜"
+                android:text="取 档"
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 android:textStyle="bold" />

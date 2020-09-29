@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RFID智慧档案管理系统</string>
+    <string name="app_name">智能人事档案柜</string>
     <string name="contractor">智能权证柜应用系统</string>
     <string name="project_title">智能权证柜应用系统</string>
 
@@ -62,12 +62,12 @@
 
     <!--管理菜单-->
     <string name="title_activity_main_menu">管理菜单</string>
-    <string name="warehousing">档案入库</string>
-    <string name="outbound">档案出库</string>
-    <string name="inventory_storage">档案盘库</string>
-    <string name="personnel_management">指纹管理</string>
-    <string name="system_settings">系统设置</string>
-    <string name="logout">退出登录</string>
+    <string name="warehousing">存档</string>
+    <string name="outbound">取档</string>
+    <string name="inventory_storage">预览</string>
+    <string name="personnel_management">指纹</string>
+    <string name="system_settings">设置</string>
+    <string name="logout">退出</string>
 
     <string name="access_operation">存取操作</string>
     <string name="regional_positioning_management">档案管理</string>

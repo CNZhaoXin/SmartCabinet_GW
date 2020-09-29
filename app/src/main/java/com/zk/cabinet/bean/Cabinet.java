@@ -46,11 +46,17 @@ public class Cabinet {
     public boolean isStock;
 
     @Transient
-    public ArrayList<ResultGetList.DataBean> stockList;
+    public boolean select;
+
+    @Transient
+    public boolean isError;
+
+    @Transient
+    public ArrayList<DossierOperating> stockList;
 
     @Generated(hash = 1747457399)
     public Cabinet(Long id, String deviceId, int floor, int position,
-                   int proportion, int antennaNumber) {
+            int proportion, int antennaNumber) {
         this.id = id;
         this.deviceId = deviceId;
         this.floor = floor;
@@ -133,5 +139,21 @@ public class Cabinet {
 
     public boolean isStock() {
         return isStock;
+    }
+
+    public boolean isSelect() {
+        return select;
+    }
+
+    public void setSelect(boolean select) {
+        this.select = select;
+    }
+
+    public boolean isError() {
+        return isError;
+    }
+
+    public void setError(boolean error) {
+        isError = error;
     }
 }

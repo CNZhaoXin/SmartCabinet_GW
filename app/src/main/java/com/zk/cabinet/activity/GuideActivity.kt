@@ -5,21 +5,38 @@ import android.app.ProgressDialog
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.os.*
+import android.text.SpannableString
 import android.text.TextUtils
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.fastjson.JSON
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
+import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import com.github.mikephil.charting.utils.ColorTemplate
+import com.github.mikephil.charting.utils.MPPointF
 import com.google.gson.Gson
 import com.zk.cabinet.R
 import com.zk.cabinet.adapter.CabinetOnlineAdapter
@@ -31,14 +48,20 @@ import com.zk.cabinet.constant.SelfComm
 import com.zk.cabinet.databinding.ActivityGuideBinding
 import com.zk.cabinet.databinding.DialogLoginBinding
 import com.zk.cabinet.db.DeviceService
+import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.db.UserService
+import com.zk.cabinet.faceServer.FaceRecognitionHttpServer
+import com.zk.cabinet.faceServer.FaceRecognitionListener
+import com.zk.cabinet.faceServer.resultBean.ResultSuccess
 import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.service.NetService
 import com.zk.cabinet.utils.FingerprintParsingLibrary
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
 import com.zk.cabinet.utils.SharedPreferencesUtil.Record
+import com.zk.common.utils.ActivityUtil
 import com.zk.rfid.callback.DeviceInformationListener
 import com.zk.rfid.ur880.UR880Entrance
+import kotlinx.android.synthetic.main.dialog_face.*
 import org.json.JSONException
 import org.json.JSONObject
 import java.lang.ref.WeakReference
@@ -50,6 +73,8 @@ private const val LOGIN_BY_PWD_SUCCESS = 0x05
 private const val LOGIN_BY_PWD_FAIL = 0x06
 private const val FINGER_LOGIN_SUCCESS = 0x07
 private const val FINGER_LOGIN_ERROR = 0x08
+private const val LOGIN_BY_FACE = 0x09
+private const val LOGIN_BY_FACE_NO_REGIST = 0x10
 
 private const val SYS_SETTING_NO_SET_CABINET = 0x09
 private const val WEB_NO_SET_CABINET = 0x10
@@ -64,6 +89,9 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     private var mDialogLoginBinding: DialogLoginBinding? = null
     private var mDialogLogin: AlertDialog? = null
+
+    private var mFaceDialogBinding: ViewDataBinding? = null
+    private var mFaceDialog: AlertDialog? = null
 
     private lateinit var mProgressDialog: ProgressDialog
 
@@ -90,7 +118,19 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             LOGIN_BY_PWD_SUCCESS -> {
                 mProgressDialog.dismiss()
                 showToast("登录成功，欢迎：${msg.obj}")
+                speek("登录成功，欢迎：${msg.obj}")
                 intentActivity(MainMenuActivity.newIntent(this))
+            }
+            LOGIN_BY_FACE -> {
+                dismissFaceDialog()
+                showToast("登录成功，欢迎：${msg.obj}")
+                speek("登录成功，欢迎：${msg.obj}")
+                intentActivity(MainMenuActivity.newIntent(this))
+                isHandle = false
+            }
+            LOGIN_BY_FACE_NO_REGIST -> {
+                dismissFaceDialog()
+                showToast("${msg.obj}")
             }
             LOGIN_BY_PWD_FAIL -> {
                 mProgressDialog.dismiss()
@@ -165,6 +205,9 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         mGuideBinding.onClickListener = this
         mHandler = MainHandler(this)
         init()
+        createPieChart()
+        // 开启人脸识别Http服务器
+        startFaceServer()
     }
 
     private fun init() {
@@ -218,10 +261,212 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         FingerprintParsingLibrary.getInstance().setFingerprintVerify(true)
     }
 
+    /**
+     * 创建圆饼图
+     */
+    private fun createPieChart() {
+        mGuideBinding.pieChart.setUsePercentValues(true)
+
+        mGuideBinding.pieChart.getDescription().setEnabled(false)
+        mGuideBinding.pieChart.setDragDecelerationFrictionCoef(0.95f)
+        // 非线型
+//        mGuideBinding.pieChart.setExtraOffsets(5, 10, 5, 5);
+        // 线型
+        mGuideBinding.pieChart.setExtraOffsets(20f, 3f, 20f, 0f)
+        val tfLight = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Light.ttf")
+        mGuideBinding.pieChart.setCenterTextTypeface(tfLight)
+        mGuideBinding.pieChart.setCenterText(
+            generateCenterSpannableText(
+                "总库存",
+                "120"
+            )
+        )
+        mGuideBinding.pieChart.setDrawHoleEnabled(true)
+        mGuideBinding.pieChart.setHoleColor(Color.WHITE)
+        mGuideBinding.pieChart.setTransparentCircleColor(Color.WHITE)
+        mGuideBinding.pieChart.setTransparentCircleAlpha(110)
+        mGuideBinding.pieChart.setHoleRadius(58f)
+        mGuideBinding.pieChart.setTransparentCircleRadius(61f)
+        mGuideBinding.pieChart.setDrawCenterText(true)
+        mGuideBinding.pieChart.setRotationAngle(0f)
+        // enable rotation of the mGuideBinding.pieChart by touch
+        mGuideBinding.pieChart.setRotationEnabled(true)
+        mGuideBinding.pieChart.setHighlightPerTapEnabled(true)
+        mGuideBinding.pieChart.setCenterTextSize(24f)
+
+        // mGuideBinding.pieChart.setUnit(" €");
+        // mGuideBinding.pieChart.setDrawUnitsInmGuideBinding.pieChart(true);
+
+        // add a selection listener
+        mGuideBinding.pieChart.setOnChartValueSelectedListener(object :
+            OnChartValueSelectedListener {
+            override fun onValueSelected(
+                e: Entry,
+                h: Highlight
+            ) {
+                if (e == null) {
+                    return
+                } else {
+                    mGuideBinding.pieChart.setCenterText(
+                        generateCenterSpannableText(
+                            "总库存",
+                            "120"
+//                            e.data as String
+                        )
+                    )
+                }
+            }
+
+            override fun onNothingSelected() {}
+        })
+        mGuideBinding.pieChart.animateY(1400, Easing.EaseInOutQuad)
+        // chart.spin(2000, 0, 360);
+        val l: Legend = mGuideBinding.pieChart.getLegend()
+        l.verticalAlignment = Legend.LegendVerticalAlignment.TOP
+        l.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
+        l.orientation = Legend.LegendOrientation.VERTICAL
+        l.setDrawInside(false)
+        l.xEntrySpace = 7f
+        l.textSize = 24f
+        l.yEntrySpace = 0f
+        l.yOffset = 0f
+
+        // entry label styling
+        mGuideBinding.pieChart.setEntryLabelColor(Color.BLACK)
+        val tfRegular = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Regular.ttf")
+        mGuideBinding.pieChart.setEntryLabelTypeface(tfRegular)
+        mGuideBinding.pieChart.setEntryLabelTextSize(24f)
+
+        // 设置圆饼图数据
+        setData()
+    }
+
+    private fun generateCenterSpannableText(
+        charName: String,
+        orgName: String
+//        data: String
+    ): SpannableString? {
+//        SpannableString s = new SpannableString("MPAndroidChart\ndeveloped by Philipp Jahoda");
+        val s = SpannableString(
+            """
+                $charName
+                $orgName
+            """.trimIndent()
+        )
+        s.setSpan(RelativeSizeSpan(1.5f), 0, charName.length, 0)
+        //        s.setSpan(new StyleSpan(Typeface.NORMAL), charName.length(), s.length() - 15, 0);
+//        s.setSpan(new ForegroundColorSpan(Color.GRAY), charName.length(), s.length() - 15, 0);
+        s.setSpan(RelativeSizeSpan(2.5f), charName.length, s.length, 0)
+        //        s.setSpan(new StyleSpan(Typeface.ITALIC), charName.length(), s.length(), 0);
+        s.setSpan(
+            ForegroundColorSpan(ColorTemplate.getHoloBlue()),
+            charName.length,
+            s.length,
+            0
+        )
+        s.setSpan(RelativeSizeSpan(1.1f), s.length, s.length, 0)
+        return s
+    }
+
+    /**
+     * 一共5种选项5种颜色
+     * 在库 出库 在车 下车 报废
+     */
+    val COLORS = intArrayOf(
+        Color.rgb(0, 229, 255),  // 本柜已存
+        Color.rgb(29, 233, 182)  // 本柜剩余,绿色
+    )
+
+    private fun setData() {
+        val entries = java.util.ArrayList<PieEntry>()
+        val colors = java.util.ArrayList<Int>()
+        var totalNumber = 0
+
+        val doaasierList = DossierOperatingService.getInstance().loadAll()
+
+        val pieEntryZaiKu = PieEntry(
+            0.toFloat(),
+            "已存(" + doaasierList.size + ")",
+            "已存(" + doaasierList.size + ")"
+        )
+        colors.add(COLORS[0])
+        val pieEntryChuKu = PieEntry(
+            0.toFloat(),
+            "已存(" + (120 - doaasierList.size) + ")",
+            "剩余(" + (120 - doaasierList.size) + ")"
+        )
+        colors.add(COLORS[1])
+
+        pieEntryZaiKu.label = "已存(" + doaasierList.size + ")"
+        pieEntryZaiKu.y = doaasierList.size.toFloat()
+        pieEntryZaiKu.data = "已存(" + doaasierList.size + ")"
+        entries.add(pieEntryZaiKu)
+
+        pieEntryChuKu.label = "剩余(" + (120 - doaasierList.size) + ")"
+        pieEntryChuKu.y = (120 - doaasierList.size).toFloat()
+        pieEntryChuKu.data = "剩余(" + (120 - doaasierList.size) + ")"
+        entries.add(pieEntryChuKu)
+
+        val dataSet = PieDataSet(entries, "")
+        dataSet.setDrawIcons(false)
+        dataSet.sliceSpace = 3f
+        dataSet.iconsOffset = MPPointF(0f, 40f)
+        dataSet.selectionShift = 5f
+        dataSet.colors = colors
+        dataSet.setSelectionShift(0f);
+
+        // 非线型
+//        PieData data = new PieData(dataSet);
+//        data.setValueFormatter(new PercentFormatter(chart));
+//        data.setValueTextSize(14f);
+//        data.setValueTextColor(Color.WHITE);
+//        data.setValueTypeface(tfLight);
+//        chart.setData(data);
+        // 非线型
+
+        // 线型
+        //dataSet.setSelectionShift(0f);
+
+        // 非线型
+//        val data = PieData(dataSet);
+//        data.setValueFormatter(PercentFormatter(mGuideBinding.pieChart));
+//        data.setValueTextSize(24f);
+//        data.setValueTextColor(Color.WHITE);
+//        val tfLight  = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Light.ttf")
+//        data.setValueTypeface(tfLight);
+//        mGuideBinding.pieChart.data = data;
+        // 非线型
+
+        // 线型
+        dataSet.valueLinePart1OffsetPercentage = 80f
+        dataSet.valueLinePart1Length = 0.2f
+        dataSet.valueLinePart2Length = 0.4f
+        dataSet.isUsingSliceColorAsValueLineColor = false
+//         dataSet.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
+        //         dataSet.setXValuePosition(PieDataSet.ValuePosition.OUTSIDE_SLICE);
+        dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+
+        val data = PieData(dataSet)
+        data.setValueFormatter(PercentFormatter(mGuideBinding.pieChart))
+        data.setValueTextSize(24f)
+        data.setValueTextColor(Color.WHITE)
+        val tfLight = Typeface.createFromAsset(getAssets(), "fonts/OpenSans-Light.ttf")
+        data.setValueTypeface(tfLight)
+        mGuideBinding.pieChart.data = data
+        // 线型
+
+        // undo all highlights
+        mGuideBinding.pieChart.highlightValues(null)
+        mGuideBinding.pieChart.invalidate()
+    }
+
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.guide_login_rl -> {
+            R.id.lav_pwd_login -> {
                 showLoginDialog()
+            }
+            R.id.lav_face_login -> {
+                showFaceDialog()
             }
             //登录弹窗的取消按钮
             R.id.dialog_other_login_dismiss_btn -> {
@@ -271,6 +516,12 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         UR880Entrance.getInstance().removeAllDeviceInformationListener()
         UR880Entrance.getInstance().disConnect()
         FingerprintParsingLibrary.getInstance().close()
+
+        if (mFaceRecognitionHttpServer.isAlive) {
+            mFaceRecognitionHttpServer.stop();
+            Log.e("人脸识别服务", "关闭服务");
+        }
+
     }
 
     private val mDeviceInformationListener = object : DeviceInformationListener {
@@ -300,6 +551,112 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     }
 
+    private lateinit var mFaceRecognitionHttpServer: FaceRecognitionHttpServer
+
+    // 人脸识别弹窗
+    private fun showFaceDialog() {
+        if (mFaceDialog == null) {
+            mFaceDialog = AlertDialog.Builder(this).create()
+            mFaceDialogBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(this), R.layout.dialog_face, null,
+                false
+            )
+            mFaceDialog!!.setView(mFaceDialogBinding!!.root)
+            mFaceDialog!!.setCancelable(true)
+            mFaceDialog!!.setOnCancelListener {
+                mFaceDialog!!.lottieAnimationView.cancelAnimation()
+                mFaceDialog!!.dismiss()
+            }
+        }
+        mFaceDialog!!.show()
+        mFaceDialog!!.lottieAnimationView.playAnimation()
+
+        val window = mFaceDialog!!.window
+        window!!.setBackgroundDrawable(ColorDrawable(0))
+        window!!.setLayout(
+            resources.displayMetrics.widthPixels * 4 / 5,
+            resources.displayMetrics.heightPixels * 2 / 5
+        )
+    }
+
+    //关闭人脸弹窗
+    private fun dismissFaceDialog() {
+        if (mFaceDialog != null && mFaceDialog!!.isShowing) {
+            mFaceDialog!!.lottieAnimationView.cancelAnimation()
+            mFaceDialog!!.dismiss()
+        }
+    }
+
+    private var isHandle = false
+
+    private fun startFaceServer() {
+        try {
+            mFaceRecognitionHttpServer =
+                FaceRecognitionHttpServer(8080, object : FaceRecognitionListener {
+                    override fun success(result: String) {
+                        Log.e("人脸识别服务", "收到信息 success")
+                        if (!isHandle && mFaceDialog!!.isShowing && ActivityUtil.isTopActivity(
+                                applicationContext, "com.zk.cabinet.activity.GuideActivity"
+                            )
+                        ) {
+                            isHandle = true
+                            // 登录
+                            val resultSuccess = JSON.parseObject(result, ResultSuccess::class.java)
+
+                            //  newUserZX.uuId = "123456" // todo 人脸ID, 要在人脸web地址中录入人脸的时候配置
+                            val user =
+                                UserService.getInstance().queryByUserUuId(resultSuccess.info.idCard)
+                            if (user != null) {
+                                // 把当前登录的人的 信息保存 存起来
+                                val recordList = ArrayList<Record>()
+                                recordList.add(Record(Key.LoginCodeTemp, user.userCode)) // zx
+                                recordList.add(Record(Key.NameTemp, user.userName)) // 赵鑫
+                                recordList.add(Record(Key.RoleNameTemp, user.modifyTime)) // 普通员工
+                                mSpUtil.applyValue(recordList)
+
+                                val msg = Message.obtain()
+                                msg.what = LOGIN_BY_FACE
+                                msg.obj = user.userName
+                                mHandler.sendMessageDelayed(msg, 0)
+                            } else {
+                                val msg = Message.obtain()
+                                msg.what = LOGIN_BY_PWD_FAIL
+                                msg.obj = "用户名或密码错误"
+                                mHandler.sendMessageDelayed(msg, 1000)
+                            }
+                        }
+                    }
+
+                    override fun noRegister(result: String) {
+                        Log.e("人脸识别服务", "收到信息 noRegister")
+                        // 提示人脸未注册 todo 还需语音提示
+                        if (mFaceDialog!!.isShowing && ActivityUtil.isTopActivity(
+                                applicationContext, "com.zk.cabinet.activity.GuideActivity"
+                            )
+                        ) {
+                            val msg = Message.obtain()
+                            msg.what = LOGIN_BY_FACE_NO_REGIST
+                            msg.obj = "人脸未注册"
+                            mHandler.sendMessageDelayed(msg, 0)
+                        }
+                    }
+
+                    override fun heart(result: String) {
+                        Log.e("人脸识别服务", "收到信息 heart")
+                    }
+                })
+
+            // 启动人连识别web服务
+            if (!mFaceRecognitionHttpServer.isAlive) {
+                mFaceRecognitionHttpServer.start()
+            }
+            Log.e("人脸识别服务", "人脸识别服务-开启")
+        } catch (e: Exception) {
+            mFaceRecognitionHttpServer.stop()
+            Log.e("人脸识别服务", "人脸识别服务-开启失败. e = $e")
+        }
+    }
+
     // 登录弹窗
     private fun showLoginDialog() {
         if (mDialogLogin == null) {
@@ -313,7 +670,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             mDialogLoginBinding!!.onClickListener = this
             mDialogLoginBinding!!.onLongClickListener = this
             mDialogLogin!!.setView(mDialogLoginBinding!!.root)
-            mDialogLogin!!.setCancelable(false)
+            mDialogLogin!!.setCancelable(true)
         }
         mDialogLoginBinding!!.dialogOtherLoginAccountEdt.text = null
         mDialogLoginBinding!!.dialogOtherLoginPwdEdt.text = null
@@ -340,7 +697,32 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         FingerprintParsingLibrary.getInstance().setFingerprintVerify(true)
     }
 
-    private fun login(user: String, pwd: String) {
+    // todo 新的单机版本用户名密码登录
+    private fun login(userCode: String, pwd: String) {
+        mProgressDialog.show()
+
+        val user = UserService.getInstance().queryByUserCode(userCode)
+        if (user != null) {
+            // 把当前登录的人的 信息保存 存起来
+            val recordList = ArrayList<Record>()
+            recordList.add(Record(Key.LoginCodeTemp, user.userCode)) // zx
+            recordList.add(Record(Key.NameTemp, user.userName)) // 赵鑫
+            recordList.add(Record(Key.RoleNameTemp, user.modifyTime)) // 普通员工
+            mSpUtil.applyValue(recordList)
+
+            val msg = Message.obtain()
+            msg.what = LOGIN_BY_PWD_SUCCESS
+            msg.obj = user.userName
+            mHandler.sendMessageDelayed(msg, 1000)
+        } else {
+            val msg = Message.obtain()
+            msg.what = LOGIN_BY_PWD_FAIL
+            msg.obj = "用户名或密码错误"
+            mHandler.sendMessageDelayed(msg, 1000)
+        }
+    }
+
+    private fun loginOld(user: String, pwd: String) {
         mProgressDialog.show()
         val jsonObject = JSONObject()
         try {
@@ -546,4 +928,5 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                 mHandler.sendMessage(msg)
             }
         }
+
 }

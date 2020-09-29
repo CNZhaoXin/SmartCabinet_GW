@@ -45,45 +45,55 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
         mMenuList.add(
             MainMenuInfo(
                 R.mipmap.ic_in_storage,
-                getString(R.string.warehousing),
+                "存 档",
                 R.drawable.selector_menu_blue
             )
         )
         mMenuList.add(
             MainMenuInfo(
                 R.mipmap.ic_out_storage,
-                getString(R.string.outbound),
+                "取 档",
                 R.drawable.selector_menu_blue
             )
         )
         mMenuList.add(
             MainMenuInfo(
                 R.mipmap.ic_inventory_storage,
-                getString(R.string.inventory_storage),
+//                getString(R.string.inventory_storage),
+                "预 览",
                 R.drawable.selector_menu_green
             )
         )
         mMenuList.add(
             MainMenuInfo(
-                R.mipmap.ic_fingerprint,
-                getString(R.string.personnel_management),
+                R.mipmap.ic_query,
+                "查 档",
                 R.drawable.selector_menu_green
             )
         )
+
+//        mMenuList.add(
+//            MainMenuInfo(
+//                R.mipmap.ic_fingerprint,
+//                getString(R.string.personnel_management),
+//                R.drawable.selector_menu_green
+//            )
+//        )
         mMenuList.add(
             MainMenuInfo(
                 R.mipmap.ic_back,
-                getString(R.string.logout),
+                "登 出",
                 R.drawable.selector_menu_red
             )
         )
-        mMenuList.add(
-            MainMenuInfo(
-                R.mipmap.ic_system_setting,
-                getString(R.string.system_settings),
-                R.drawable.selector_menu_orange
-            )
-        )
+        // todo 隐藏
+//        mMenuList.add(
+//            MainMenuInfo(
+//                R.mipmap.ic_system_setting,
+//                getString(R.string.system_settings),
+//                R.drawable.selector_menu_orange
+//            )
+//        )
 
         mMenuAdapter = MainMenuAdapter(this, mMenuList)
         mMainMenuBinding.mainMenuGv.adapter = mMenuAdapter
@@ -92,10 +102,10 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (mMenuList[position].mImage) {
             R.mipmap.ic_in_storage -> {
-                intentActivity(WarehousingActivity.newIntent(this))
+                intentActivity(WarehousingOperatingActivity.newIntent(this))
             }
             R.mipmap.ic_out_storage -> {
-                intentActivity(OutboundActivity.newIntent(this))
+                intentActivity(OutboundOperatingActivity.newIntent(this))
             }
             R.mipmap.ic_inventory_storage -> {
                 intentActivity(
@@ -105,14 +115,21 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
                     )
                 )
             }
-            R.mipmap.ic_fingerprint -> {
-                intentActivity(
-                    Intent(
-                        this@MainMenuActivity,
-                        PersonnelManagementActivity::class.java
-                    )
-                )
+
+            // 查档
+            R.mipmap.ic_query -> {
+                intentActivity(QueryActivity.newIntent(this))
             }
+//
+// 指纹识别
+//            R.mipmap.ic_fingerprint -> {
+//                intentActivity(
+//                    Intent(
+//                        this@MainMenuActivity,
+//                        PersonnelManagementActivity::class.java
+//                    )
+//                )
+//            }
             R.mipmap.ic_system_setting -> {
                 intentActivity(SystemSettingsActivity.newIntent(this))
             }

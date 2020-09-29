@@ -8,12 +8,11 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import com.zk.cabinet.R
-import com.zk.cabinet.bean.ResultGetOutBound
-import com.zk.cabinet.constant.SelfComm
+import com.zk.cabinet.bean.DossierOperating
 
 class OutboundAdapter(
     context: Context,
-    dossierList: ArrayList<ResultGetOutBound.NameValuePairsBeanX.DataBean.ValuesBean>
+    dossierList: ArrayList<DossierOperating>
 ) :
     BaseAdapter() {
     private val mContext = context
@@ -25,39 +24,37 @@ class OutboundAdapter(
         var view = convertView
         val dossier = mDossierList[position]
         if (view == null) {
-            view = mLayoutInflater.inflate(R.layout.adapter_outbound_item, null)
-            viewHolder = ViewHolder(
-                view.findViewById(R.id.adapter_outbound_iv),
-                view.findViewById(R.id.adapter_outbound_number_tv),
-                view.findViewById(R.id.adapter_outbound_rfid_tv),
-                view.findViewById(R.id.adapter_outbound_name_tv),
-                view.findViewById(R.id.adapter_outbound_no_tv),
-                view.findViewById(R.id.adapter_outbound_cate_tv),
-                view.findViewById(R.id.tv_warranType),
-                view.findViewById(R.id.adapter_outbound_type_tv),
-                view.findViewById(R.id.adapter_outbound_position_tv)
+            view = mLayoutInflater.inflate(R.layout.adapter_out_storage_item, null)
+            viewHolder = OutboundAdapter.ViewHolder(
+                view.findViewById(R.id.iv_checked),
+                view.findViewById(R.id.iv_user),
+                view.findViewById(R.id.tv_user_name),
+                view.findViewById(R.id.tv_sex),
+                view.findViewById(R.id.tv_birthday),
+                view.findViewById(R.id.tv_cabicode),
+                view.findViewById(R.id.tv_position)
             )
             view.tag = viewHolder
         } else {
             viewHolder = view.tag as ViewHolder
         }
 
-        viewHolder.mAdapterOutboundNumberTv.text = dossier.nameValuePairs.warrantNum
-        viewHolder.mAdapterOutboundRfidTv.text = dossier.nameValuePairs.rfidNum
-        viewHolder.mAdapterOutboundNameTv.text = dossier.nameValuePairs.warrantName
-        viewHolder.mAdapterOutboundNoTv.text = dossier.nameValuePairs.warrantNo
-        viewHolder.mAdapterOutboundCateTv.text =
-            SelfComm.WARRANT_CATE[dossier.nameValuePairs.warranCate]
-        viewHolder.tv_warranType.text = SelfComm.WARRANT_TYPE[dossier.nameValuePairs.warranType]
-        viewHolder.mAdapterOutboundTypeTv.text =
-            SelfComm.OUT_OPERATING_TYPE[dossier.nameValuePairs.outStorageType]
-        viewHolder.mAdapterOutboundPositionTv.text =
-            "${dossier.nameValuePairs.cabcode} - ${dossier.nameValuePairs.position}-${dossier.nameValuePairs.light}"
+        val resId =
+            mContext.resources.getIdentifier(dossier.warrantName, "drawable", mContext.packageName)
+        viewHolder.iv_user.setImageResource(resId)
 
-        if (dossier.nameValuePairs.isSelected) {
-            viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.mipmap.ic_check))
+        viewHolder.tv_user_name.text = dossier.inputName
+        viewHolder.tv_sex.text = dossier.quarNo
+        viewHolder.tv_birthday.text = dossier.warrantNo
+        viewHolder.tv_cabicode.text = dossier.cabcode
+        viewHolder.tv_position.text = "${dossier.floor}层${dossier.light}号"
+
+        if (dossier.selected) {
+            viewHolder.iv_checked.visibility = View.VISIBLE
+            viewHolder.iv_checked.setImageDrawable(mContext.getDrawable(R.mipmap.ic_check))
         } else {
-            viewHolder.mAdapterOutboundIv.setImageDrawable(mContext.getDrawable(R.mipmap.ic_check_no))
+            viewHolder.iv_checked.visibility = View.GONE
+            viewHolder.iv_checked.setImageDrawable(mContext.getDrawable(R.mipmap.ic_check_no))
         }
         return view!!
     }
@@ -75,18 +72,17 @@ class OutboundAdapter(
     }
 
     private class ViewHolder(
-        var mAdapterOutboundIv: ImageView,
-        var mAdapterOutboundNumberTv: TextView,
-        var mAdapterOutboundRfidTv: TextView,
-        var mAdapterOutboundNameTv: TextView,
-        var mAdapterOutboundNoTv: TextView,
-        var mAdapterOutboundCateTv: TextView,
-        var tv_warranType: TextView,
-        var mAdapterOutboundTypeTv: TextView,
-        var mAdapterOutboundPositionTv: TextView
+        var iv_checked: ImageView,
+        var iv_user: ImageView,
+        var tv_user_name: TextView,
+        var tv_sex: TextView,
+        var tv_birthday: TextView,
+        var tv_cabicode: TextView,
+        var tv_position: TextView
+
     )
 
-    fun setList(dossierList: ArrayList<ResultGetOutBound.NameValuePairsBeanX.DataBean.ValuesBean>) {
+    fun setList(dossierList: ArrayList<DossierOperating>) {
         mDossierList = dossierList
     }
 }

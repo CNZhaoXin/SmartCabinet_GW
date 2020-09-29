@@ -4,16 +4,17 @@
     android:layout_width="wrap_content"
     android:layout_height="60dp"
     android:gravity="center"
+    android:paddingLeft="10dp"
     android:orientation="horizontal">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:text="柜体:"
-        android:textColor="@color/gray_light"
-        android:textSize="22sp" />
+    <!--    <TextView-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginLeft="10dp"-->
+    <!--        android:layout_marginRight="10dp"-->
+    <!--        android:text="档案柜:"-->
+    <!--        android:textColor="@color/gray_light"-->
+    <!--        android:textSize="30sp" />-->
 
     <TextView
         android:id="@+id/adapter_cabinet_online_item_tv"
@@ -21,14 +22,14 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="5dp"
         android:text="xxx"
-        android:textColor="@color/md_red_500"
-        android:textSize="24sp"
+        android:textColor="#F5A623"
+        android:textSize="30sp"
         android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/adapter_cabinet_online_item_iv"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="20dp"
         android:src="@drawable/cabinet_offline" />

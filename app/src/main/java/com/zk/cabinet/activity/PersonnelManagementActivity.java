@@ -94,8 +94,12 @@ public class PersonnelManagementActivity extends TimeOffAppCompatActivity {
         binding.tvRoleName.setText(getMSpUtil().getString(SharedPreferencesUtil.Key.RoleNameTemp, ""));
         binding.tvOrgName.setText(getMSpUtil().getString(SharedPreferencesUtil.Key.OrgNameTemp, ""));
 
-        String uuId = getMSpUtil().getString(SharedPreferencesUtil.Key.IdTemp, "");
-        curUser = UserService.getInstance().queryByUserUuId(uuId);
+//        recordList.add(Record(Key.LoginCodeTemp, user.userCode)) // zx
+//        recordList.add(Record(Key.NameTemp, user.userName)) // 赵鑫
+//        recordList.add(Record(Key.RoleNameTemp, user.modifyTime)) // 普通员工
+
+        String loginCodeTemp = getMSpUtil().getString(SharedPreferencesUtil.Key.LoginCodeTemp, "");
+        curUser = UserService.getInstance().queryByUserCode(loginCodeTemp);
 
         if (curUser.getFingerPrint() == null) {
             binding.tvFingerprint.setText("未录入");

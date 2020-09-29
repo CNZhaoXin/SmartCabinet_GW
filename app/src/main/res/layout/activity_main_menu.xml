@@ -12,10 +12,10 @@
 
     </data>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg1"
+        android:background="@mipmap/bg2"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -63,11 +63,15 @@
                 android:orientation="horizontal"
                 android:padding="20dp">
 
-                <ImageView
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lav_face_login"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:layout_gravity="center"
                     android:layout_marginRight="10dp"
-                    android:src="@mipmap/ic_clock" />
+                    app:lottie_autoPlay="true"
+                    app:lottie_fileName="clock.json"
+                    app:lottie_loop="true" />
 
                 <TextView
                     android:id="@+id/main_menu_countdown_tv"
@@ -94,29 +98,33 @@
         </RelativeLayout>
 
         <TextView
+            android:id="@+id/guide_title_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:letterSpacing="0.3"
-            android:paddingTop="90dp"
-            android:text="RFID智慧档案管理系统"
+            android:letterSpacing="0.2"
+            android:paddingTop="200dp"
+            android:text="欢迎使用智能人事档案柜"
             android:textColor="@android:color/background_light"
-            android:textSize="@dimen/super_super_big_more_text"
+            android:textSize="60sp"
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/guide_title_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/guide_title_1"
             android:gravity="center"
-            android:text="RFID Intelligent file Management system"
+            android:text="Welcome to the intelligent personnel file cabinet"
             android:textColor="@color/md_grey_300"
-            android:textSize="@dimen/big_text"
+            android:textSize="34sp"
             android:textStyle="bold" />
 
         <GridView
             android:id="@+id/main_menu_gv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/guide_title_2"
             android:layout_marginLeft="150dp"
             android:layout_marginTop="100dp"
             android:layout_marginRight="150dp"
@@ -126,5 +134,5 @@
             android:verticalSpacing="30dp"
             app:OnItemClickListener="@{onItemClickListener}" />
 
-    </LinearLayout>
+    </RelativeLayout>
 </layout>

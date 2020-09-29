@@ -3,6 +3,8 @@ package com.zk.cabinet.base
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.WindowManager
@@ -13,8 +15,9 @@ import com.zk.cabinet.constant.SelfComm
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
 import com.zk.common.utils.LogUtil
+import java.util.*
 
-open class TimeOffAppCompatActivity : AppCompatActivity() {
+open class TimeOffAppCompatActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     protected var isShow = true        //是否可刷新页面
     protected var isAutoFinish = true  //是否需要自动关闭页面
     protected var isDialogShow = false //是否有dialog显示
@@ -22,6 +25,36 @@ open class TimeOffAppCompatActivity : AppCompatActivity() {
     protected var mCountdown = -1
     private var mTimer: CountDownTimer? = null
     private var mToast: Toast? = null
+    protected var textToSpeech: TextToSpeech? = null
+
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            // 初始化tts引擎
+            val result = textToSpeech!!.setLanguage(Locale.CHINA)
+            // 设置参数
+            textToSpeech!!.setPitch(1.2f) // 设置音调，,1.0是常规
+            textToSpeech!!.setSpeechRate(1.0f) // 设定语速，1.0正常语速
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Toast.makeText(this, "语音包丢失或语音不支持", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        if (textToSpeech != null) {
+            //释放资源
+            textToSpeech!!.stop()
+            textToSpeech!!.shutdown()
+        }
+        super.onDestroy()
+    }
+
+    protected fun speek(speekText: String) {
+        if (textToSpeech != null) {
+            Log.e("zx-报警", "speek")
+            textToSpeech!!.speak(speekText, TextToSpeech.QUEUE_FLUSH, null)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +64,10 @@ open class TimeOffAppCompatActivity : AppCompatActivity() {
         )
         if (isAutoFinish) {
             setAutoFinish()
+        }
+
+        if (textToSpeech == null) {
+            textToSpeech = TextToSpeech(this, this)
         }
     }
 

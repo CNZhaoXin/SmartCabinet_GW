@@ -12,41 +12,28 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alibaba.fastjson.JSON
-import com.android.volley.DefaultRetryPolicy
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.zk.cabinet.R
 import com.zk.cabinet.adapter.DemoInterfaceAdapter
-import com.zk.cabinet.adapter.DeviceAdapter
 import com.zk.cabinet.adapter.DialogDossierDetailsAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.Cabinet
 import com.zk.cabinet.bean.Device
-import com.zk.cabinet.bean.ResultGetList
+import com.zk.cabinet.bean.DossierOperating
 import com.zk.cabinet.databinding.ActivityDemoInterfaceBinding
-import com.zk.cabinet.databinding.DialogDeviceSingleSelectBinding
 import com.zk.cabinet.databinding.DialogDossierDetailsBinding
 import com.zk.cabinet.db.CabinetService
 import com.zk.cabinet.db.DeviceService
-import com.zk.cabinet.net.NetworkRequest
+import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.utils.SharedPreferencesUtil
-import com.zk.common.utils.LogUtil
 import com.zk.rfid.bean.LabelInfo
 import com.zk.rfid.bean.UR880SendInfo
 import com.zk.rfid.callback.InventoryListener
 import com.zk.rfid.ur880.UR880Entrance
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 import java.lang.ref.WeakReference
 import kotlin.properties.Delegates
 
@@ -70,8 +57,6 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         private const val INVENTORY_VALUE = 0x02
         private const val CANCEL_INVENTORY = 0x03
         private const val END_INVENTORY = 0x04
-        private const val SUBMITTED_SUCCESS = 0x05
-        private const val SUBMITTED_FAIL = 0x06
 
         private const val GET_LIST_SUCCESS = 0x07
         private const val GET_LIST_FAIL = 0x08
@@ -111,29 +96,44 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
             }
             INVENTORY_VALUE -> {
                 val labelInfo = msg.obj as LabelInfo
-                LogUtil.instance.d("-------------labelInfo.deviceID: ${labelInfo.deviceID}")
-                LogUtil.instance.d("-------------labelInfo.antennaNumber: ${labelInfo.antennaNumber}")
-                LogUtil.instance.d("-------------labelInfo.fastID: ${labelInfo.fastID}")
-                LogUtil.instance.d("-------------labelInfo.rssi: ${labelInfo.rssi}")
-                LogUtil.instance.d("-------------labelInfo.operatingTime: ${labelInfo.operatingTime}")
-                LogUtil.instance.d("-------------labelInfo.epcLength: ${labelInfo.epcLength}")
-                LogUtil.instance.d("-------------labelInfo.epc: ${labelInfo.epc}")
-                LogUtil.instance.d("-------------labelInfo.tid: ${labelInfo.tid}")
-                LogUtil.instance.d("-------------labelInfo.inventoryNumber: ${labelInfo.inventoryNumber}")
-                labelInfo.antennaNumber = labelInfo.antennaNumber + 1
-                for (cabinet in mCabinetList) {
-                    if (cabinet.antennaNumber == labelInfo.antennaNumber) {
-                        if (cabinet.labelInfoList == null) {
-                            cabinet.labelInfoList = ArrayList()
-                            cabinet.labelInfoList!!.add(labelInfo)
-                            mDemoInterfaceAdapter.notifyDataSetChanged()
-                        } else {
-                            if (!cabinet.labelInfoList.contains(labelInfo)) {
+
+                // todo 属于柜子的读写器设备上报的数据才处理,当通道门识别到了数据,盘点界面不处理
+                val deviceList = DeviceService.getInstance().loadAll()
+                if (deviceList.size > 0 && deviceList[0].deviceId == labelInfo.deviceID) {
+                    Log.e("zx-盘点界面", "-------------labelInfo.deviceID: ${labelInfo.deviceID}")
+                    Log.e(
+                        "zx-盘点界面",
+                        "-------------labelInfo.antennaNumber: ${labelInfo.antennaNumber}"
+                    )
+                    Log.e("zx-盘点界面", "-------------labelInfo.fastID: ${labelInfo.fastID}")
+                    Log.e("zx-盘点界面", "-------------labelInfo.rssi: ${labelInfo.rssi}")
+                    Log.e(
+                        "zx-盘点界面",
+                        "-------------labelInfo.operatingTime: ${labelInfo.operatingTime}"
+                    )
+                    Log.e("zx-盘点界面", "-------------labelInfo.epcLength: ${labelInfo.epcLength}")
+                    Log.e("zx-盘点界面", "-------------labelInfo.epc: ${labelInfo.epc}")
+                    Log.e("zx-盘点界面", "-------------labelInfo.tid: ${labelInfo.tid}")
+                    Log.e(
+                        "zx-盘点界面",
+                        "-------------labelInfo.inventoryNumber: ${labelInfo.inventoryNumber}"
+                    )
+                    labelInfo.antennaNumber = labelInfo.antennaNumber + 1
+
+                    for (cabinet in mCabinetList) {
+                        if (cabinet.antennaNumber == labelInfo.antennaNumber) {
+                            if (cabinet.labelInfoList == null) {
+                                cabinet.labelInfoList = ArrayList()
                                 cabinet.labelInfoList!!.add(labelInfo)
                                 mDemoInterfaceAdapter.notifyDataSetChanged()
+                            } else {
+                                if (!cabinet.labelInfoList.contains(labelInfo)) {
+                                    cabinet.labelInfoList!!.add(labelInfo)
+                                    mDemoInterfaceAdapter.notifyDataSetChanged()
+                                }
                             }
+                            break
                         }
-                        break
                     }
                 }
             }
@@ -141,83 +141,60 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                 Log.e("zx-盘点-", "取消盘点")
             }
             END_INVENTORY -> {
-                Log.e("zx-盘点-", "停止盘点")
                 finishHandler.removeCallbacks(finishRunnable)
 
                 floor++
+                Log.e("zx-盘点-", "停止盘点----floor=$floor")
                 if (floor < 5) {
                     // 柜子一层盘点时间限制为10S,假如10S内没有结束一层盘点,说明读写器掉线了,需要关闭界面
-                    finishHandler.postDelayed(finishRunnable, 1000 * 10)
+                    finishHandler.postDelayed(finishRunnable, 1000 * 5)
                     UR880Entrance.getInstance().send(
                         UR880SendInfo.Builder().inventory(mDevice.deviceId, 0, floor, 0).build()
                     )
-                } else {
-                    if (mProgressDialog.isShowing) mProgressDialog.dismiss()
-                    if (isAutomatic) {
-                        warehousingSubmission()
-                    }
                 }
-            }
-            SUBMITTED_SUCCESS -> {
-                if (mProgressDialog.isShowing) mProgressDialog.dismiss()
-                showToast(msg.obj.toString())
-                if (isAutomatic) {
-                    if (mDeviceList.size > 0) {
-                        mDevice = mDeviceList.removeAt(0)
-                        inventoryId = mInventoryIdList.removeAt(0)
-                        inOrg = mInOrgList.removeAt(0)
-                        // 盘点盘点单中的多个柜体
-                        mDemoInterfaceBinding.demoInterfaceBoxNumberTv.text =
-                            "${mDevice.deviceName}"
-                        // "柜体名称：${mDevice.deviceName} (${mDevice.deviceId})"
-                        getAndShowStockList(mDevice)
-                    } else {
-                        finish()
-                    }
-                }
-            }
-            SUBMITTED_FAIL -> {
-                if (mProgressDialog.isShowing) mProgressDialog.dismiss()
-                showToast(msg.obj.toString())
-                finish()
-            }
 
+                if (floor == 5) {
+                    if (mProgressDialog.isShowing) mProgressDialog.dismiss()
+                }
+            }
             GET_LIST_FAIL -> {
                 if (mProgressDialog.isShowing) mProgressDialog.dismiss()
-                showToast(msg.obj.toString())
+                // showToast(msg.obj.toString())
                 finish()
             }
 
             GET_LIST_NO_DATA -> {
                 if (mProgressDialog.isShowing) mProgressDialog.dismiss()
-                showToast(msg.obj.toString())
+                // showToast(msg.obj.toString())
                 finish()
             }
 
             GET_LIST_SUCCESS -> {
                 if (mProgressDialog.isShowing) mProgressDialog.dismiss()
-                val stockList = msg.obj as ArrayList<ResultGetList.DataBean>
+
+                // todo
+                val stockDossierOperatingList = msg.obj as ArrayList<DossierOperating>
+
                 // 展示库存数据,mCabinetList开始是固定的120条格子基础数据,将库存数据根据position和light封装到格子数据中
                 for (cabinet in mCabinetList) {
-                    // 如果是自动盘库可能存在多个柜子,所以得先清除数据
-                    if (isAutomatic && cabinet.stockList != null) {
-                        cabinet.stockList.clear()
-                        cabinet.stockList == null
-                    }
-                    for (stock in stockList) {
-                        if (cabinet.floor.toString() == stock.position && cabinet.position.toString() == stock.light) {
+                    for (stockDossierOperating in stockDossierOperatingList) {
+                        if (cabinet.floor == stockDossierOperating.floor && cabinet.position == stockDossierOperating.light) {
                             if (cabinet.stockList == null) {
                                 cabinet.stockList = ArrayList()
                                 cabinet.isStock = true
                             }
-                            cabinet.stockList.add(stock)
+                            cabinet.stockList.add(stockDossierOperating)
                         }
                     }
+                    mDemoInterfaceAdapter.notifyDataSetChanged()
                 }
-                mDemoInterfaceAdapter.notifyDataSetChanged()
 
-                if (isAutomatic)
-                    startInventory()
+                mDemoInterfaceBinding.tvNormal.text = stockDossierOperatingList.size.toString()
+                mDemoInterfaceBinding.tvEmpty.text =
+                    (120 - stockDossierOperatingList.size).toString()
+
+                // todo 先盘点一次
+                // startInventory()
             }
         }
     }
@@ -237,49 +214,18 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         mProgressDialog = ProgressDialog(this, R.style.mLoadingDialog)
         mProgressDialog.setCancelable(false)
 
-        isAutomatic = intent.getBooleanExtra(AUTOMATIC, false)
+        // 是否开启倒计时关闭
+        isAutoFinish = true
 
-        if (!isAutomatic) { // 手动进入盘点界面
-            // 是否开启倒计时关闭
-            isAutoFinish = true
-
-            val canOperateCabinetList =
-                mSpUtil.getString(SharedPreferencesUtil.Key.CanOperateCabinet, "")
-            val gson = Gson()
-            val deviceList = gson.fromJson<List<Device>>(
-                canOperateCabinetList,
-                object : TypeToken<List<Device?>?>() {}.type
-            )
-
-            showSingleSelectDialog(deviceList)
-            initView()
+        val deviceList = DeviceService.getInstance().loadAll()
+        if (deviceList.size > 0) {
+            mDevice = deviceList[0]
         } else {
-            // 自动盘点时关闭倒计时
-            isAutoFinish = false
-            // 自动盘点时部分UI隐藏
-            mDemoInterfaceBinding.tvOperatorText.visibility = View.GONE
-            mDemoInterfaceBinding.llCountClock.visibility = View.GONE
-            mDemoInterfaceBinding.tvOperator.visibility = View.GONE
-
-            mDemoInterfaceBinding.btnBack.visibility = View.GONE
-            mDemoInterfaceBinding.btnInventoryStorage.visibility = View.GONE
-            mDemoInterfaceBinding.btnOpenDoor.visibility = View.GONE
-
-            mInventoryIdList = intent.getStringArrayListExtra(INVENTORY_ID)!!
-            mInOrgList = intent.getStringArrayListExtra(IN_ORG)!!
-            val cabCodeList = intent.getStringArrayListExtra(CAB_CODE_LIST)!!
-            for (deviceId in cabCodeList) {
-                mDeviceList.add(DeviceService.getInstance().queryByDeviceName(deviceId))
-            }
-            mDevice = mDeviceList.removeAt(0)
-            inventoryId = mInventoryIdList.removeAt(0)
-            inOrg = mInOrgList.removeAt(0)
-            // mDemoInterfaceBinding.demoInterfaceBoxNumberTv.text = "柜体名称：${mDevice.deviceName}(${mDevice.deviceId})"
-            mDemoInterfaceBinding.demoInterfaceBoxNumberTv.text = "${mDevice.deviceName}"
-
-            initView()
-            getAndShowStockList(mDevice)
+            finish()
         }
+
+        getAndShowStockList()
+        initView()
     }
 
     private fun initView() {
@@ -297,147 +243,93 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         mDemoInterfaceAdapter.mOnItemClickListener = object :
             DemoInterfaceAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
-                // 点击要展示档案数据详情
+                // todo 点击进行选择档案,准备取档
+                val cabinet = mCabinetList[position]
+                if (cabinet.isStock) {
+                    // 改数据库中的数据状态
+                    val dossierOperating = cabinet.stockList[0]
+                    dossierOperating.selected = !cabinet.isSelect
+                    // showToast("暂无数据" + dossierOperating.inputName + "," + dossierOperating.selected)
+                    DossierOperatingService.getInstance().update(dossierOperating)
+
+                    cabinet.isSelect = !cabinet.isSelect
+                    mDemoInterfaceAdapter.notifyDataSetChanged()
+                } else {
+                    // showToast("暂无数据")
+                }
+
+                var hasSelect = false
+                for (cabinets in mCabinetList) {
+                    if (cabinets.isSelect) {
+                        hasSelect = true
+                        break
+                    }
+                }
+
+                if (hasSelect) {
+                    mDemoInterfaceBinding.btnQudang.isEnabled = true
+                    mDemoInterfaceBinding.btnQudang.setBackgroundResource(R.drawable.selector_menu_green)
+                } else {
+                    mDemoInterfaceBinding.btnQudang.isEnabled = false
+                    mDemoInterfaceBinding.btnQudang.setBackgroundResource(R.drawable.shape_btn_un_enable)
+                }
+            }
+        }
+
+        mDemoInterfaceAdapter.mOnItemLongClickListener = object :
+            DemoInterfaceAdapter.OnItemLongClickListener {
+            override fun onItemLongClick(position: Int) {
+                // 长按展示档案数据详情
                 val mStockList = mCabinetList[position].stockList
                 if (mStockList != null && mStockList.size > 0) {
                     // showToast("数据条目数:" + mCabinetList[position].stockList.size)
                     showDossierDetailsDialog(mStockList)
                 } else {
-                    showToast("暂无数据")
+                    // showToast("暂无数据")
                 }
             }
         }
+
+        mDemoInterfaceAdapter.mErrorListener = object :
+            DemoInterfaceAdapter.ErrorListener {
+            override fun errorSize() {
+                var emptySize = 0
+                for (cabinet in mCabinetList) {
+                    if (cabinet.isError()) {
+                        emptySize = emptySize + 1
+                        mDemoInterfaceBinding.tvError.text = emptySize.toString()
+                        Log.e("zx-盘点-", "停止盘点---- emptySize.toString()=$emptySize")
+                    }
+                }
+            }
+        }
+
         UR880Entrance.getInstance().addOnInventoryListener(mInventoryListener)
     }
 
-    private var mDeviceSingleSelectDialogBinding: DialogDeviceSingleSelectBinding? = null
-    private var mSingleSelectDialog: AlertDialog? = null
-    private lateinit var mDialogDeviceAdapter: DeviceAdapter
-
-    // 柜体单选弹窗
-    private fun showSingleSelectDialog(deviceList: List<Device>) {
-        if (mSingleSelectDialog == null) {
-            mDeviceSingleSelectDialogBinding = DataBindingUtil.inflate(
-                LayoutInflater.from(this),
-                R.layout.dialog_device_single_select,
-                null,
-                false
-            )
-
-            mSingleSelectDialog = AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setView(mDeviceSingleSelectDialogBinding!!.root)
-                .create()
-
-            val window = mSingleSelectDialog!!.window
-            window!!.setBackgroundDrawable(ColorDrawable(0))
-        }
-
-        var selectPosition = 0
-        mDialogDeviceAdapter = DeviceAdapter(this, deviceList)
-        mDeviceSingleSelectDialogBinding!!.listView.adapter = mDialogDeviceAdapter
-        mDeviceSingleSelectDialogBinding!!.listView.descendantFocusability = FOCUS_BLOCK_DESCENDANTS
-        mDeviceSingleSelectDialogBinding!!.setOnItemClickListener { adapterView, view, position, id ->
-            for (indices in deviceList.indices) {
-                if (position != indices) {
-                    deviceList[indices].isSelected = false
-                } else {
-                    deviceList[indices].isSelected = true
-                    selectPosition = position
-                    mDeviceSingleSelectDialogBinding!!.btnConfirm.isEnabled = true
-                    mDeviceSingleSelectDialogBinding!!.btnConfirm.background =
-                        getDrawable(R.drawable.selector_menu_green)
-                }
-            }
-            mDialogDeviceAdapter.notifyDataSetChanged()
-        }
-        mDeviceSingleSelectDialogBinding!!.setOnClickListener { view: View? ->
-            if (view!!.id == R.id.btn_cancel) {
-                mSingleSelectDialog!!.dismiss()
-                finish()
-            } else if (view.id == R.id.btn_confirm) {
-                //  mDemoInterfaceBinding.demoInterfaceBoxNumberTv.text = "柜体名称：${mDevice.deviceName}(${mDevice.deviceId})"
-                mDevice = deviceList[selectPosition]
-                mDemoInterfaceBinding.demoInterfaceBoxNumberTv.text = "${mDevice.deviceName}"
-                mSingleSelectDialog!!.dismiss()
-                getAndShowStockList(mDevice)
-            }
-        }
-
-        mSingleSelectDialog!!.show()
-    }
-
     /**
-     * 获取柜子库存数据
+     * todo 展示柜子假档案数据
      */
-    private fun getAndShowStockList(mDevice: Device) {
-        mProgressDialog.setMessage("正在获取库存数据，请稍后...")
+    private fun getAndShowStockList() {
+        mProgressDialog.setMessage("正在获取柜存档案...")
         if (!mProgressDialog.isShowing) mProgressDialog.show()
 
-        val requestUrl = "${NetworkRequest.instance.mList}?cabCode=" + mDevice.deviceName
-        Log.e("zx-获取库存请求参数:", requestUrl)
+        val stockDossierOperatingList = DossierOperatingService.getInstance().loadAll()
+        Log.e("zx-获取库存假数据", JSON.toJSONString(stockDossierOperatingList))
 
-        val jsonObjectRequest = JsonObjectRequest(
-            Request.Method.GET,
-            requestUrl,
-            Response.Listener { response ->
-                try {
-                    Log.e("zx-获取库存结果:", "$response")
+        // 剔除掉出库的数据 , 只现实在库的数据
+        val iterator = stockDossierOperatingList.iterator()
+        while (iterator.hasNext()) {
+            if (iterator.next().operatingType == 2)
+                iterator.remove()
+        }
 
-                    val resultGetList = JSON.parseObject<ResultGetList>(
-                        "$response", ResultGetList::class.java
-                    )
-
-                    if (resultGetList.isSuccess) {
-                        val stockList = resultGetList.data
-                        if (resultGetList.dataCount == "1" && stockList.size > 0) {
-                            val msg = Message.obtain()
-                            msg.what = GET_LIST_SUCCESS
-                            msg.obj = stockList
-                            mHandler.sendMessageDelayed(msg, 800)
-                        } else {
-                            val msg = Message.obtain()
-                            msg.what = GET_LIST_NO_DATA
-                            msg.obj = "未获取到库存数据"
-                            mHandler.sendMessageDelayed(msg, 800)
-                        }
-                    } else {
-                        val msg = Message.obtain()
-                        msg.what = GET_LIST_FAIL
-                        if (resultGetList.message == null)
-                            msg.obj = "获取库存结果错误"
-                        else
-                            msg.obj = resultGetList.message
-                        mHandler.sendMessageDelayed(msg, 800)
-                    }
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                    val msg = Message.obtain()
-                    msg.what = GET_LIST_FAIL
-                    msg.obj = "数据解析失败"
-                    mHandler.sendMessageDelayed(msg, 800)
-                }
-            },
-            Response.ErrorListener { error ->
-                val msg = if (error != null)
-                    if (error.networkResponse != null)
-                        "errorCode: ${error.networkResponse.statusCode} VolleyError: $error"
-                    else
-                        "errorCode: -1 VolleyError: $error"
-                else {
-                    "errorCode: -1 VolleyError: 未知"
-                }
-                val message = Message.obtain()
-                message.what = GET_LIST_FAIL
-                message.obj = msg
-                mHandler.sendMessageDelayed(message, 800)
-            })
-        jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
-            10000,
-            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        )
-        NetworkRequest.instance.add(jsonObjectRequest)
+        if (stockDossierOperatingList.size > 0) {
+            val msg = Message.obtain()
+            msg.what = GET_LIST_SUCCESS
+            msg.obj = stockDossierOperatingList
+            mHandler.sendMessageDelayed(msg, 800)
+        }
     }
 
     private var mDossierDetailsDialogBinding: DialogDossierDetailsBinding? = null
@@ -445,7 +337,7 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private lateinit var mDossierDetailsAdapter: DialogDossierDetailsAdapter
 
     // 档案详情Dialog
-    private fun showDossierDetailsDialog(stockList: ArrayList<ResultGetList.DataBean>) {
+    private fun showDossierDetailsDialog(stockList: ArrayList<DossierOperating>) {
         if (mDossierDetailsDialog == null) {
             mDossierDetailsDialogBinding = DataBindingUtil.inflate(
                 LayoutInflater.from(this),
@@ -458,9 +350,6 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                 .setCancelable(true)
                 .setView(mDossierDetailsDialogBinding!!.root)
                 .create()
-
-            val window = mDossierDetailsDialog!!.window
-            window!!.setBackgroundDrawable(ColorDrawable(0))
         }
 
         mDossierDetailsAdapter = DialogDossierDetailsAdapter(this, stockList)
@@ -473,7 +362,15 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                 mDossierDetailsDialog!!.dismiss()
             }
         }
+
         mDossierDetailsDialog!!.show()
+
+        val window = mDossierDetailsDialog!!.window
+        window!!.setBackgroundDrawable(ColorDrawable(0))
+        window!!.setLayout(
+            resources.displayMetrics.widthPixels * 2 / 3,
+            resources.displayMetrics.heightPixels * 2 / 5
+        )
     }
 
     override fun countDownTimerOnTick(millisUntilFinished: Long) {
@@ -508,15 +405,28 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
             R.id.btn_back -> {
                 finish()
             }
+            R.id.btn_qudang -> { // todo 取档
+                val selectList = DossierOperatingService.getInstance().queryBySelected()
+                if (selectList != null && selectList.size > 0) {
+                    // todo 跳转取档界面,进行取档
+//                    showToast("" + selectList.size)
+                    intentActivity(OutboundOperatingActivity.newIntent(this))
+                    finish()
+                } else {
+                    // showToast("请先选择档案")
+                }
+
+            }
             R.id.btn_inventory_storage -> {
+                mDemoInterfaceBinding.tvError.text = "0"
                 startInventory()
             }
             // 停止盘点
             // UR880Entrance.getInstance().send(UR880SendInfo.Builder().cancel(mDevice.deviceId).build())
-            R.id.btn_open_door -> {
-                UR880Entrance.getInstance()
-                    .send(UR880SendInfo.Builder().openDoor(mDevice.deviceId, 0).build())
-            }
+//            R.id.btn_open_door -> {
+//                UR880Entrance.getInstance()
+//                    .send(UR880SendInfo.Builder().openDoor(mDevice.deviceId, 0).build())
+//            }
         }
     }
 
@@ -530,6 +440,7 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     }
 
     private fun startInventory() {
+        speek("正在盘点,请稍后")
         mProgressDialog.setMessage("准备开始盘点，请稍后...")
         if (!mProgressDialog.isShowing) mProgressDialog.show()
 
@@ -543,99 +454,18 @@ class DemoInterfaceActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         mDemoInterfaceAdapter.notifyDataSetChanged()
 
         // 柜子一层盘点时间限制为10S,假如10S内没有结束一层盘点,说明读写器掉线了,需要关闭界面
-        finishHandler.postDelayed(finishRunnable, 1000 * 10)
+        finishHandler.postDelayed(finishRunnable, 1000 * 5)
         UR880Entrance.getInstance()
             .send(UR880SendInfo.Builder().inventory(mDevice.deviceId, 0, floor, 0).build())
     }
 
-    private fun warehousingSubmission() {
-        mProgressDialog.setMessage("正在提交盘库数据，请稍后...")
-        if (!mProgressDialog.isShowing) mProgressDialog.show()
-
-        val jsonObject = JSONObject()
-        try {
-            val orderItemsJsonArray = JSONArray()
-            val inventoriesJsonArray = JSONArray()
-            for (cabinet in mCabinetList) {
-                if (cabinet.labelInfoList != null && cabinet.labelInfoList.size > 0) {
-                    for (labelInfo in cabinet.labelInfoList) {
-                        val changedObject = JSONObject()
-                        changedObject.put("rfidNum", labelInfo.epc)
-                        changedObject.put("cabCode", mDevice.deviceName)
-                        val light =
-                            if (labelInfo.antennaNumber % 24 == 0) 24 else labelInfo.antennaNumber % 24
-                        val floor =
-                            if (labelInfo.antennaNumber % 24 == 0) labelInfo.antennaNumber / 24 else (labelInfo.antennaNumber / 24 + 1)
-                        changedObject.put("position", floor)
-                        changedObject.put("light", light)
-                        changedObject.put("inputOrg", inOrg)
-                        orderItemsJsonArray.put(changedObject)
-                    }
-                }
-            }
-            if (orderItemsJsonArray.length() == 0) {
-                val msg = Message.obtain()
-                msg.what = SUBMITTED_SUCCESS
-                msg.obj = "无可提交的数据"
-                mHandler.sendMessageDelayed(msg, 800)
-                return
-            }
-            val inventories = JSONObject()
-            inventories.put("inventoryId", inventoryId)
-            inventories.put("orderItems", orderItemsJsonArray)
-            inventoriesJsonArray.put(inventories)
-            jsonObject.put("inventories", inventoriesJsonArray)
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-        Log.e("zx-自动盘库提交参数-", "$jsonObject")
-        val jsonObjectRequest = JsonObjectRequest(
-            Request.Method.POST, NetworkRequest.instance.mInventoryReport,
-            jsonObject, Response.Listener { response ->
-                try {
-                    Log.e("zx-自动盘库盘库提交结果-", "$response")
-                    val success = response!!.getBoolean("success")
-                    if (success) {
-                        val msg = Message.obtain()
-                        msg.what = SUBMITTED_SUCCESS
-                        msg.obj = "数据提交成功"
-                        mHandler.sendMessageDelayed(msg, 800)
-                    } else {
-                        val msg = Message.obtain()
-                        msg.what = SUBMITTED_FAIL
-                        msg.obj = response.getString("message")
-                        mHandler.sendMessageDelayed(msg, 800)
-                    }
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                    val msg = Message.obtain()
-                    msg.what = SUBMITTED_FAIL
-                    msg.obj = "数据解析失败"
-                    mHandler.sendMessageDelayed(msg, 800)
-                }
-            }, Response.ErrorListener { error ->
-                val msg = if (error != null)
-                    if (error.networkResponse != null)
-                        "errorCode: ${error.networkResponse.statusCode} VolleyError: $error"
-                    else
-                        "errorCode: -1 VolleyError: $error"
-                else {
-                    "errorCode: -1 VolleyError: 未知"
-                }
-                val message = Message.obtain()
-                message.what = SUBMITTED_FAIL
-                message.obj = msg
-                mHandler.sendMessageDelayed(message, 800)
-            })
-        jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
-            10000,
-            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        )
-        NetworkRequest.instance.add(jsonObjectRequest)
-    }
-
     override fun onDestroy() {
+        val selectList = DossierOperatingService.getInstance().queryBySelected()
+        for (select in selectList) {
+            select.selected = false
+            DossierOperatingService.getInstance().update(select)
+        }
+
 //        UR880Entrance.getInstance().removeCabinetInfoListener(mCabinetInfoListener)
         UR880Entrance.getInstance().removeInventoryListener(mInventoryListener)
         super.onDestroy()

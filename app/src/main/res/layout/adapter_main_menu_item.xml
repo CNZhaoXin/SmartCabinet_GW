@@ -13,12 +13,12 @@
         android:layout_height="wrap_content"
         android:background="@drawable/selector_menu_orange"
         android:drawableLeft="@mipmap/ic_in_storage"
-        android:drawablePadding="40dp"
+        android:drawablePadding="30dp"
         android:gravity="center"
         android:padding="60dp"
         android:text="@string/warehousing"
         android:textColor="@color/white"
-        android:textSize="34sp"
+        android:textSize="38sp"
         android:textStyle="bold" />
 
 </LinearLayout>

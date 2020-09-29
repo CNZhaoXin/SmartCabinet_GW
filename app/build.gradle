@@ -63,6 +63,13 @@ android {
         jni.srcDirs = []
     }
 
+
+//    buildFeatures{
+//        dataBinding = true
+//        // for view binding :
+//        // viewBinding = true
+//    }
+
     dataBinding {
         //noinspection DataBindingWithoutKapt
         enabled = true
@@ -120,5 +127,13 @@ dependencies {
     implementation 'me.jessyan:autosize:1.2.1'
     // 未混淆处理，FastJson (https://github.com/alibaba/fastjson 目前最新：检查日期 2020.8.24)
     implementation 'com.alibaba:fastjson:1.1.72.android'
+
+    // MPAndroidChart (https://github.com/PhilJay/MPAndroidChart 目前最新：检查日期 2019.8.30)
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
+    // https://github.com/airbnb/lottie-android
+    implementation 'com.airbnb.android:lottie:3.4.2'
+    // https://github.com/NanoHttpd/nanohttpd
+    implementation'org.nanohttpd:nanohttpd:2.3.1'
 
 }

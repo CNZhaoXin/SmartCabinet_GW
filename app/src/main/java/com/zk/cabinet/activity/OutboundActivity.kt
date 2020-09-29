@@ -22,8 +22,10 @@ import com.zk.cabinet.R
 import com.zk.cabinet.adapter.OutboundAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.bean.Device
+import com.zk.cabinet.bean.DossierOperating
 import com.zk.cabinet.bean.ResultGetOutBound
 import com.zk.cabinet.databinding.ActivityOutboundBinding
+import com.zk.cabinet.db.DossierOperatingService
 import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import org.json.JSONException
@@ -36,8 +38,7 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
     private lateinit var mHandler: OutboundHandler
     private lateinit var mProgressDialog: ProgressDialog
 
-    private var mOutboundList =
-        ArrayList<ResultGetOutBound.NameValuePairsBeanX.DataBean.ValuesBean>()
+    private var mOutboundList = ArrayList<DossierOperating>()
     private lateinit var mOutboundAdapter: OutboundAdapter
 
     companion object {
@@ -54,8 +55,7 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
         when (msg.what) {
             GET_OUTBOUND_SUCCESS -> {
                 mProgressDialog.dismiss()
-                mOutboundList =
-                    msg.obj as ArrayList<ResultGetOutBound.NameValuePairsBeanX.DataBean.ValuesBean>
+                mOutboundList = msg.obj as ArrayList<DossierOperating>
                 mOutboundAdapter.setList(mOutboundList)
                 mOutboundAdapter.notifyDataSetChanged()
             }
@@ -81,9 +81,6 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
 
         mHandler = OutboundHandler(this)
 
-        mOutboundAdapter = OutboundAdapter(this, mOutboundList)
-        mOutboundBinding.outboundLv.adapter = mOutboundAdapter
-
         val name = mSpUtil.getString(SharedPreferencesUtil.Key.NameTemp, "xxx")
         mOutboundBinding.tvOperator.text = name
 
@@ -92,7 +89,25 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
 
         mProgressDialog.setMessage("正在获取待出库档案列表...")
         mProgressDialog.show()
-        handler.post(runnable)
+
+        // todo 随机选2份档案 产生取档列表
+        val dossierList = DossierOperatingService.getInstance().loadAll()
+        // (数据类型)(最小值+Math.random()*(最大值-最小值+1))
+        val random1 = (1 + Math.random() * (dossierList.size - 1 - 1 + 1)).toInt()
+        val random2 = random1 + 1
+
+        val randomDossierList = ArrayList<DossierOperating>()
+        randomDossierList.add(dossierList[random1])
+        randomDossierList.add(dossierList[random2])
+
+        mOutboundAdapter = OutboundAdapter(this, randomDossierList)
+        mOutboundBinding.outboundLv.adapter = mOutboundAdapter
+
+        val msg = Message.obtain()
+        msg.what = GET_OUTBOUND_SUCCESS
+        msg.obj = randomDossierList
+        mHandler.sendMessageDelayed(msg, 800)
+
     }
 
     override fun countDownTimerOnTick(millisUntilFinished: Long) {
@@ -210,17 +225,15 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
                 if (!mProgressDialog.isShowing) mProgressDialog.show()
 
                 // 传递被选择的数据
-                var selectList =
-                    ArrayList<ResultGetOutBound.NameValuePairsBeanX.DataBean.ValuesBean>()
+                var selectList = ArrayList<DossierOperating>()
                 for (select in mOutboundList) {
-                    if (select.nameValuePairs.isSelected) {
+                    if (select.selected) {
                         selectList.add(select)
                     }
                 }
 
                 intentActivity(
-                    OutboundOperatingActivity.newIntent(this)
-                        .putExtra("OutBoundList", selectList)
+                    OutboundOperatingActivity.newIntent(this).putExtra("OutBoundList", selectList)
                 )
             }
 
@@ -230,41 +243,19 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
         }
     }
 
-    private val handler = Handler()
-    private val runnable = Runnable {
-        run {
-            getOutbound()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        mOutboundBinding.btnOpenDoor.background =
-            resources.getDrawable(R.drawable.shape_btn_un_enable)
-        mOutboundBinding.btnOpenDoor.isEnabled = false
-
-        if (mProgressDialog.isShowing)
-            mProgressDialog.dismiss()
-
-        // 若是出库成功返回这个界面数据刷新会更新最新的数据,自动删除掉已经出库的数据
-        mProgressDialog.setMessage("正在获取待出库档案列表...")
-        mProgressDialog.show()
-        handler.postDelayed(runnable, 2000)
-    }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        mOutboundList[position].nameValuePairs.isSelected =
-            !mOutboundList[position].nameValuePairs.isSelected
+        mOutboundList[position].selected = !mOutboundList[position].selected
 
-        if (mOutboundList[position].nameValuePairs.isSelected) {
+        if (mOutboundList[position].selected) {
             var device: String? = null
             var isOK = true
             for (entity in mOutboundList) {
-                if (entity.nameValuePairs.isSelected) {
+                if (entity.selected) {
                     if (device == null) {
-                        device = entity.nameValuePairs.cabcode
+                        device = entity.cabcode
                     } else {
-                        if (device != entity.nameValuePairs.cabcode) {
+                        if (device != entity.cabcode) {
                             isOK = false
                             break
                         }
@@ -285,7 +276,7 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
         } else {
             var hasSelect = false
             for (dossierOperating in mOutboundList) {
-                if (dossierOperating.nameValuePairs.isSelected) {
+                if (dossierOperating.selected) {
                     hasSelect = true
                     break
                 } else {
@@ -297,11 +288,11 @@ class OutboundActivity : TimeOffAppCompatActivity(), View.OnClickListener,
                 var device: String? = null
                 var isOK = true
                 for (entity in mOutboundList) {
-                    if (entity.nameValuePairs.isSelected) {
+                    if (entity.selected) {
                         if (device == null) {
-                            device = entity.nameValuePairs.cabcode
+                            device = entity.cabcode
                         } else {
-                            if (device != entity.nameValuePairs.cabcode) {
+                            if (device != entity.cabcode) {
                                 isOK = false
                                 break
                             }
