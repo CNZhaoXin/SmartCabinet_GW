@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="onLongClickListener"
+            type="android.view.View.OnLongClickListener" />
+
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/ll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/bg2"
+        android:gravity="center"
+        android:onClick="@{onClickListener}"
+        android:orientation="vertical">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottieAnimationView"
+            android:layout_width="600dp"
+            android:layout_height="600dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="warning.json"
+            app:lottie_loop="true" />
+
+        <Button
+            android:id="@+id/btn_warning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="50dp"
+            android:background="@drawable/selector_menu_orange"
+            android:drawableLeft="@mipmap/ic_no_warning"
+            android:drawablePadding="20dp"
+            android:gravity="center"
+            android:onClick="@{onClickListener}"
+            android:padding="30dp"
+            android:text="解除报警"
+            android:textColor="@color/white"
+            android:textSize="36sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+</layout>

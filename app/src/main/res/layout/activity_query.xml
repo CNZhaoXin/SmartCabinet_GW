@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="onClickListener"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="onItemClickListener"
+            type="android.widget.AdapterView.OnItemClickListener" />
+
+    </data>
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/bg2"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:layout_centerVertical="true"
+                android:background="@drawable/shape_oprator_bg"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingRight="30dp">
+
+                <TextView
+                    android:id="@+id/tv_operator_str"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:text="操作员:"
+                    android:textColor="@color/gray_light"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:id="@+id/tv_operator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="xxx"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_operation_str"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="10dp"
+                    android:text="操作:"
+                    android:textColor="@color/gray_light"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:id="@+id/tv_operation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="『 查档 』"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginRight="10dp"
+                    android:src="@mipmap/ic_clock" />
+
+                <TextView
+                    android:id="@+id/tv_countdown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:text="0"
+                    android:textColor="#EE6911"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical"
+                    android:text="秒"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="60dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="60dp"
+                android:layout_marginBottom="220dp"
+                android:background="@drawable/shape_list_trans_bg"
+                android:orientation="vertical"
+                android:paddingLeft="20dp"
+                android:paddingTop="15dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="20dp">
+
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/searchView"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="50dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/draw_conner_20"
+                    android:gravity="center_vertical"
+                    app:defaultQueryHint="请输入姓名拼音"
+                    app:iconifiedByDefault="false"
+                    app:searchIcon="@mipmap/ic_query_black" />
+
+                <ListView
+                    android:id="@+id/listView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="visible" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="60dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="60dp"
+                    android:background="@drawable/selector_menu_red"
+                    android:drawableLeft="@mipmap/ic_back"
+                    android:drawablePadding="20dp"
+                    android:gravity="center"
+                    android:onClick="@{onClickListener}"
+                    android:padding="30dp"
+                    android:text="返 回"
+                    android:textColor="@color/white"
+                    android:textSize="36sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btn_qudang"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_btn_un_enable"
+                    android:drawableLeft="@mipmap/ic_out_storage"
+                    android:drawablePadding="20dp"
+                    android:gravity="center"
+                    android:enabled="false"
+                    android:onClick="@{onClickListener}"
+                    android:padding="30dp"
+                    android:text="取 档"
+                    android:textColor="@color/white"
+                    android:textSize="36sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</layout>
