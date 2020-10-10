@@ -31,8 +31,8 @@ class WebApiServiceDialog(title: Int, inputListener: InputListener) :
         mBuilder = AlertDialog.Builder(activity)
         val inflater = activity!!.layoutInflater
         val view = inflater.inflate(R.layout.dialog_web_api_set, null)
-        mDialogWebApiIpEdt = view.findViewById<AutoCompleteTextView>(R.id.dialog_web_api_ip_edt)
-        mDialogWebApiPortEdt = view.findViewById<AutoCompleteTextView>(R.id.dialog_web_api_port_edt)
+        mDialogWebApiIpEdt = view.findViewById<EditText>(R.id.dialog_web_api_ip_edt)
+        mDialogWebApiPortEdt = view.findViewById<EditText>(R.id.dialog_web_api_port_edt)
         mDialogWebApiIpEdt.setText(mWebApiServiceIp)
         if (!TextUtils.isEmpty(mWebApiServiceIp)) mDialogWebApiIpEdt.setSelection(mWebApiServiceIp!!.length)
         mDialogWebApiPortEdt.setText(if (mWebApiServicePort != -1) mWebApiServicePort.toString() else null)
