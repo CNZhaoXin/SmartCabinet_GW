@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name = "SmartDossierCabinet"
+rootProject.name = "SmartCabinet_GW"

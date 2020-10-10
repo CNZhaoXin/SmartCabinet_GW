@@ -97,10 +97,10 @@
         tools:ignore="ProtectedPermissions" />
 
     <application
-        android:name=".FileManagementCabinetApplication"
+        android:name=".app.MyApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/appName"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
@@ -171,24 +171,13 @@
             </intent-filter>
         </activity>
 
-        <!-- 屏幕分辨率Display: mDisplayId=0 init=1280x1024 240dpi cur=1024x1280 app=1024x1208 rng=1024x916-1280x1172
-        deferred=false layoutNeeded=false-->
-
-        <!--        17寸pad -->
+        <!-- 1204*1280(7.7英寸pad),以这个屏幕为标准做适配 -->
         <meta-data
             android:name="design_width_in_dp"
             android:value="1024" />
         <meta-data
             android:name="design_height_in_dp"
             android:value="1280" />
-
-        <!--        华为Pad-->
-<!--        <meta-data-->
-<!--            android:name="design_width_in_dp"-->
-<!--            android:value="1200" />-->
-<!--        <meta-data-->
-<!--            android:name="design_height_in_dp"-->
-<!--            android:value="1920" />-->
 
     </application>
 
