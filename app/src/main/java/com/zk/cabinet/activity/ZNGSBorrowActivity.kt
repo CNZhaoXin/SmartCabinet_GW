@@ -102,9 +102,9 @@ class ZNGSBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLi
         UR880Entrance.getInstance().addOnInventoryListener(mInventoryListener)
 
         // todo 1413的测试柜子固件不一样,要调用开门
-        UR880Entrance.getInstance().send(
-            UR880SendInfo.Builder().openDoor("204742930", 0x00).build()
-        )
+//        UR880Entrance.getInstance().send(
+//            UR880SendInfo.Builder().openDoor("204742930", 0x00).build()
+//        )
     }
 
     private val loadListHandler = Handler()

@@ -153,6 +153,36 @@ public class ResultGetPosInfoByCabinetEquipmentId {
             private List<Integer> lampList;
             private boolean isInStockStatus; // 是否是[在库/审批借阅中/待借阅]状态的档案(在库位中的档案)
             private boolean isInStocked;  // 盘点扫描后,该库存档案是否在库位中
+            // "库房编号"
+            private String houseCode;
+            // "库房房号"
+            private String houseNo;
+            // "库房名称"
+            private String houseName;
+
+            public String getHouseCode() {
+                return houseCode;
+            }
+
+            public void setHouseCode(String houseCode) {
+                this.houseCode = houseCode;
+            }
+
+            public String getHouseNo() {
+                return houseNo;
+            }
+
+            public void setHouseNo(String houseNo) {
+                this.houseNo = houseNo;
+            }
+
+            public String getHouseName() {
+                return houseName;
+            }
+
+            public void setHouseName(String houseName) {
+                this.houseName = houseName;
+            }
 
             public boolean isInStocked() {
                 return isInStocked;

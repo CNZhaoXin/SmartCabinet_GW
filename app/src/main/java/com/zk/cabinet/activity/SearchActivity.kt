@@ -81,7 +81,7 @@ class SearchActivity : TimeOffAppCompatActivity(), View.OnClickListener {
         })
 
         mBinding.listView.setOnItemClickListener { adapterView, view, position, l ->
-            // todo 点击查看档案详情
+            // 点击查看档案详情
         }
     }
 
@@ -99,10 +99,14 @@ class SearchActivity : TimeOffAppCompatActivity(), View.OnClickListener {
              rfid string 档案 rfid
              archivesStatus int 档案状态*/
 
+        val requestUrl =
+            NetworkRequest.instance.mSearchArchivesInfo + "?pageNum=1&pageSize=100&searchContent=" + searchContent
+        LogUtils.e("搜索-请求参数:", requestUrl)
+
         //  不做分页,最多显示100条搜索结果
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET,
-            NetworkRequest.instance.mSearchArchivesInfo + "?pageNum=1&pageSize=100&searchContent=" + searchContent,
+            requestUrl,
             { response ->
                 LogUtils.e("搜索-返回结果:", "$response")
 

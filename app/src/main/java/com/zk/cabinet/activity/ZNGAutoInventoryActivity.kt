@@ -240,7 +240,7 @@ class ZNGAutoInventoryActivity : TimeOffAppCompatActivity(), View.OnClickListene
                                 mAdapter = ZNGInventoryAdapter(mCabinetList, this, false)
                                 val manager = GridLayoutManager(
                                     this,
-                                    24, // todo 这个数值是柜子每层可存的档案数,正式得改为15,应该弄成可以配置的
+                                    15, // todo 这个数值是柜子每层可存的档案数,正式得改为15,应该弄成可以配置的
                                     LinearLayoutManager.VERTICAL,
                                     false
                                 )

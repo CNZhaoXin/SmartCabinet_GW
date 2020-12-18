@@ -79,7 +79,7 @@ class ZNGSBorrowAdapter(
             viewHolder.iv_checked.visibility = View.GONE
             viewHolder.ll.setBackgroundColor(mContext.resources.getColor(R.color.color_list_unable))
             viewHolder.tv_position.setTextColor(mContext.resources.getColor(R.color.red_primary))
-            viewHolder.tv_position.text = "该档案需前往「 一体机 」登录借阅"
+            viewHolder.tv_position.text = "该档案需前往「 ${entity.houseName}-一体机 」登录借阅"
         } else if ("2" == cabinetType) {
             // 获取档案组柜配置的读写器设备ID，判断待借阅的档案是档案组柜中某个柜子的档案,才可以操作
             val deviceList = DeviceService.getInstance().loadAll()
@@ -99,13 +99,14 @@ class ZNGSBorrowAdapter(
                 viewHolder.iv_checked.visibility = View.GONE
                 viewHolder.ll.setBackgroundColor(mContext.resources.getColor(R.color.white))
                 viewHolder.tv_position.setTextColor(mContext.resources.getColor(R.color.black))
-                // 档案位置:操作屏-柜子-层-号库位(灯)
-                viewHolder.tv_position.text = "${entity.masterName}-${entity.cabinetName}-${entity.rowNo}层-${entity.numNo}号库位 (" + entity.lampList.joinToString() + "灯)"
+                // 档案位置:档案室名称-柜子名称-层号库位(灯)
+                viewHolder.tv_position.text =
+                    "${entity.houseName}-${entity.cabinetName}-${entity.rowNo}层${entity.numNo}号库位 (" + entity.lampList.joinToString() + "灯)"
             } else {
                 viewHolder.iv_checked.visibility = View.GONE
                 viewHolder.ll.setBackgroundColor(mContext.resources.getColor(R.color.color_list_unable))
                 viewHolder.tv_position.setTextColor(mContext.resources.getColor(R.color.red_primary))
-                viewHolder.tv_position.text = "该档案需前往「 ${entity.masterName} 」操作屏登录借阅"
+                viewHolder.tv_position.text = "该档案需前往「 ${entity.houseName}-${entity.masterName} 」操作屏登录借阅"
             }
 
         } else if ("3" == cabinetType) {
@@ -113,7 +114,7 @@ class ZNGSBorrowAdapter(
             viewHolder.iv_checked.visibility = View.GONE
             viewHolder.ll.setBackgroundColor(mContext.resources.getColor(R.color.color_list_unable))
             viewHolder.tv_position.setTextColor(mContext.resources.getColor(R.color.red_primary))
-            viewHolder.tv_position.text = "该档案需前往「 ${entity.masterName} 」操作屏登录借阅"
+            viewHolder.tv_position.text = "该档案需前往「 ${entity.houseName}-${entity.cabinetName} 」操作屏登录借阅"
         }
 
         if (entity.isSelect) {

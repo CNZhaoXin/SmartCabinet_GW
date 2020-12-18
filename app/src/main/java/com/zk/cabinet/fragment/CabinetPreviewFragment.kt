@@ -406,7 +406,7 @@ class CabinetPreviewFragment : BaseFragment(), View.OnClickListener {
                                 mAdapter = ZNGInventoryAdapter(mCabinetList, activity!!, false)
                                 val manager = GridLayoutManager(
                                     activity!!,
-                                    24, // todo 这个数值是柜子每层可存的档案数,正式得改为15,应该弄成可以配置的
+                                    15, // todo 这个数值是柜子每层可存的档案数,正式得改为15,应该弄成可以配置的
                                     LinearLayoutManager.VERTICAL,
                                     false
                                 )
@@ -430,8 +430,8 @@ class CabinetPreviewFragment : BaseFragment(), View.OnClickListener {
                                                 mArchivesList
                                             )
                                         } else {
-                                            showWarningToast("『 ${mCabinetList[position].rowNo}-${mCabinetList[position].numNo} 』号库位暂无档案存入")
-                                            speek("${mCabinetList[position].rowNo}杠${mCabinetList[position].numNo}号库位暂无档案存入")
+                                            showWarningToast("『 ${mCabinetList[position].rowNo}层${mCabinetList[position].numNo} 』号库位暂无档案存入")
+                                            speek("${mCabinetList[position].rowNo}层${mCabinetList[position].numNo}号库位暂无档案存入")
                                         }
                                     }
                                 }
@@ -552,22 +552,22 @@ class CabinetPreviewFragment : BaseFragment(), View.OnClickListener {
 
         if (isInventoryed) {
             mDossierDetailsDialogBinding!!.tvTitle.text =
-                "『 ${entity.rowNo}-${entity.numNo}号库位（已存：${mArchivesList.size}" +
+                "『 ${entity.rowNo}层${entity.numNo}号库位（已存：${mArchivesList.size}" +
                         "，应在库：${isInStockedList.size + isNoInStockedList.size}" +
                         "，实在库：${isInStockedList.size} " +
                         "，缺：${isNoInStockedList.size}）』"
             speek(
-                "${entity.rowNo}杠${entity.numNo}号库位已存${mArchivesList.size}份档案" +
+                "${entity.rowNo}层${entity.numNo}号库位已存${mArchivesList.size}份档案" +
                         ",应在库${isInStockedList.size + isNoInStockedList.size}份档案" +
                         ",实在库${isInStockedList.size}份档案" +
                         ",缺${isNoInStockedList.size}份档案"
             )
         } else {
             mDossierDetailsDialogBinding!!.tvTitle.text =
-                "『 ${entity.rowNo}-${entity.numNo}号库位（已存：${mArchivesList.size}" +
+                "『 ${entity.rowNo}层${entity.numNo}号库位（已存：${mArchivesList.size}" +
                         "，应在库：${isInStockedList.size + isNoInStockedList.size}）』"
             speek(
-                "${entity.rowNo}杠${entity.numNo}号库位已存${mArchivesList.size}份档案" +
+                "${entity.rowNo}层${entity.numNo}号库位已存${mArchivesList.size}份档案" +
                         ",应在库${isInStockedList.size + isNoInStockedList.size}份档案"
             )
         }

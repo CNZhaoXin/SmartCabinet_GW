@@ -36,6 +36,36 @@ public class FileDetailsData {
     private int numNo;
     private int archivesStatus;
     private List<Integer> lampList;
+    // "库房编号"
+    private String houseCode;
+    // "库房房号"
+    private String houseNo;
+    // "库房名称"
+    private String houseName;
+
+    public String getHouseCode() {
+        return houseCode;
+    }
+
+    public void setHouseCode(String houseCode) {
+        this.houseCode = houseCode;
+    }
+
+    public String getHouseNo() {
+        return houseNo;
+    }
+
+    public void setHouseNo(String houseNo) {
+        this.houseNo = houseNo;
+    }
+
+    public String getHouseName() {
+        return houseName;
+    }
+
+    public void setHouseName(String houseName) {
+        this.houseName = houseName;
+    }
 
     public String getCabinetType() {
         return cabinetType;

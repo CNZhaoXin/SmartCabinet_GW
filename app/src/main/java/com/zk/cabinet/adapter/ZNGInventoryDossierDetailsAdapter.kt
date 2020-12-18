@@ -85,9 +85,9 @@ class ZNGInventoryDossierDetailsAdapter(
             tv_cabinetType = "档案单柜"
         }
 
-        // 档案位置:操作屏-柜子-层-号库位(灯)
+        // 档案位置:档案室名称-柜子名称-层号库位(灯)
         viewHolder.tv_position.text =
-            "${entity.masterName}-${entity.cabinetName}-${entity.rowNo}层-${entity.numNo}号库位 (" + entity.lampList.joinToString() + "灯)"
+            "${entity.houseName}-${entity.cabinetName}-${entity.rowNo}层${entity.numNo}号库位 (" + entity.lampList.joinToString() + "灯)"
 
         // 盘点前是否是在库位中的档案([在库/借阅审批中/待借阅]状态的)
         if (entity.isInStockStatus) {
