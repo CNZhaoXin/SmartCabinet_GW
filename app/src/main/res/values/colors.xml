@@ -1,14 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#28293C</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#03DAC5</color>
+
+    <color name="colorPrimary">#00BFA5</color>
+    <color name="colorPrimaryTrans">#9A00BFA5</color>
+    <color name="colorPrimaryDark">#01A28C</color>
+    <color name="colorAccent">#9A00BFA5</color>
+
+    <color name="colorShimmer">#848484</color>
+    <!-- 按钮和条目的水波纹颜色，一个是白色，一个是黑色 -->
+    <color name="color_ripple_white">#30ffffff</color>
+    <color name="color_ripple_black">#30000000</color>
+
+    <!-- 待入库0,在库10,借阅审批中50,待借阅100,待归还200,异常9000 -->
+    <color name="colorDRK">@color/red_primary</color>
+    <color name="colorZK">@color/green_primary</color>
+    <color name="colorJYSPZ">@color/md_cyan_500</color>
+    <color name="colorDJY">@color/md_blue_500</color>
+    <color name="colorDGH">@color/md_amber_600</color>
+    <color name="colorYC">@color/red_primary</color>
+
+    <color name="color_list_unable">#DCDADA</color>
+
+    <color name="color_white_ff">#7FFFFFFF</color>
+    <color name="color_white_zt">#4C000000</color>
+    <color name="color_white_zt_gray">#B2000000</color>
+
     <color name="colorFontMain">#C1C1C1</color>
     <color name="colorSysFontMain">#28293C</color>
 
+
     <color name="dossier_text">#569fff</color>
     <color name="background">#efeefe</color>
-    <color name="gray_light">#C1C1C1</color>
+    <color name="gray_light">#e6e6e6</color>
     <color name="dialog_down">#525ca0</color>
     <color name="dialog_up">#88525ca0</color>
     <color name="gray_deep">#666666</color>
@@ -17,10 +40,6 @@
 
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-
-    <!-- 按钮和条目的水波纹颜色，一个是白色，一个是黑色 -->
-    <color name="color_ripple_white">#30ffffff</color>
-    <color name="color_ripple_black">#30000000</color>
 
     <!--ALL COLOURS-->
     <color name="transparent">#00000000</color>

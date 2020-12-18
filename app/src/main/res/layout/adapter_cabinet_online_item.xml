@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/RelativeLayout1"
     android:layout_width="wrap_content"
-    android:layout_height="60dp"
-    android:gravity="center"
-    android:paddingLeft="10dp"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_oprator_bg"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    tools:ignore="UseCompoundDrawables">
 
     <!--    <TextView-->
     <!--        android:layout_width="wrap_content"-->
@@ -20,18 +23,19 @@
         android:id="@+id/adapter_cabinet_online_item_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:layout_marginRight="5dp"
+        android:gravity="center"
         android:text="xxx"
-        android:textColor="#F5A623"
-        android:textSize="30sp"
+        android:textColor="@color/white"
+        android:textSize="18sp"
         android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/adapter_cabinet_online_item_iv"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginRight="20dp"
         android:src="@drawable/cabinet_offline" />
 
 </LinearLayout>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activity.MainMenuActivity">
+
+    <data>
+
+        <variable
+            name="onItemClickListener"
+            type="android.widget.AdapterView.OnItemClickListener" />
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/shape_activity_bg"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/ll_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:orientation="vertical"
+            android:padding="30dp">
+
+            <TextClock
+                android:id="@+id/main_time_d_tc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:format12Hour="yyyy年MM月dd EEEE"
+                android:format24Hour="yyyy年MM月dd EEEE"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextClock
+                android:id="@+id/main_time_h_tc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:format12Hour="aa hh:mm:ss"
+                android:format24Hour="HH:mm:ss"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="40sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <com.romainpiel.shimmer.ShimmerTextView
+            android:id="@+id/stv_chinese_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:letterSpacing="0.1"
+            android:paddingTop="170dp"
+            android:text="@string/title"
+            android:textColor="@color/white"
+            android:textSize="58sp"
+            android:textStyle="bold"
+            app:reflectionColor="@color/colorShimmer" />
+
+        <com.romainpiel.shimmer.ShimmerTextView
+            android:id="@+id/stv_english_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/stv_chinese_title"
+            android:gravity="center"
+            android:text="@string/titleEng"
+            android:textColor="@color/white"
+            android:textSize="34sp"
+            android:textStyle="bold"
+            app:reflectionColor="@color/colorShimmer" />
+
+        <GridView
+            android:id="@+id/gridView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/stv_english_title"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="100dp"
+            android:layout_marginRight="100dp"
+            android:layout_marginBottom="50dp"
+            android:gravity="center_horizontal"
+            android:horizontalSpacing="30dp"
+            android:numColumns="2"
+            android:verticalSpacing="50dp"
+            app:OnItemClickListener="@{onItemClickListener}" />
+
+    </RelativeLayout>
+
+</layout>

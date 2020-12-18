@@ -17,54 +17,40 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:background="@drawable/shape_login_dialog_bg"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingTop="55dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp">
 
-<!--        <TextView-->
-<!--            android:id="@+id/tv_title"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="70dp"-->
-<!--            android:text="「档案详情」"-->
-<!--            android:textColor="@color/white"-->
-<!--            android:textSize="28sp"-->
-<!--            android:textStyle="bold" />-->
-
-        <LinearLayout
-            android:id="@+id/ll_content"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
             android:layout_marginTop="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="40dp"
-            android:background="@drawable/shape_list_trans_bg"
-            android:orientation="vertical"
-            android:paddingLeft="20dp"
-            android:paddingTop="20dp"
-            android:paddingRight="20dp"
-            android:visibility="visible">
+            android:text="「档案详情」"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold" />
 
-            <ListView
-                android:id="@+id/listView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:OnItemClickListener="@{onItemClickListener}" />
-
-        </LinearLayout>
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:layout_weight="1"
+            app:OnItemClickListener="@{onItemClickListener}" />
 
         <Button
             android:id="@+id/btn_cancel"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:layout_marginLeft="100dp"
-            android:layout_marginRight="100dp"
-            android:layout_marginBottom="70dp"
-            android:background="@drawable/selector_menu_orange"
+            android:layout_marginLeft="60dp"
+            android:layout_marginRight="60dp"
+            android:layout_marginBottom="30dp"
+            android:background="@drawable/selector_menu_orange_normal"
             android:onClick="@{onClickListener}"
             android:text="关 闭"
             android:textColor="@color/white"

@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_menu_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:background="@color/transparent"
-    android:gravity="center"
-    android:orientation="horizontal">
+    android:background="@drawable/selector_menu_orange"
+    android:padding="30dp">
+
+    <ImageView
+        android:id="@+id/iv_menu_item"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:layout_centerInParent="true"
+        android:src="@mipmap/ic_return" />
 
     <TextView
-        android:id="@+id/btn_menu_item"
-        android:layout_width="match_parent"
+        android:id="@+id/tv_menu_item"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/selector_menu_orange"
-        android:drawableLeft="@mipmap/ic_in_storage"
-        android:drawablePadding="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
         android:gravity="center"
-        android:padding="60dp"
+        android:paddingRight="20dp"
         android:text="@string/warehousing"
         android:textColor="@color/white"
-        android:textSize="38sp"
+        android:textSize="40sp"
         android:textStyle="bold" />
 
-</LinearLayout>
+</RelativeLayout>

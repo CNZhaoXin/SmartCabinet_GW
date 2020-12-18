@@ -8,11 +8,13 @@ android {
     buildToolsVersion "29.0.3"
 
     defaultConfig {
+        // 国网档案室项目
+        // 北京智芯微电子科技有限公司RFID智能档案管理系统
         applicationId "com.gw.cabinet"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0.0"
+        versionCode 6
+        versionName "1.0.6"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -45,7 +47,9 @@ android {
             if (outputFile != null && outputFile.name.endsWith('.apk')) {
                 if (variant.buildType.name == 'release') {
 //                    fileName = "SmartCabinet_GW_v{versionName}_release_${buildTime()}.apk"
-                    fileName = "SmartCabinet_GW_v${versionName}_release.apk"
+//                    fileName = "SmartCabinet_GW_v${versionName}_release.apk"
+                    // 1_v1.0.1.apk
+                    fileName = "${versionCode}_v${versionName}.apk"
                 } else if (variant.buildType.name == 'debug') {
 //                    fileName = "SmartCabinet_GW_v{versionName}_debug_${buildTime()}.apk"
                     fileName = "SmartCabinet_GW_v${versionName}_debug.apk"
@@ -98,7 +102,7 @@ static def buildTime() {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
@@ -106,7 +110,7 @@ dependencies {
     implementation 'com.android.support:design:29.0.0'
     implementation 'androidx.core:core-ktx:1.3.2'
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation "androidx.recyclerview:recyclerview:1.1.0"
     implementation "androidx.recyclerview:recyclerview-selection:1.1.0-rc03"
     // For control over item selection of both touch and mouse driven selection
@@ -118,9 +122,9 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.mcxiaoke.volley:library:1.0.19'
 
-    implementation files('libs/rfid-release.aar')
-    implementation files('libs/zkandroidcore.jar')
-    implementation files('libs/zkandroidfpsensor.jar')
+    implementation files('libs/rfid-release_V1.0.8.aar')
+    //implementation files('libs/zkandroidcore.jar')
+    //implementation files('libs/zkandroidfpsensor.jar')
 
     //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
     implementation 'com.tencent.bugly:crashreport:3.1.9'
@@ -131,12 +135,52 @@ dependencies {
     // 未混淆处理，FastJson (https://github.com/alibaba/fastjson 目前最新：检查日期 2020.8.24)
     implementation 'com.alibaba:fastjson:1.1.72.android'
 
-    // MPAndroidChart (https://github.com/PhilJay/MPAndroidChart 目前最新：检查日期 2019.8.30)
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
-
     // https://github.com/airbnb/lottie-android
     implementation 'com.airbnb.android:lottie:3.4.2'
     // https://github.com/NanoHttpd/nanohttpd
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
 
+    // 未混淆处理，AndroidUtilCode (Github上最全的Android工具类,含toast/log)(https://github.com/Blankj/AndroidUtilCode 检查日期：2019.8.26)
+    implementation 'com.blankj:utilcode:1.24.4'
+    // Shimmer-android (https://github.com/RomainPiel/Shimmer-android 目前最新：检查日期 2017.11.10)
+    implementation 'com.romainpiel.shimmer:library:1.4.0@aar'
+    // MPAndroidChart (https://github.com/PhilJay/MPAndroidChart 目前最新：检查日期 2020.10.14)
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    // MagicIndicator (https://github.com/hackware1993/MagicIndicator 目前最新：检查日期 2020.10.21)
+    implementation 'com.github.hackware1993:MagicIndicator:1.7.0' // for androidx
+    // yuzhiqiang1993:zxing (https://github.com/yuzhiqiang1993/zxing 目前最新：检查日期 2020.10.22)
+    // implementation 'com.github.yuzhiqiang1993:zxing:2.2.8'
+
+    // zxing-lite (https://github.com/jenly1314/ZXingLite 目前最新：检查日期 2020.10.22)
+    implementation 'com.king.zxing:zxing-lite:1.1.9-androidx' // AndroidX 版本
+    // permission (https://github.com/yanzhenjie/AndPermission 目前最新：检查日期 2020.10.22)
+    implementation 'com.yanzhenjie:permission:2.0.3'
+    // xpopup (https://github.com/li-xiaojun/XPopup 目前最新：检查日期 2020.10.19)
+    // implementation 'com.lxj:xpopup:2.1.4'
+    // AVLoadingIndicatorView (https://github.com/81813780/AVLoadingIndicatorView 目前最新：检查日期 2020.10.29)
+    implementation 'com.wang.avi:library:2.1.3'
+    // eventbus (https://github.com/greenrobot/EventBus 目前最新：检查日期 2020.10.29)
+    // implementation 'org.greenrobot:eventbus:3.2.0'
+    // PickerView (https://github.com/Bigkoo/Android-PickerView 目前最新：检查日期 2019.12.27)
+    implementation 'com.contrarywind:Android-PickerView:4.1.9'
+
+    // PDA uhf
+    implementation files('libs/SenterOpenApi_IoT_1.2.3.95_Common.jar')
+    implementation files('libs/SenterOpenApi_IoT_1.2.3.95_Function_KeyManager.jar')
+    implementation files('libs/SenterOpenApi_IoT_1.2.3.95_Function_UltraHighFrequency_Compat_Support.jar')
+    implementation files('libs/SenterOpenApi_IoT_1.2.3.95_Function_UltraHighFrequency_ModelD2.jar')
+
+    // 未混淆处理,usb通信,可串口转usb再通信,usb-serial-for-android (https://github.com/mik3y/usb-serial-for-android 目前最新：检查日期 2020.10.15)
+    // implementation 'com.github.mik3y:usb-serial-for-android:3.2.0'
+    // 未混淆处理,串口通信,可usb转串口再通信,serialport(https://github.com/licheedev/Android-SerialPort-API 目前最新：检查日期 2020.10.15)
+    // https://juejin.im/post/5c010a19e51d456ac27b40fc 设置可参考这个
+    // implementation 'com.licheedev:android-serialport:2.1.1'
+
+    // Currently you will need the SDK for 24(7.0).
+    // MQTT (https://github.com/eclipse/paho.mqtt.android  目前最新：检查日期 2020.11.16)
+    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
+    implementation 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
+
+    // FileDownloader(https://github.com/lingochamp/FileDownloader/blob/master/README-zh.md 目前最新：检查日期 2020.12.16)
+    implementation 'com.liulishuo.filedownloader:library:1.7.7'
 }

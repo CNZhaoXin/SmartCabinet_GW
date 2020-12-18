@@ -42,8 +42,8 @@
                     android:layout_gravity="end|center_vertical"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:paddingEnd="@dimen/super_big_spacing">
+                    android:paddingEnd="@dimen/super_big_spacing"
+                    android:visibility="visible">
 
                     <ImageView
                         android:layout_width="24dp"
@@ -75,12 +75,13 @@
 
             </androidx.appcompat.widget.Toolbar>
 
+            <!-- 重启应用 -->
             <LinearLayout
                 android:id="@+id/system_setting_restart_ll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="0dp"
@@ -190,6 +191,51 @@
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
+                <!-- 设备类型切换 -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/card_spacing"
+                    android:foreground="@drawable/ripple"
+                    android:visibility="visible"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="@dimen/medium_spacing"
+                            android:paddingTop="@dimen/medium_spacing"
+                            android:text="@string/device_type_change"
+                            android:textColor="@color/md_blue_grey_900"
+                            android:textSize="@dimen/medium_text"
+                            android:textStyle="bold"
+                            tools:ignore="RtlSymmetry" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_device_type"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@mipmap/ic_screen"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/device_type"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- 网络配置 -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -245,6 +291,21 @@
                             app:settingTitle="@string/device_internal_ethernet"
                             app:settingTitleColor="@color/colorSysFontMain" />
 
+                        <!-- 本机固定IP配置 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_this_machine_ip"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_platform_service_ip"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/this_machine_ip"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
                         <com.zk.common.view.setting.SettingBasic
                             android:id="@+id/system_setting_web_api_service_sb"
                             android:layout_width="match_parent"
@@ -259,12 +320,26 @@
                             app:settingTitle="@string/web_api_service"
                             app:settingTitleColor="@color/colorSysFontMain" />
 
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_mqtt"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_platform_service_ip"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/title_mqtt"
+                            app:settingTitleColor="@color/colorSysFontMain" />
 
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!--柜体参数-->
+                <!-- 操作屏设备ID/一体机设备ID -->
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_equipment_id_setting"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginBottom="@dimen/card_spacing"
@@ -283,7 +358,206 @@
                             android:layout_height="wrap_content"
                             android:paddingStart="@dimen/medium_spacing"
                             android:paddingTop="@dimen/medium_spacing"
-                            android:text="@string/title_cabinet_parameters"
+                            android:text="操作屏设备ID配置"
+                            android:textColor="@color/md_blue_grey_900"
+                            android:textSize="@dimen/medium_text"
+                            android:textStyle="bold"
+                            tools:ignore="RtlSymmetry" />
+
+                        <!-- 操作屏设备ID配置 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_equipment_id"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@mipmap/ic_screen"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/equipment_id_setting"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- 一体机配置 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_ytj_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/card_spacing"
+                    android:clickable="false"
+                    android:foreground="@drawable/ripple"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="@dimen/medium_spacing"
+                            android:paddingTop="@dimen/medium_spacing"
+                            android:text="一体机配置"
+                            android:textColor="@color/md_blue_grey_900"
+                            android:textSize="@dimen/medium_text"
+                            android:textStyle="bold"
+                            tools:ignore="RtlSymmetry" />
+
+                        <!-- 一体机设备ID配置 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_equipment_id_ytj"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@mipmap/ic_screen"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/equipment_id_ytj_setting"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <!-- 读写器串口配置 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_ytj_serial"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_cabinet_service_port"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/ytj_serial_setting"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <!-- 读写器串口调式 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_ytj_serial_debug"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            android:visibility="visible"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@mipmap/ic_rfid"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/ytj_serial_debug"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- 档案架配置 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_daj_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/card_spacing"
+                    android:clickable="false"
+                    android:foreground="@drawable/ripple"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="@dimen/medium_spacing"
+                            android:paddingTop="@dimen/medium_spacing"
+                            android:text="档案组架配置"
+                            android:textColor="@color/md_blue_grey_900"
+                            android:textSize="@dimen/medium_text"
+                            android:textStyle="bold"
+                            tools:ignore="RtlSymmetry" />
+
+                        <!-- 添加档案组架 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_daj"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_number_of_boxes"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/title_daj_setting"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <!-- 灯控串口设置 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_light_serial"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_cabinet_service_port"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/light_serial_setting"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <!-- 灯控调试 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_light_serial_debug"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@mipmap/ic_light"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/light_serial_debug"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- 档案柜配置-->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_dag_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/card_spacing"
+                    android:clickable="false"
+                    android:foreground="@drawable/ripple"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="@dimen/medium_spacing"
+                            android:paddingTop="@dimen/medium_spacing"
+                            android:text="档案柜配置"
                             android:textColor="@color/md_blue_grey_900"
                             android:textSize="@dimen/medium_text"
                             android:textStyle="bold"
@@ -301,6 +575,20 @@
                             app:settingIcon="@drawable/sys_number_of_boxes"
                             app:settingIconColor="@color/colorSysFontMain"
                             app:settingTitle="@string/number_of_boxes"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_cabinet_service_port_sb"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_cabinet_service_port"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/cabinet_service_port"
                             app:settingTitleColor="@color/colorSysFontMain" />
 
                         <com.zk.common.view.setting.SettingBasic
@@ -333,8 +621,40 @@
                             app:settingTitle="@string/title_too_many_files"
                             app:settingTitleColor="@color/colorSysFontMain" />
 
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- 刷卡设备配置 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_skq_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/card_spacing"
+                    android:clickable="false"
+                    android:foreground="@drawable/ripple"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="@dimen/medium_spacing"
+                            android:paddingTop="@dimen/medium_spacing"
+                            android:text="刷卡设备配置"
+                            android:textColor="@color/md_blue_grey_900"
+                            android:textSize="@dimen/medium_text"
+                            android:textStyle="bold"
+                            tools:ignore="RtlSymmetry" />
+
+                        <!-- 刷卡设备串口配置 -->
                         <com.zk.common.view.setting.SettingBasic
-                            android:id="@+id/system_setting_cabinet_service_port_sb"
+                            android:id="@+id/system_setting_skq_serial"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:clickable="true"
@@ -344,7 +664,85 @@
                             app:settingCaptionColor="@color/colorSysFontMain"
                             app:settingIcon="@drawable/sys_cabinet_service_port"
                             app:settingIconColor="@color/colorSysFontMain"
-                            app:settingTitle="@string/cabinet_service_port"
+                            app:settingTitle="@string/skq_serial_setting"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <!-- 刷卡设备串口调试 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_skq_serial_debug"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            android:visibility="visible"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@mipmap/ic_shuaka"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/skq_serial_debug"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- 人脸设备配置 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_face_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/card_spacing"
+                    android:clickable="false"
+                    android:foreground="@drawable/ripple"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="@dimen/medium_spacing"
+                            android:paddingTop="@dimen/medium_spacing"
+                            android:text="人脸设备配置"
+                            android:textColor="@color/md_blue_grey_900"
+                            android:textSize="@dimen/medium_text"
+                            android:textStyle="bold"
+                            tools:ignore="RtlSymmetry" />
+
+                        <!-- 人脸设备服务端口配置 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_face_port"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_cabinet_service_port"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/face_port"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <!-- 人脸设备调试 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_face_debug"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            android:visibility="visible"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@mipmap/ic_face"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/face_debug"
                             app:settingTitleColor="@color/colorSysFontMain" />
 
                     </LinearLayout>
@@ -472,7 +870,6 @@
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -578,10 +975,12 @@
 
                 </androidx.cardview.widget.CardView>
 
+                <!-- 版本管理 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
@@ -608,19 +1007,6 @@
                                 android:textStyle="bold"
                                 tools:ignore="RtlSymmetry" />
 
-                            <com.zk.common.view.setting.SettingBasic
-                                android:id="@+id/system_setting_app_version_sb"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:onClick="@{onClickListener}"
-                                app:settingCaption="@string/air"
-                                app:settingCaptionColor="@color/colorSysFontMain"
-                                app:settingIcon="@drawable/sys_app_version"
-                                app:settingIconColor="@color/colorSysFontMain"
-                                app:settingTitle="@string/app_version"
-                                app:settingTitleColor="@color/colorSysFontMain" />
 
                             <com.zk.common.view.setting.SettingBasic
                                 android:id="@+id/system_setting_update_from_u_disk_sb"
@@ -629,6 +1015,7 @@
                                 android:clickable="true"
                                 android:focusable="true"
                                 android:onClick="@{onClickListener}"
+                                android:visibility="gone"
                                 app:settingCaption="@string/file_manager"
                                 app:settingCaptionColor="@color/colorSysFontMain"
                                 app:settingIcon="@drawable/sys_update_from_u_disk"
@@ -643,6 +1030,7 @@
                                 android:clickable="true"
                                 android:focusable="true"
                                 android:onClick="@{onClickListener}"
+                                android:visibility="gone"
                                 app:settingCaption="@string/uninstall_app"
                                 app:settingCaptionColor="@color/colorSysFontMain"
                                 app:settingIcon="@drawable/sys_uninstall_app"
@@ -658,7 +1046,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="visible">
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
@@ -685,6 +1074,21 @@
                                 android:textStyle="bold"
                                 tools:ignore="RtlSymmetry" />
 
+                            <!-- App版本 -->
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_app_version_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                app:settingCaption="@string/air"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_app_version"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/app_version"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
                             <com.zk.common.view.setting.SettingBasic
                                 android:id="@+id/system_setting_display_sb"
                                 android:layout_width="match_parent"
@@ -699,6 +1103,7 @@
                                 app:settingTitle="@string/title_display_bar"
                                 app:settingTitleColor="@color/colorSysFontMain" />
 
+                            <!-- Android文件管理器 -->
                             <com.zk.common.view.setting.SettingBasic
                                 android:id="@+id/system_setting_file_manager_sb"
                                 android:layout_width="match_parent"
@@ -727,6 +1132,20 @@
                                 app:settingTitle="@string/title_android_browser"
                                 app:settingTitleColor="@color/colorSysFontMain" />
 
+                            <com.zk.common.view.setting.SettingBasic
+                                android:id="@+id/system_setting_ping_test_sb"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:onClick="@{onClickListener}"
+                                app:settingCaption="@string/network_test"
+                                app:settingCaptionColor="@color/colorSysFontMain"
+                                app:settingIcon="@drawable/sys_network_test"
+                                app:settingIconColor="@color/colorSysFontMain"
+                                app:settingTitle="@string/title_network_test"
+                                app:settingTitleColor="@color/colorSysFontMain" />
+
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
                 </LinearLayout>
@@ -735,7 +1154,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
@@ -897,19 +1317,6 @@
                                 app:settingTitle="@string/title_query_cabinet_sql"
                                 app:settingTitleColor="@color/colorSysFontMain" />
 
-                            <com.zk.common.view.setting.SettingBasic
-                                android:id="@+id/system_setting_ping_test_sb"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:onClick="@{onClickListener}"
-                                app:settingCaption="@string/network_test"
-                                app:settingCaptionColor="@color/colorSysFontMain"
-                                app:settingIcon="@drawable/sys_network_test"
-                                app:settingIconColor="@color/colorSysFontMain"
-                                app:settingTitle="@string/title_network_test"
-                                app:settingTitleColor="@color/colorSysFontMain" />
 
                             <com.zk.common.view.setting.SettingBasic
                                 android:id="@+id/system_setting_calibration_test_sb"

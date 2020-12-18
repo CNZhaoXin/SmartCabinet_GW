@@ -27,6 +27,12 @@ class SharedPreferencesUtil {
         editor.apply()
     }
 
+    fun clear() {
+        val editor = sp.edit()
+        editor.clear()
+        editor.apply()
+    }
+
     fun getBoolean(key: Key, defaultValue: Boolean): Boolean {
         return sp.getBoolean(key.name, defaultValue)
     }
@@ -118,8 +124,11 @@ class SharedPreferencesUtil {
         Root,                      //配置管理员账户 String
         RootPwd,                   //配置管理员密码 String
 
+        Token,
         IdTemp,
         NameTemp,
+        DeviceName,  // 设备名称
+
         GenderTemp,
         PhoneNumberTemp,
         LoginCodeTemp,
@@ -144,11 +153,23 @@ class SharedPreferencesUtil {
         Eth0DNS,                   //DNS String
         Eth1IP,                    //IP String
         Eth1SubnetMask,            //子网掩码 String
-        WebApiServiceIp,           //平台服务IP String
+
+        WebApiServiceIp,           // WEW服务器IP String
         WebApiServicePort,         //平台服务端口 Int
+        MQTTServiceIp,           // MQTT服务器IP String
+        MQTTServicePort,           // MQTT服务器端口 String
+
         CabinetServicePort,        //柜体服务端口 Int
+        FaceServicePort,        // 人脸设备服务端口 Int
+        EquipmentId,        //  操作屏设备ID/一体机设备ID
+        InventoryDeviceId,        //  当前正在盘点的设备ID
 
         SoundSwitch,               //盘点结束后读出盘点的本数 bool
+
+        DAJNumberSelected,     // 档案架选择的数量 ATest = 0, A = 1, A,B = 2
+        LightsSerialSelected,     // 选择的灯控串口
+        YTJDxqSerialSelected,     // 选择的一体机读写器串口
+        SKQSerialSelected,     // 选择的刷卡器串口
 
         NumberOfBoxes,             //箱体数量 String like [A] OR [B,A] OR [A,B,C]
         NumberOfBoxesSelected,     //箱体数量 ATest = 0, A = 1, A,B = 2

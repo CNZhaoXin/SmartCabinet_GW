@@ -1,14 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string-array name="dialog_number_of_daj">
+        <item>1个档案组架</item>
+        <item>2个档案组架</item>
+        <item>3个档案组架</item>
+        <item>4个档案组架</item>
+        <item>5个档案组架</item>
+        <item>6个档案组架</item>
+        <item>7个档案组架</item>
+        <item>8个档案组架</item>
+        <item>9个档案组架</item>
+        <item>10个档案组架</item>
+    </string-array>
+
     <string-array name="dialog_number_of_boxes_array">
-        <item>1个柜体</item>
-        <item>2个柜体</item>
-        <item>3个柜体</item>
-        <item>4个柜体</item>
-        <item>5个柜体</item>
-        <item>6个柜体</item>
-        <item>7个柜体</item>
+        <item>1个档案柜</item>
+        <item>2个档案柜</item>
+        <item>3个档案柜</item>
+        <item>4个档案柜</item>
+        <item>5个档案柜</item>
+        <item>6个档案柜</item>
+        <item>7个档案柜</item>
+        <item>8个档案柜</item>
+        <item>9个档案柜</item>
+        <item>10个档案柜</item>
+    </string-array>
+
+    <string-array name="dialog_number_of_cabinet_single">
+        <item>1个档案柜</item>
     </string-array>
 
     <string-array name="dialog_not_closed_door_alarm_time_array">

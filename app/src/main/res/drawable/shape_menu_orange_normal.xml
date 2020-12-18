@@ -4,4 +4,16 @@
     <solid android:color="@color/md_orange_A200" />
     <corners android:radius="20dp" />
 
+    <!-- android:type=["linear" | "radial" | "sweep"]-->
+    <gradient
+        android:angle="180"
+        android:centerColor="@color/md_orange_A200"
+        android:centerX="0.1"
+        android:centerY="0.1"
+        android:endColor="@color/md_orange_A400"
+        android:gradientRadius="500"
+        android:startColor="@color/white"
+        android:type="radial"
+        android:useLevel="false" />
+
 </shape>

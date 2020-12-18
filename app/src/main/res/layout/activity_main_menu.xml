@@ -15,7 +15,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@mipmap/bg2"
+        android:background="@drawable/shape_activity_bg"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -40,7 +40,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:text="操作员:"
-                    android:textColor="@color/gray_light"
+                    android:textColor="@color/white"
                     android:textSize="22sp" />
 
                 <TextView
@@ -97,41 +97,44 @@
 
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/guide_title_1"
+        <com.romainpiel.shimmer.ShimmerTextView
+            android:id="@+id/stv_chinese_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:letterSpacing="0.2"
-            android:paddingTop="200dp"
-            android:text="欢迎使用智能人事档案柜"
-            android:textColor="@android:color/background_light"
-            android:textSize="60sp"
-            android:textStyle="bold" />
+            android:letterSpacing="0.1"
+            android:paddingTop="170dp"
+            android:text="@string/title"
+            android:textColor="@color/white"
+            android:textSize="58sp"
+            android:textStyle="bold"
+            app:reflectionColor="@color/colorShimmer" />
 
-        <TextView
-            android:id="@+id/guide_title_2"
+        <com.romainpiel.shimmer.ShimmerTextView
+            android:id="@+id/stv_english_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/guide_title_1"
+            android:layout_below="@+id/stv_chinese_title"
             android:gravity="center"
-            android:text="Welcome to the intelligent personnel file cabinet"
-            android:textColor="@color/md_grey_300"
+            android:text="@string/titleEng"
+            android:textColor="@color/white"
             android:textSize="34sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:reflectionColor="@color/colorShimmer" />
 
         <GridView
             android:id="@+id/main_menu_gv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/guide_title_2"
-            android:layout_marginLeft="150dp"
+            android:layout_below="@+id/stv_english_title"
+            android:layout_marginLeft="220dp"
             android:layout_marginTop="100dp"
-            android:layout_marginRight="150dp"
+            android:layout_marginRight="220dp"
+            android:layout_marginBottom="50dp"
             android:gravity="center_horizontal"
             android:horizontalSpacing="30dp"
-            android:numColumns="2"
-            android:verticalSpacing="30dp"
+            android:numColumns="1"
+            android:verticalSpacing="45dp"
             app:OnItemClickListener="@{onItemClickListener}" />
 
     </RelativeLayout>

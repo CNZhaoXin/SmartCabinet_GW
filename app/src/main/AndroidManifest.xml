@@ -8,8 +8,13 @@
         android:required="true" />
 
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
 
+    <uses-permission
+        android:name="android.permission.INTERACT_ACROSS_USERS_FULL"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.hardware.camera.autofocus" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
@@ -33,8 +38,11 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <!-- 系统权限start -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- 系统权限start -->
+
+    <uses-permission
+        android:name="android.permission.ACCESS_SUPERUSER"
+        tools:ignore="WrongManifestParent" />
     <uses-permission
         android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
         tools:ignore="ProtectedPermissions" />
@@ -97,78 +105,149 @@
         tools:ignore="ProtectedPermissions" />
 
     <application
-        android:name=".app.MyApp"
+        android:name=".application.App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_logo"
         android:label="@string/appName"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
 
-        <service
-            android:name=".service.NetService"
-            android:enabled="true"
-            android:exported="true" />
-
+        <!-- 公共页面 -->
         <activity
-            android:name=".activity.PersonnelManagementActivity"
-            android:label="@string/title_personnel_management"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".activity.OutboundOperatingActivity"
-            android:label="@string/outbound"
-            android:theme="@style/NoActionBarAppTheme" />
-        <activity
-            android:name=".activity.CabinetConfigurationActivity"
-            android:label="@string/title_cabinet"
-            android:theme="@style/NoActionBarAppTheme" />
-        <activity
-            android:name=".activity.WarehousingOperatingActivity"
-            android:label="@string/warehousing"
-            android:theme="@style/NoActionBarAppTheme" />
-        <activity
-            android:name=".activity.OutboundActivity"
-            android:label="@string/outbound"
-            android:theme="@style/NoActionBarAppTheme" />
-        <activity
-            android:name=".activity.WarehousingActivity"
-            android:label="@string/warehousing"
-            android:theme="@style/NoActionBarAppTheme" />
-        <activity
-            android:name=".activity.DemoInterfaceActivity"
-            android:label="@string/inventory_storage"
-            android:theme="@style/NoActionBarAppTheme" />
-        <activity
-            android:name=".activity.SystemSettingsActivity"
-            android:label="@string/title_activity_system_settings"
+            android:name=".activity.GuideActivity"
+            android:label="常驻主页"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
             android:theme="@style/NoActionBarAppTheme" />
         <activity
             android:name=".activity.MainMenuActivity"
             android:label="@string/title_activity_main_menu"
+            android:screenOrientation="portrait"
             android:theme="@style/NoActionBarAppTheme" />
         <activity
-            android:name=".activity.QueryActivity"
-            android:label="查档"
+            android:name=".activity.SystemSettingsActivity"
+            android:label="@string/title_activity_system_settings"
+            android:screenOrientation="portrait"
             android:theme="@style/NoActionBarAppTheme" />
         <activity
-            android:name=".activity.WarningActivity"
-            android:label="异常出库报警"
-            android:launchMode="singleInstance"
+            android:name=".activity.SearchActivity"
+            android:label="档案搜索"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarAppTheme" />
+        <!-- PDA -->
+        <activity
+            android:name=".activity.CustomCaptureActivity"
+            android:label="PDA-扫二维码/条形码"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.InStoragePDAActivity"
+            android:label="PDA-入库"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.MoveStoragePDAActivity"
+            android:label="PDA-移库"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.PDAInventoryActivity"
+            android:label="PDA-盘库"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.PDAInventoryOperatorActivity"
+            android:label="PDA-盘库-操作"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarAppTheme" />
+        <!-- 一体机 -->
+        <activity
+            android:name=".activity.YTJBorrowActivity"
+            android:label="一体机-借阅"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.YTJReturnActivity"
+            android:label="一体机-归还"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.YTJSerialDebugActivity"
+            android:label="读写器调试"
+            android:theme="@style/NoActionBarAppTheme" />
+        <!-- 档案单柜 -->
+        <activity
+            android:name=".activity.ZNGBorrowActivity"
+            android:label="档案单柜-借阅"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.ZNGReturnActivity"
+            android:label="档案单柜-归还"
+            android:theme="@style/NoActionBarAppTheme" />
+        <!-- 档案组柜-->
+        <activity
+            android:name=".activity.ZNGSBorrowActivity"
+            android:label="档案组柜-借阅"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.ZNGSReturnActivity"
+            android:label="档案组柜-归还"
+            android:theme="@style/NoActionBarAppTheme" />
+        <!-- 档案组架 -->
+        <activity
+            android:name=".activity.DAJSettingActivity"
+            android:label="添加档案组架"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.DAJLightDebugActivity"
+            android:label="灯控调试"
+            android:theme="@style/NoActionBarAppTheme" />
+        <!-- 档案组柜/档案单柜 -->
+        <activity
+            android:name=".activity.DAGSettingActivity"
+            android:label="添加档案柜"
+            android:theme="@style/NoActionBarAppTheme" />
+        <!-- 档案组架/档案组柜/档案单柜 -->
+        <activity
+            android:name=".activity.SKQSerialDebugActivity"
+            android:label="刷卡器调试"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.FaceDebugActivity"
+            android:label="人脸设备调试"
             android:theme="@style/NoActionBarAppTheme" />
 
         <activity
-            android:name=".activity.GuideActivity"
-            android:launchMode="singleTop"
+            android:name=".activity.CabinetPreviewActivity"
+            android:label="档案组架/档案组柜/档案单柜-预览(手动盘库)"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.ZNGAutoInventoryActivity"
+            android:label="档案组柜/档案单柜-自动盘库界面"
+            android:theme="@style/NoActionBarAppTheme" />
+
+        <activity
+            android:name=".activity.DeviceSelectActivity"
+            android:label="@string/appName"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+
                 <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+
+            <!-- 监听usb设备挂载/断开, 如果要监听,去Github看Usb那个Demo -->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" /> -->
+            <!-- </intent-filter> -->
+            <!-- <meta-data -->
+            <!-- android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" -->
+            <!-- android:resource="@xml/device_filter" /> -->
         </activity>
 
         <!-- 1204*1280(7.7英寸pad),以这个屏幕为标准做适配 -->
@@ -178,6 +257,11 @@
         <meta-data
             android:name="design_height_in_dp"
             android:value="1280" />
+
+        <!-- Mqtt Service -->
+<!--        android:enabled="true"-->
+<!--        android:exported="true"-->
+        <service android:name="org.eclipse.paho.android.service.MqttService" />
 
     </application>
 

@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.zk.cabinet.R
-import com.zk.cabinet.bean.CabinetOnlineInfo
+import com.zk.cabinet.entity.CabinetOnlineInfo
 
 class CabinetOnlineAdapter(context: Context, cabinetOnlineList: ArrayList<CabinetOnlineInfo>) :
     RecyclerView.Adapter<CabinetOnlineAdapter.ViewHolder>() {
@@ -41,6 +41,6 @@ class CabinetOnlineAdapter(context: Context, cabinetOnlineList: ArrayList<Cabine
             mContext.resources.getString(R.string.cabinet_online_box_name),
             cabinetOnlineInfo.mCodeName
         )
-        holder.adapterCabinetOnlineItemIv!!.setImageResource(if (cabinetOnlineInfo.isOnLine) R.drawable.cabinet_online else R.drawable.cabinet_offline)
+        holder.adapterCabinetOnlineItemIv!!.setImageResource(if (cabinetOnlineInfo.isOnLine) R.drawable.shape_online_bg else R.drawable.shape_offline_bg)
     }
 }

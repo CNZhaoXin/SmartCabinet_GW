@@ -18,11 +18,16 @@ public class Device {
     @Property(nameInDb = "DeviceName")
     private String deviceName;
 
-    @Generated(hash = 789884766)
-    public Device(Long id, String deviceId, String deviceName) {
+    @Property(nameInDb = "LightControlBoardId")
+    private String lightControlBoardId;
+
+    @Generated(hash = 1769929908)
+    public Device(Long id, String deviceId, String deviceName,
+            String lightControlBoardId) {
         this.id = id;
         this.deviceId = deviceId;
         this.deviceName = deviceName;
+        this.lightControlBoardId = lightControlBoardId;
     }
 
     @Transient
@@ -62,5 +67,13 @@ public class Device {
 
     public boolean isSelected() {
         return selected;
+    }
+
+    public String getLightControlBoardId() {
+        return this.lightControlBoardId;
+    }
+
+    public void setLightControlBoardId(String lightControlBoardId) {
+        this.lightControlBoardId = lightControlBoardId;
     }
 }

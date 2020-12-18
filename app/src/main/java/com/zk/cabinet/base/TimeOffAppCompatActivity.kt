@@ -10,6 +10,8 @@ import android.view.MotionEvent
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.blankj.utilcode.util.AppUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.zk.cabinet.R
 import com.zk.cabinet.constant.SelfComm
 import com.zk.cabinet.utils.SharedPreferencesUtil
@@ -35,7 +37,11 @@ open class TimeOffAppCompatActivity : AppCompatActivity(), TextToSpeech.OnInitLi
             textToSpeech!!.setPitch(1.2f) // 设置音调，,1.0是常规
             textToSpeech!!.setSpeechRate(1.0f) // 设定语速，1.0正常语速
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Toast.makeText(this, "语音包丢失或语音不支持", Toast.LENGTH_SHORT).show()
+                if (AppUtils.isAppInstalled("com.iflytek.speechcloud")) {
+                    showErrorToast("语音引擎包未设置")
+                } else {
+                    showErrorToast("语音引擎包未安装")
+                }
             }
         }
     }
@@ -51,7 +57,7 @@ open class TimeOffAppCompatActivity : AppCompatActivity(), TextToSpeech.OnInitLi
 
     protected fun speek(speekText: String) {
         if (textToSpeech != null) {
-            Log.e("zx-报警", "speek")
+            Log.e("zx-", "speek")
             textToSpeech!!.speak(speekText, TextToSpeech.QUEUE_FLUSH, null)
         }
     }
@@ -72,7 +78,7 @@ open class TimeOffAppCompatActivity : AppCompatActivity(), TextToSpeech.OnInitLi
     }
 
     private fun setAutoFinish() {
-        val mCountdownTemp = mSpUtil.getInt(Key.Countdown, 60)
+        val mCountdownTemp = mSpUtil.getInt(Key.Countdown, 600)
         if (mCountdownTemp != mCountdown) {
             mCountdown = mCountdownTemp
             initTime()
@@ -95,7 +101,7 @@ open class TimeOffAppCompatActivity : AppCompatActivity(), TextToSpeech.OnInitLi
                 countDownTimerOnTick(temp)
                 LogUtil.instance.d("无人操作，倒计时 -------------------- $temp")
                 if (temp <= 10) {
-                    showToast("已经${mCountdown - temp}秒无人操作${temp}秒后返回主界面")
+                    showWarningToast("已经${mCountdown - temp}秒无人操作,${temp}秒后返回主界面")
                 }
             }
 
@@ -160,10 +166,11 @@ open class TimeOffAppCompatActivity : AppCompatActivity(), TextToSpeech.OnInitLi
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            showToast(resources.getString(R.string.no_keycode_back))
-            return false
-        }
+        // 禁用回退键
+//        if (keyCode == KeyEvent.KEYCODE_BACK) {
+//            showToast(resources.getString(R.string.no_keycode_back))
+//            return false
+//        }
         return super.onKeyDown(keyCode, event)
     }
 
@@ -174,5 +181,29 @@ open class TimeOffAppCompatActivity : AppCompatActivity(), TextToSpeech.OnInitLi
         mToast?.cancel()
         mToast =
             Toast.makeText(applicationContext, charSequence, Toast.LENGTH_SHORT).apply { show() }
+    }
+
+    fun showSuccessToast(showText: String) {
+        ToastUtils.setBgColor(resources.getColor(R.color.green_primary))
+        ToastUtils.setMsgColor(resources.getColor(R.color.white))
+        ToastUtils.showLong(showText)
+    }
+
+    fun showErrorToast(showText: String) {
+        ToastUtils.setBgColor(resources.getColor(R.color.red_primary))
+        ToastUtils.setMsgColor(resources.getColor(R.color.white))
+        ToastUtils.showLong(showText)
+    }
+
+    fun showWarningToast(showText: String) {
+        ToastUtils.setBgColor(resources.getColor(R.color.md_yellow_900))
+        ToastUtils.setMsgColor(resources.getColor(R.color.white))
+        ToastUtils.showLong(showText)
+    }
+
+    fun showNormalToast(showText: String) {
+        ToastUtils.setBgColor(resources.getColor(R.color.colorPrimary))
+        ToastUtils.setMsgColor(resources.getColor(R.color.white))
+        ToastUtils.showLong(showText)
     }
 }

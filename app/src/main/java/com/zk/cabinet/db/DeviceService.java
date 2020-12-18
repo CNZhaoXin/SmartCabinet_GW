@@ -19,15 +19,26 @@ public class DeviceService extends BaseService<Device, Long> {
         return instance;
     }
 
-    public Device queryByDeviceName(String name) {
-        if (name == null) return null;
+    public Device queryByDeviceName(String deviceName) {
+        if (deviceName == null) return null;
 
-        List<Device> list = query(DeviceDao.Properties.DeviceName.eq(name));
+        List<Device> list = query(DeviceDao.Properties.DeviceName.eq(deviceName));
         Device dossierOperating = null;
         if (list != null && list.size() > 0) {
             dossierOperating = list.get(0);
         }
         return dossierOperating;
+    }
+
+    public Device queryByDeviceID(String deviceID) {
+        if (deviceID == null) return null;
+
+        List<Device> list = query(DeviceDao.Properties.DeviceId.eq(deviceID));
+        Device device = null;
+        if (list != null && list.size() > 0) {
+            device = list.get(0);
+        }
+        return device;
     }
 
 }

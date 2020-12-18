@@ -1,7 +1,15 @@
 <resources>
-    <string name="appName">国网库房管理系统</string>
-    <string name="contractor">智能权证柜应用系统</string>
-    <string name="project_title">智能权证柜应用系统</string>
+
+    <string name="appName">RFID智能档案管理系统</string>
+    <string name="title">欢迎使用RFID智能档案管理系统</string>
+    <string name="titleEng">Welcome to RFID smart file management system</string>
+
+    <!-- 北京智芯微电子科技有限公司RFID智能档案管理系统 -->
+    <!-- <string name="title">北京智芯微电子科技有限公司档案室</string> -->
+    <!-- <string name="titleEng">Beijing archives intellectual core microelectronics technology co., LTD</string>-->
+
+    <string name="ERROR_TOAST_NO_NETWORK">没有网络，请检查网络</string>
+    <string name="ERROR_TOAST_SEVER_ERROR">服务器请求错误</string>
 
     <!--常用按钮名称和提示 - start -->
     <string name="no_keycode_back">禁止使用回退键！</string>
@@ -126,29 +134,62 @@
     <string name="unit_address">单位地址</string>
     <!--本地参数- end-->
 
-    <!--服务参数- start-->
-    <string name="title_service_parameter">服务参数</string>
+
+    <!-- 设备类型配置 -->
+    <string name="device_type_change_title">是否切换设备类型?</string>
+    <string name="device_type_change_msg">注意：切换设备类型将清空所有配置数据</string>
+    <string name="device_type_change">设备类型切换</string>
+    <string name="device_type">设备类型</string>
+    <!--网络配置- start-->
+    <string name="title_service_parameter">网络配置</string>
+    <string name="web_api_service">WEB服务器配置</string>
+    <string name="this_machine_ip">本机固定IP配置</string>
+    <string name="title_web_api_service_ip">WEB服务器IP:</string>
+    <string name="title_web_api_service_port">WEB服务器端口:</string>
+    <string name="title_mqtt">MQTT服务器配置</string>
+    <string name="title_mqtt_ip">MQTT服务器IP:</string>
+    <string name="title_mqtt_port">MQTT服务器端口:</string>
+
     <string name="device_ethernet">设备以太网-外网（部分服务需设备重启生效）</string>
     <string name="device_internal_ethernet">设备以太网-内网（部分服务需设备重启生效）</string>
-    <string name="web_api_service">平台服务(webAPI)</string>
-    <string name="cabinet_service_port">柜体端口（保存配置后将重启App）</string>
     <string name="title_ip">IP地址：</string>
     <string name="title_subnet_mask">子网掩码：</string>
     <string name="title_gateway">网关：</string>
     <string name="title_dns">DNS：</string>
-    <string name="title_web_api_service_ip">平台服务IP：</string>
-    <string name="title_web_api_service_port">平台服务端口：</string>
+
     <string name="eth_0_caption_text">IP地址：%1$s 子网掩码：%2$s 网关：%3$s DNS：%4$s</string>
     <string name="eth_1_caption_text">IP地址：%1$s 子网掩码：%2$s</string>
     <string name="web_api_caption_text">%1$s:%2$d</string>
     <string name="cabinet_port_caption_text">%1$s</string>
     <!--服务参数- end-->
 
+    <!--  档案组架配置  -->
+    <string name="title_daj_setting">添加档案组架</string>
+    <string name="number_of_daj">档案组架数量：%1$s</string>
+    <string name="light_serial_setting">灯控串口配置</string>
+    <string name="light_serial_debug">灯控调试</string>
+    <!--  档案柜配置  -->
+    <string name="title_cabinet">档案柜配置</string>
+    <string name="number_of_boxes">添加档案柜</string>
+    <string name="cabinet_service_port">档案柜读写器服务端口配置</string>
+    <string name="number_of_boxes_caption_text">档案柜数量：%1$s</string>
+    <!--  一体机配置  -->
+    <string name="ytj_serial_setting">读写器串口配置</string>
+    <string name="ytj_serial_debug">读写器调试</string>
+    <!--  刷卡器配置  -->
+    <string name="skq_serial_setting">刷卡设备串口配置</string>
+    <string name="skq_serial_debug">刷卡设备调试</string>
+    <!--  人脸设备配置  -->
+    <string name="face_port">人脸设备服务端口配置</string>
+    <string name="face_debug">人脸设备调试</string>
+    <!-- 操作屏设备ID配置/一体机设备ID配置 -->
+    <string name="equipment_id_setting">操作屏设备ID配置</string>
+    <string name="equipment_id_ytj_setting">一体机设备ID配置</string>
+    <string name="equipment_id">操作屏设备ID</string>
+    <string name="equipment_id_ytj">一体机设备ID</string>
+
     <!--柜体参数- start-->
     <string name="title_cabinet_parameters">柜体参数</string>
-    <string name="title_cabinet">柜体配置</string>
-    <string name="number_of_boxes">柜体配置（保存配置后将重启App）</string>
-    <string name="number_of_boxes_caption_text">柜体数量：%1$s</string>
     <string name="title_cabinet_in_order">柜体排列顺序</string>
     <string name="cabinet_name">%1$s柜</string>
     <string name="not_closed_door_alarm_time">未关门报警时间</string>
@@ -157,11 +198,11 @@
     <string name="too_many_files_number">当卷宗数量超过%1$s本时,存取预览界面会文字提醒,并且在存取操作时语言提醒.</string>
     <!--柜体参数- end-->
 
-    <!--常规管理- start-->
-    <string name="title_routine_management">常规管理</string>
+    <!--其他配置- start-->
+    <string name="title_routine_management">其他配置</string>
     <string name="synchronised_time">自动同步周期（设备重启后生效）</string>
     <string name="synchronised_time_caption_text">每隔%1$s自动和服务同步数据</string>
-    <string name="countdown">自动返回主界面</string>
+    <string name="countdown">自动返回主界面时间配置</string>
     <string name="countdown_caption_text">无人操作%1$s后将自动返回主界面</string>
     <string name="date_and_time">日期和时间</string>
     <string name="automatic_restart">自动重启配置（设备重启后生效）</string>
@@ -204,10 +245,10 @@
     <string name="title_display_bar">Android系统设置</string>
     <string name="display_bar">点击进入Android系统设置界面</string>
     <string name="display_bar_prompt">警告！\n请不要在Android系统设置界面里卸载（删除）NewFileCabinet，一旦卸载（删除）设备将直接报废，需返厂维修！</string>
-    <string name="title_android_file_manager">文件管理器</string>
-    <string name="android_file_manager">点击进入文件管理器</string>
-    <string name="title_android_browser">浏览器</string>
-    <string name="android_browser">点击进入浏览器</string>
+    <string name="title_android_file_manager">Android文件管理器</string>
+    <string name="android_file_manager">点击进入Android文件管理器</string>
+    <string name="title_android_browser">Android浏览器</string>
+    <string name="android_browser">点击进入Android浏览器</string>
     <!--设置界面 - Android设置- end-->
 
     <!--设置界面 - 版本管理- start-->
@@ -250,7 +291,6 @@
     <string name="ping_count">Ping的次数:</string>
     <string name="ping_wait_time">ping超时时间:</string>
     <string name="ping_message">正在尝试Ping：%1$s</string>
-
 
     <string name="title_debug_storage_method">盘点日志存储方式</string>
     <string name="title_debug_storage_client">测试工具配置</string>
@@ -325,4 +365,6 @@
     <!--系统设置-->
 
     <string name="title_personnel_management">人员管理</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

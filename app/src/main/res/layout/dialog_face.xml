@@ -21,12 +21,20 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:text="『 人脸识别登录 』"
+            android:textColor="@color/white"
+            android:textSize="36sp" />
+
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/lottieAnimationView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            app:lottie_fileName="face4.json"
+            android:layout_width="400dp"
+            android:layout_height="400dp"
+            app:lottie_fileName="face2.json"
             app:lottie_loop="true" />
 
     </LinearLayout>

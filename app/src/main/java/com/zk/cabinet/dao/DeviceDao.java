@@ -27,6 +27,7 @@ public class DeviceDao extends AbstractDao<Device, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "ID");
         public final static Property DeviceId = new Property(1, String.class, "deviceId", false, "DeviceId");
         public final static Property DeviceName = new Property(2, String.class, "deviceName", false, "DeviceName");
+        public final static Property LightControlBoardId = new Property(3, String.class, "lightControlBoardId", false, "LightControlBoardId");
     }
 
 
@@ -44,7 +45,8 @@ public class DeviceDao extends AbstractDao<Device, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"Device\" (" + //
                 "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"DeviceId\" TEXT," + // 1: deviceId
-                "\"DeviceName\" TEXT);"); // 2: deviceName
+                "\"DeviceName\" TEXT," + // 2: deviceName
+                "\"LightControlBoardId\" TEXT);"); // 3: lightControlBoardId
     }
 
     /** Drops the underlying database table. */
@@ -71,6 +73,11 @@ public class DeviceDao extends AbstractDao<Device, Long> {
         if (deviceName != null) {
             stmt.bindString(3, deviceName);
         }
+ 
+        String lightControlBoardId = entity.getLightControlBoardId();
+        if (lightControlBoardId != null) {
+            stmt.bindString(4, lightControlBoardId);
+        }
     }
 
     @Override
@@ -91,6 +98,11 @@ public class DeviceDao extends AbstractDao<Device, Long> {
         if (deviceName != null) {
             stmt.bindString(3, deviceName);
         }
+ 
+        String lightControlBoardId = entity.getLightControlBoardId();
+        if (lightControlBoardId != null) {
+            stmt.bindString(4, lightControlBoardId);
+        }
     }
 
     @Override
@@ -103,7 +115,8 @@ public class DeviceDao extends AbstractDao<Device, Long> {
         Device entity = new Device( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // deviceId
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // deviceName
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // deviceName
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3) // lightControlBoardId
         );
         return entity;
     }
@@ -113,6 +126,7 @@ public class DeviceDao extends AbstractDao<Device, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setDeviceId(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setDeviceName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setLightControlBoardId(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
      }
     
     @Override

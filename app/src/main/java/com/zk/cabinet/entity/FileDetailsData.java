@@ -1,0 +1,144 @@
+package com.zk.cabinet.entity;
+
+import java.util.List;
+
+/**
+ * 档案详情实体
+ */
+public class FileDetailsData {
+
+/*
+        {                                                                  //每条档案信息
+            "cabinetId":"1231231231";                                       //档案柜id
+            "cabinetName":"档案柜名称";                                      //档案柜名称
+            "archivesId": "123123",                                          // 档案柜id
+                "borrowerDeptName": "XXX部门",                                   //借阅人部门名称
+                "borrowerName": "张三",                                          //借阅人姓名
+                "archivesName": "一颗积合作档案",                                //档案名称
+                "rfid": "123",                                                   //rfid
+                "rowNo": 1,                                                      //行号
+                "numNo": 2,                                                      //库位序号
+                "archivesStatus": 0                                             // 档案状态
+            "lampList": []   // 灯位列表
+        }
+*/
+
+    private String cabinetId;
+    private String cabinetName;
+    private String archivesId;
+    private String borrowerDeptName;
+    private String cabinetType;
+    private String borrowerName;
+    private String archivesName;
+    private String rfid;
+    private String masterName; // 操作屏名称
+    private int rowNo;
+    private int numNo;
+    private int archivesStatus;
+    private List<Integer> lampList;
+
+    public String getCabinetType() {
+        return cabinetType;
+    }
+
+    public void setCabinetType(String cabinetType) {
+        this.cabinetType = cabinetType;
+    }
+
+    public void setCabinetId(String cabinetId) {
+        this.cabinetId = cabinetId;
+    }
+
+    public String getCabinetId() {
+        return cabinetId;
+    }
+
+    public void setCabinetName(String cabinetName) {
+        this.cabinetName = cabinetName;
+    }
+
+    public String getCabinetName() {
+        return cabinetName;
+    }
+
+    public void setArchivesId(String archivesId) {
+        this.archivesId = archivesId;
+    }
+
+    public String getArchivesId() {
+        return archivesId;
+    }
+
+    public void setBorrowerDeptName(String borrowerDeptName) {
+        this.borrowerDeptName = borrowerDeptName;
+    }
+
+    public String getBorrowerDeptName() {
+        return borrowerDeptName;
+    }
+
+    public void setBorrowerName(String borrowerName) {
+        this.borrowerName = borrowerName;
+    }
+
+    public String getBorrowerName() {
+        return borrowerName;
+    }
+
+    public void setArchivesName(String archivesName) {
+        this.archivesName = archivesName;
+    }
+
+    public String getArchivesName() {
+        return archivesName;
+    }
+
+    public void setRfid(String rfid) {
+        this.rfid = rfid;
+    }
+
+    public String getRfid() {
+        return rfid;
+    }
+
+    public void setRowNo(int rowNo) {
+        this.rowNo = rowNo;
+    }
+
+    public int getRowNo() {
+        return rowNo;
+    }
+
+    public void setNumNo(int numNo) {
+        this.numNo = numNo;
+    }
+
+    public int getNumNo() {
+        return numNo;
+    }
+
+    public void setArchivesStatus(int archivesStatus) {
+        this.archivesStatus = archivesStatus;
+    }
+
+    public int getArchivesStatus() {
+        return archivesStatus;
+    }
+
+    public void setLampList(List<Integer> lampList) {
+        this.lampList = lampList;
+    }
+
+    public List<Integer> getLampList() {
+        return lampList;
+    }
+
+    public String getMasterName() {
+        return masterName;
+    }
+
+    public void setMasterName(String masterName) {
+        this.masterName = masterName;
+    }
+}
+
