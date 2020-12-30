@@ -437,8 +437,17 @@ class ZNGBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                                 entity.isSelect = true
                                 selectedList.add(entity)
                             } else {
-                                // 档案没有被扫描到,也不属于该层
+                                // 档案没有被扫描到,且该档案也本不属于该层
                             }
+                        }
+                    }
+
+                    // 假如这一层只有这一份待借阅档案, 然后还被拿出来,那么读写器上报的就是空的数据,什么都没有,这个时候就判定该档案被拿出了
+                    if (deviceScanHashSet.isEmpty()) {
+                        if (entity.cabinetEquipmentId == mDevice!!.deviceId && entity.rowNo == mFloor) {
+                            // 该层取出的待借阅档案
+                            entity.isSelect = true
+                            selectedList.add(entity)
                         }
                     }
                 }

@@ -101,7 +101,7 @@ class PDAInventoryFragment : BaseFragment(), View.OnClickListener {
         if (isInit) {
             // 初始化成功
             mBinding.btnStartInventory.isEnabled = true
-            mBinding.btnStartInventory.setBackgroundResource(R.drawable.selector_menu_orange)
+            mBinding.btnStartInventory.setBackgroundResource(R.drawable.selector_menu_orange_normal)
             // 初始化音频
             PDAUhfHelper.getInstance().initVoice(requireContext())
             // 设置读取回调监听器

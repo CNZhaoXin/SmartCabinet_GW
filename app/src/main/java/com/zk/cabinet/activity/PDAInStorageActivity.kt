@@ -19,9 +19,9 @@ import com.king.zxing.Intents
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
 import com.zk.cabinet.R
-import com.zk.cabinet.adapter.SearchDossierDetailsAdapter
+import com.zk.cabinet.adapter.SearchDossierByRfidAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
-import com.zk.cabinet.databinding.ActivityMoveStoragePdaBinding
+import com.zk.cabinet.databinding.ActivityInStoragePdaBinding
 import com.zk.cabinet.entity.RequestPostBind
 import com.zk.cabinet.entity.RequestPostBindData
 import com.zk.cabinet.entity.ResultGetArchivesInfoByRFID
@@ -40,24 +40,24 @@ private const val BIND_SUCCESS = 0x01
 private const val BIND_ERROR = 0x02
 
 /**
- * PDA-移库
+ * PDA-入库
  */
-class MoveStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener {
-    private lateinit var mBinding: ActivityMoveStoragePdaBinding
+class PDAInStorageActivity : TimeOffAppCompatActivity(), View.OnClickListener {
+    private lateinit var mBinding: ActivityInStoragePdaBinding
     private lateinit var mHandler: MyHandler
 
-    private lateinit var mDetailsAdapter: SearchDossierDetailsAdapter
+    private lateinit var mAdapter: SearchDossierByRfidAdapter
     private var queryFileList = ArrayList<SearchDossierDetailsData>()
 
     companion object {
         fun newIntent(packageContext: Context?): Intent {
-            return Intent(packageContext, MoveStoragePDAActivity::class.java)
+            return Intent(packageContext, PDAInStorageActivity::class.java)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_move_storage_pda)
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_in_storage_pda)
         mBinding.onClickListener = this
 
         mHandler = MyHandler(this)
@@ -74,8 +74,8 @@ class MoveStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener 
     }
 
     private fun initFileAdapter() {
-        mDetailsAdapter = SearchDossierDetailsAdapter(this, queryFileList)
-        mBinding.listView.adapter = mDetailsAdapter
+        mAdapter = SearchDossierByRfidAdapter(this, queryFileList)
+        mBinding.listView.adapter = mAdapter
     }
 
     /**
@@ -91,7 +91,7 @@ class MoveStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener 
             PDAUhfHelper.getInstance().initVoice(this)
             // 设置读取回调监听器
             PDAUhfHelper.getInstance().setReceiveListener(PDAUhfHelper.ReceiveListener {
-                // todo 根据EPC查询档案,如果是在库的档案就可以移库,如果是在库状态就能移库
+                // todo 根据EPC查询档案,如果是 待入库/异常状态 的档案就可以入库,如果是在库状态就能移库
                 showSuccessToast("EPC:$it")
                 getArchivesInfoByRFID(arrayOf(it))
             })
@@ -132,8 +132,8 @@ class MoveStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                 PDAUhfHelper.getInstance().startInventoryOne()
             }
 
-            // 移库提交
-            R.id.btn_move_storage -> {
+            // 入库提交
+            R.id.btn_in_storage -> {
                 postBind()
             }
         }
@@ -142,7 +142,7 @@ class MoveStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener 
     private lateinit var mProgressDialog: ProgressDialog
 
     /**
-     * Post 移库绑定(入库绑定)
+     * Post 入库绑定
      * 支持多条数据一起提交，每条数据格式：
      * 参数名 类型 描述
      * posRFID string 库位id
@@ -154,15 +154,15 @@ class MoveStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener 
             showWarningToast("请先扫描库位二维码")
             return
         } else if (queryFileList.size == 0) {
-            showWarningToast("请先扫描待移库的档案")
+            showWarningToast("请先扫描待入库/异常出库档案")
             return
         }
 
-        mProgressDialog.setMessage("正在移库...")
+        mProgressDialog.setMessage("正在入库...")
         mProgressDialog.show()
 
         val requestUrl = NetworkRequest.instance.mPosBind
-        LogUtils.e("移库绑定-请求URL:$requestUrl")
+        LogUtils.e("入库绑定-请求URL:$requestUrl")
 
         val requestPostBind = RequestPostBind()
         val requestPostBindList = ArrayList<RequestPostBindData>()
@@ -172,34 +172,34 @@ class MoveStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener 
             requestPostBindData.rfid = entity.rfid
             requestPostBindList.add(requestPostBindData)
         }
-        requestPostBind.bindType = "2" // 移库
+        requestPostBind.bindType = "1" // 入库
         requestPostBind.data = requestPostBindList
 
         val jsonObject = JSONObject(JSON.toJSONString(requestPostBind))
-        LogUtils.e("移库绑定-请求参数:" + JSON.toJSONString(requestPostBind))
-        LogUtils.e("移库绑定-请求参数:$jsonObject")
+        LogUtils.e("入库绑定-请求参数:" + JSON.toJSONString(requestPostBind))
+        LogUtils.e("入库绑定-请求参数:$jsonObject")
 
         val jsonObjectRequest = JsonObjectRequestWithHeader(
             Request.Method.POST, requestUrl, jsonObject,
             { response ->
-                LogUtils.e("移库绑定-请求结果:", "$response")
+                LogUtils.e("入库绑定-请求结果:", "$response")
                 try {
                     if (response != null) {
                         val code = response.getInt("code")
                         if (200 == code) {
-                            sendDelayMessage(BIND_SUCCESS, "移库绑定成功")
+                            sendDelayMessage(BIND_SUCCESS, "入库绑定成功")
                             queryFileList.clear()
-                            mDetailsAdapter.notifyDataSetChanged()
+                            mAdapter.notifyDataSetChanged()
                             mBinding.tvBarcode.text = ""
                         } else {
                             sendDelayMessage(BIND_ERROR, response.getString("msg"))
                         }
                     } else {
-                        sendDelayMessage(BIND_ERROR, "移库绑定-失败")
+                        sendDelayMessage(BIND_ERROR, "入库绑定-失败")
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
-                    sendDelayMessage(BIND_ERROR, "移库绑定-失败")
+                    sendDelayMessage(BIND_ERROR, "入库绑定-失败")
                 }
             },
             { error ->
@@ -295,9 +295,9 @@ class MoveStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                             val dataList = result.data
                             if (dataList != null && dataList.size > 0) {
                                 for (newEntity in dataList) {
-                                    // 在库状态的档案才能移库
+                                    // 待入库状态的档案才能入库
                                     // 档案状态:待入库0,在库10,借阅审批中50,待借阅100,待归还200,异常9000
-                                    if (newEntity.archivesStatus == 10) {
+                                    if (newEntity.archivesStatus == 0 || newEntity.archivesStatus == 9000) {
                                         if (queryFileList.size > 0) {
                                             var isExist = false
                                             for (oldEntity in queryFileList) {
@@ -314,8 +314,8 @@ class MoveStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                                     }
                                 }
 
-                                mDetailsAdapter.setList(queryFileList)
-                                mDetailsAdapter.notifyDataSetChanged()
+                                mAdapter.setList(queryFileList)
+                                mAdapter.notifyDataSetChanged()
                             } else {
                                 showWarningToast("未查询到档案信息")
                             }
@@ -370,7 +370,7 @@ class MoveStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener 
     }
 
 
-    private class MyHandler(activity: MoveStoragePDAActivity) : Handler() {
+    private class MyHandler(activity: PDAInStorageActivity) : Handler() {
         private val mainWeakReference = WeakReference(activity)
 
         override fun handleMessage(msg: Message) {

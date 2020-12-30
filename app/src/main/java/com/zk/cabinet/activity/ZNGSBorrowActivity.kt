@@ -302,7 +302,7 @@ class ZNGSBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLi
                 }
                 LogUtils.e(
                     "档案组柜待借阅-配置的读写器设备IDS:",
-                    JSON.toJSONString(deviceScanHashSet)
+                    JSON.toJSONString(deviceSettingHashSet)
                 )
 
                 // 针对被识别的某柜某层的标签数据的处理 1.是否被扫描到 2.是否是同一层 3.是否是同一个位置
@@ -379,7 +379,17 @@ class ZNGSBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLi
                             }
                         }
                     }
+
+                    // 假如这一层只有这一份待借阅档案, 然后还被拿出来,那么读写器上报的就是空的数据,什么都没有,这个时候就判定该档案被拿出了
+                    if (deviceScanHashSet.isEmpty()) {
+                        if (deviceSettingHashSet.contains(entity.cabinetEquipmentId) && entity.rowNo == mFloor) {
+                            // 该层取出的待借阅档案
+                            entity.isSelect = true
+                            selectedList.add(entity)
+                        }
+                    }
                 }
+
                 if (selectedList.size > 0) {
                     if (noSelectedList.size > 0) {
                         if (errorPositionList.size > 0) {

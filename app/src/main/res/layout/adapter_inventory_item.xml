@@ -16,7 +16,6 @@
         android:layout_gravity="center"
         android:ems="1"
         android:gravity="center"
-        android:letterSpacing="0.2"
         android:text="空 余"
         android:textColor="@color/black"
         android:textSize="15sp"

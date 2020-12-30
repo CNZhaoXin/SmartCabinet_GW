@@ -1,15 +1,12 @@
 package com.zk.cabinet.net
 
 import android.content.Context
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.hik.cabinet.net.VolleyRequest
 import com.zk.cabinet.helper.MQTTHelper
 import com.zk.cabinet.utils.SharedPreferencesUtil
 import com.zk.cabinet.utils.SharedPreferencesUtil.Key
 
 class NetworkRequest : VolleyRequest() {
-    private val mGson: Gson = GsonBuilder().create()
     lateinit var mMQTTUrl: String
 
     lateinit var mClientLogin: String
@@ -37,22 +34,9 @@ class NetworkRequest : VolleyRequest() {
     lateinit var mGetPosInfoByCabinetEquipmentId: String
     lateinit var mGetAllCodeType: String
 
-    lateinit var mWarehousingList: String
-    lateinit var mOutboundList: String
-    lateinit var mWarehousingSubmission: String
-    lateinit var mOutboundSubmission: String
-    lateinit var mInventoryRequest: String
-    lateinit var mInventoryReport: String
-    lateinit var mList: String
-
-
     companion object {
         // 阿里云外网测试服务器地址,设置为默认地址
         // http://118.25.102.226:11001/apiLogin
-        /*  private const val URL_HEAD = "http://"
-          private const val URL_COLON = ":"
-          private const val DEFAULT_URL = "118.25.102.226"
-          private const val DEFAULT_PORT = 11001*/
 
         // 外网测试MQTT地址,设置为默认地址
         // 地址：47.96.95.4  
@@ -60,14 +44,18 @@ class NetworkRequest : VolleyRequest() {
         // 用户名密码:test/test
         // 主题：pad
         // "tcp://" + "47.96.95.4" + ":1883"
-        /* private const val DEFAULT_MQTT_HEAD = "tcp://"
-         private const val DEFAULT_MQTT_IP = "47.96.95.4"
-         private const val DEFAULT_MQTT_COLON = ":"
-         private const val DEFAULT_MQTT_PORT = 1883
-         */
 
+/*        private const val URL_HEAD = "http://"
+        private const val URL_COLON = ":"
+        private const val DEFAULT_URL = "118.25.102.226"
+        private const val DEFAULT_PORT = 11001
 
-        // 国网智芯内网服务器地址,设置为默认地址
+        private const val DEFAULT_MQTT_HEAD = "tcp://"
+        private const val DEFAULT_MQTT_IP = "47.96.95.4"
+        private const val DEFAULT_MQTT_COLON = ":"
+        private const val DEFAULT_MQTT_PORT = 1883*/
+
+        // todo 国网智芯内网服务器地址,设置为默认地址
         // centos:7.6.1810
         // 10.238.211.2:11001     root ：123!@#qwe
         // redis密码：wbl20201117
@@ -77,10 +65,6 @@ class NetworkRequest : VolleyRequest() {
         // appKey: 29019157
         // appSecret: 5GPKANd87cMqtkWtzKxn
         // http://10.238.211.2:11001/apiLogin
-        private const val URL_HEAD = "http://"
-        private const val URL_COLON = ":"
-        private const val DEFAULT_URL = "10.238.211.2"
-        private const val DEFAULT_PORT = 11001
 
         // 国网智芯内网MQTT服务器地址,设置为默认地址
         // 地址：10.238.211.2
@@ -88,6 +72,12 @@ class NetworkRequest : VolleyRequest() {
         // 用户名密码:test/test
         // 主题：pad
         // "tcp://" + "10.238.211.2" + ":1883"
+
+        private const val URL_HEAD = "http://"
+        private const val URL_COLON = ":"
+        private const val DEFAULT_URL = "10.238.211.2"
+        private const val DEFAULT_PORT = 11001
+
         private const val DEFAULT_MQTT_HEAD = "tcp://"
         private const val DEFAULT_MQTT_IP = "10.238.211.2"
         private const val DEFAULT_MQTT_COLON = ":"
@@ -118,7 +108,6 @@ class NetworkRequest : VolleyRequest() {
         // 接口地址：  Post    /api/pad/lightUp
         // 平台收到请求后，通过MQTT下发亮灯指令；
         private const val lightUp = "/api/pad/lightUp"
-
 
         // 14.根据操作屏设备id获取操作屏及其档案柜信息
         // 接口地址：  get /api/pad/getCabineMasterByEquipmentId
@@ -174,14 +163,6 @@ class NetworkRequest : VolleyRequest() {
 
         // 获取档案类型
         private const val getAllCodeType = "/api/pad/getAllCodeType"
-
-        private const val WAREHOUSING = "/cabinet/godown/entry/page"
-        private const val OUTBOUND = "/cabinet/delivery/order/page"
-        private const val WAREHOUSING_SUBMISSION = "/cabinet/sku/store"
-        private const val OUTBOUND_SUBMISSION = "/cabinet/sku/out"
-        private const val INVENTORY_REQUEST = "/cabinet/inventory/order/page?cabCode="
-        private const val INVENTORY_REPORT = "/cabinet/inventory/order/add"
-        private const val LIST = "/cabinet/sku/list"
 
         val instance: NetworkRequest by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
             NetworkRequest()
@@ -259,16 +240,9 @@ class NetworkRequest : VolleyRequest() {
             URL_HEAD + url + URL_COLON + port + getCabineMasterByEquipmentId
         mGetCapital = URL_HEAD + url + URL_COLON + port + getCapital
         mGetAIOInfoByEquipmentId = URL_HEAD + url + URL_COLON + port + getAIOInfoByEquipmentId
-        mGetPosInfoByCabinetEquipmentId = URL_HEAD + url + URL_COLON + port + getPosInfoByCabinetEquipmentId
+        mGetPosInfoByCabinetEquipmentId =
+            URL_HEAD + url + URL_COLON + port + getPosInfoByCabinetEquipmentId
         mGetAllCodeType = URL_HEAD + url + URL_COLON + port + getAllCodeType
-
-        mWarehousingList = URL_HEAD + url + URL_COLON + port + WAREHOUSING
-        mOutboundList = URL_HEAD + url + URL_COLON + port + OUTBOUND
-        mWarehousingSubmission = URL_HEAD + url + URL_COLON + port + WAREHOUSING_SUBMISSION
-        mOutboundSubmission = URL_HEAD + url + URL_COLON + port + OUTBOUND_SUBMISSION
-        mInventoryRequest = URL_HEAD + url + URL_COLON + port + INVENTORY_REQUEST
-        mInventoryReport = URL_HEAD + url + URL_COLON + port + INVENTORY_REPORT
-        mList = URL_HEAD + url + URL_COLON + port + LIST
     }
 
     fun configModifyMQTT(mqttIP: String, mqttPort: Int) {

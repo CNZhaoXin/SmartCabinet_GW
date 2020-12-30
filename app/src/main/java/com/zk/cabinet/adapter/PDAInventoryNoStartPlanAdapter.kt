@@ -44,7 +44,7 @@ class PDAInventoryNoStartPlanAdapter(
         when (entity.inventoryType) {
             "1" -> {
                 viewHolder.tv_inventoryType.text = "自动盘库"
-                viewHolder.iv_arrow.visibility = View.INVISIBLE
+                viewHolder.iv_arrow.visibility = View.GONE
                 viewHolder.cardView.setCardBackgroundColor(mContext.resources.getColor(R.color.gray_light))
             }
             "2" -> {

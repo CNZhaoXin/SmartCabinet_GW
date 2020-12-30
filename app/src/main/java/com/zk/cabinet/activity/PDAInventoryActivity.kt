@@ -14,7 +14,7 @@ import com.zk.cabinet.R
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.databinding.ActivityPadInventoryBinding
 import com.zk.cabinet.fragment.PDADoneInventoryPlanFragment
-import com.zk.cabinet.fragment.PDAInventoryNoStartPlanFragment
+import com.zk.cabinet.fragment.PDANoInventoryPlanFragment
 import net.lucode.hackware.magicindicator.FragmentContainerHelper
 import net.lucode.hackware.magicindicator.MagicIndicator
 import net.lucode.hackware.magicindicator.buildins.commonnavigator.CommonNavigator
@@ -112,7 +112,7 @@ class PDAInventoryActivity : TimeOffAppCompatActivity(), View.OnClickListener {
 
     private fun initFragments() {
         // 盘库计划
-        val mPDAInventoryNoStartPlanFragment = PDAInventoryNoStartPlanFragment()
+        val mPDAInventoryNoStartPlanFragment = PDANoInventoryPlanFragment()
         mFragments.add(mPDAInventoryNoStartPlanFragment)
         // 盘库结果
         val mPDADoneInventoryPlanFragment = PDADoneInventoryPlanFragment()

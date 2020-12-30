@@ -1,7 +1,9 @@
 package com.zk.cabinet.fragment
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -26,10 +28,11 @@ import org.json.JSONException
 /**
  * PDA-待盘库计划
  */
-class PDAInventoryNoStartPlanFragment : BaseFragment(), View.OnClickListener,
+class PDANoInventoryPlanFragment : BaseFragment(), View.OnClickListener,
     AdapterView.OnItemClickListener {
 
     private lateinit var mBinding: FragmentPdaInventoryNoStartPlanBinding
+    private lateinit var mProgressDialog: ProgressDialog
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,13 +44,28 @@ class PDAInventoryNoStartPlanFragment : BaseFragment(), View.OnClickListener,
             container,
             false
         )
-
-        initAdapter()
-        mBinding.loadingView.smoothToShow()
-        getNoStartInventoryPlan()
         mBinding.onClickListener = this
         mBinding.onItemClickListener = this
+
+        initAdapter()
+
+        // 初始化Dialog
+        mProgressDialog = ProgressDialog(activity, R.style.mLoadingDialog)
+        mProgressDialog.setCancelable(false)
+
+        // 正在获取盘库计划列表
+        mProgressDialog.setMessage("正在获取盘库计划列表...")
+        mProgressDialog.show()
+        loadListHandler.postDelayed(loadListRunnable, 1000)
+
         return mBinding.root
+    }
+
+    private val loadListHandler = Handler()
+    private val loadListRunnable = Runnable {
+        run {
+            getNoStartInventoryPlan()
+        }
     }
 
     private lateinit var mAdapter: PDAInventoryNoStartPlanAdapter
@@ -87,25 +105,25 @@ class PDAInventoryNoStartPlanFragment : BaseFragment(), View.OnClickListener,
                                 mAdapter.setList(dataList)
                                 mAdapter.notifyDataSetChanged()
                                 mBinding.llNoData.visibility = GONE
-                                mBinding.loadingView.smoothToHide()
+                                mProgressDialog.dismiss()
                             } else {
                                 // 这里要设置一张无数据的空图片
                                 showWarningToast("暂无盘库计划信息")
                                 mBinding.llNoData.visibility = VISIBLE
-                                mBinding.loadingView.smoothToHide()
+                                mProgressDialog.dismiss()
                             }
                         } else {
                             showWarningToast(response.getString("msg"))
-                            mBinding.loadingView.smoothToHide()
+                            mProgressDialog.dismiss()
                         }
                     } else {
                         showWarningToast("获取未盘库的盘库计划信息-请求失败")
-                        mBinding.loadingView.smoothToHide()
+                        mProgressDialog.dismiss()
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
                     showErrorToast("获取未盘库的盘库计划信息-请求失败")
-                    mBinding.loadingView.smoothToHide()
+                    mProgressDialog.dismiss()
                 }
             },
             { error ->
@@ -119,7 +137,7 @@ class PDAInventoryNoStartPlanFragment : BaseFragment(), View.OnClickListener,
                         "errorCode: -1 VolleyError: 未知"
                     }
                 showErrorToast(msg)
-                mBinding.loadingView.smoothToHide()
+                mProgressDialog.dismiss()
             })
 
         jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
@@ -133,9 +151,10 @@ class PDAInventoryNoStartPlanFragment : BaseFragment(), View.OnClickListener,
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.ll_no_data -> {
-                mBinding.loadingView.smoothToShow()
-                mBinding.llNoData.visibility = GONE
-                getNoStartInventoryPlan()
+                mBinding.llNoData.visibility = View.GONE
+                mProgressDialog.setMessage("正在获取盘库计划列表...")
+                mProgressDialog.show()
+                loadListHandler.postDelayed(loadListRunnable, 1000)
             }
         }
     }
