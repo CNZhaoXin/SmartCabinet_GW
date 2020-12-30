@@ -8,15 +8,15 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 import com.zk.cabinet.R
-import com.zk.cabinet.entity.FileDetailsData
+import com.zk.cabinet.entity.SearchDossierDetailsData
 
-class FileDetailsAdapter(
+class SearchDossierDetailsAdapter(
     context: Context,
-    searchFileList: List<FileDetailsData>
+    searchSearchDossierList: List<SearchDossierDetailsData>
 ) :
     BaseAdapter() {
     private val mContext = context
-    private var mSearchFileList = searchFileList
+    private var mSearchFileList = searchSearchDossierList
     private val mLayoutInflater = LayoutInflater.from(context)
 
     @SuppressLint("SetTextI18n")
@@ -26,7 +26,9 @@ class FileDetailsAdapter(
         val entity = mSearchFileList[position]
         if (view == null) {
             view = mLayoutInflater.inflate(R.layout.adapter_file_item, null)
-            viewHolder = FileDetailsAdapter.ViewHolder(
+            viewHolder = SearchDossierDetailsAdapter.ViewHolder(
+                view.findViewById(R.id.tv_archivesCode),
+                view.findViewById(R.id.tv_archivesNo),
                 view.findViewById(R.id.tv_file_name),
                 view.findViewById(R.id.tv_status),
                 view.findViewById(R.id.tv_epc),
@@ -37,6 +39,10 @@ class FileDetailsAdapter(
             viewHolder = view.tag as ViewHolder
         }
 
+        // 档案编号（文号）
+        viewHolder.tv_archivesCode.text = entity.archivesCode
+        // 档案号
+        viewHolder.tv_archivesNo.text = entity.archivesNo
         // 档案名称
         viewHolder.tv_file_name.text = entity.archivesName
         // 档案状态 待入库0,在库10,借阅审批中50,待借阅100,待归还200,异常9000
@@ -95,13 +101,15 @@ class FileDetailsAdapter(
     }
 
     private class ViewHolder(
+        var tv_archivesCode: TextView,
+        var tv_archivesNo: TextView,
         var tv_file_name: TextView,
         var tv_status: TextView,
         var tv_epc: TextView,
         var tv_position: TextView,
     )
 
-    fun setList(searchFileList: List<FileDetailsData>) {
-        mSearchFileList = searchFileList
+    fun setList(searchSearchDossierList: List<SearchDossierDetailsData>) {
+        mSearchFileList = searchSearchDossierList
     }
 }

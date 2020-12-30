@@ -253,7 +253,8 @@
             android:layout_gravity="center"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="10dp"
-            android:src="@mipmap/ic_arrow_right" />
+            android:src="@mipmap/ic_arrow_right"
+            android:visibility="gone" />
 
     </LinearLayout>
 

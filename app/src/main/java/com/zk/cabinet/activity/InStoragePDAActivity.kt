@@ -19,13 +19,13 @@ import com.king.zxing.Intents
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
 import com.zk.cabinet.R
-import com.zk.cabinet.adapter.QueryFileByRfidAdapter
+import com.zk.cabinet.adapter.SearchDossierByRfidAdapter
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.databinding.ActivityInStoragePdaBinding
-import com.zk.cabinet.entity.FileDetailsData
 import com.zk.cabinet.entity.RequestPostBind
 import com.zk.cabinet.entity.RequestPostBindData
 import com.zk.cabinet.entity.ResultGetArchivesInfoByRFID
+import com.zk.cabinet.entity.SearchDossierDetailsData
 import com.zk.cabinet.net.JsonObjectRequestWithHeader
 import com.zk.cabinet.net.NetworkRequest
 import com.zk.cabinet.pdauhf.PDAUhfHelper
@@ -46,8 +46,8 @@ class InStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private lateinit var mBinding: ActivityInStoragePdaBinding
     private lateinit var mHandler: MyHandler
 
-    private lateinit var mAdapter: QueryFileByRfidAdapter
-    private var queryFileList = ArrayList<FileDetailsData>()
+    private lateinit var mAdapter: SearchDossierByRfidAdapter
+    private var queryFileList = ArrayList<SearchDossierDetailsData>()
 
     companion object {
         fun newIntent(packageContext: Context?): Intent {
@@ -74,7 +74,7 @@ class InStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     }
 
     private fun initFileAdapter() {
-        mAdapter = QueryFileByRfidAdapter(this, queryFileList)
+        mAdapter = SearchDossierByRfidAdapter(this, queryFileList)
         mBinding.listView.adapter = mAdapter
     }
 
@@ -91,7 +91,7 @@ class InStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener {
             PDAUhfHelper.getInstance().initVoice(this)
             // 设置读取回调监听器
             PDAUhfHelper.getInstance().setReceiveListener(PDAUhfHelper.ReceiveListener {
-                // todo 根据EPC查询档案,如果是待入库的档案就可以入库,如果是在库状态就能移库
+                // todo 根据EPC查询档案,如果是 待入库/异常状态 的档案就可以入库,如果是在库状态就能移库
                 showSuccessToast("EPC:$it")
                 getArchivesInfoByRFID(arrayOf(it))
             })
@@ -151,10 +151,10 @@ class InStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener {
     private fun postBind() {
         val posRFID = mBinding.tvBarcode.text.trim().toString()
         if (TextUtils.isEmpty(posRFID)) {
-            showWarningToast("请先扫描档案盒二维码")
+            showWarningToast("请先扫描库位二维码")
             return
         } else if (queryFileList.size == 0) {
-            showWarningToast("请先扫描待入库档案")
+            showWarningToast("请先扫描待入库/异常出库档案")
             return
         }
 
@@ -297,7 +297,7 @@ class InStoragePDAActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                                 for (newEntity in dataList) {
                                     // 待入库状态的档案才能入库
                                     // 档案状态:待入库0,在库10,借阅审批中50,待借阅100,待归还200,异常9000
-                                    if (newEntity.archivesStatus == 0) {
+                                    if (newEntity.archivesStatus == 0 || newEntity.archivesStatus == 9000) {
                                         if (queryFileList.size > 0) {
                                             var isExist = false
                                             for (oldEntity in queryFileList) {

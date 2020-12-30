@@ -34,6 +34,8 @@ class ZNGInventoryDossierDetailsAdapter(
             view = mLayoutInflater.inflate(R.layout.adapter_zng_inventory_dossier_details, null)
             viewHolder = ViewHolder(
                 view.findViewById(R.id.ll),
+                view.findViewById(R.id.tv_archivesCode),
+                view.findViewById(R.id.tv_archivesNo),
                 view.findViewById(R.id.tv_file_name),
                 view.findViewById(R.id.tv_status),
                 view.findViewById(R.id.tv_epc),
@@ -45,6 +47,10 @@ class ZNGInventoryDossierDetailsAdapter(
             viewHolder = view.tag as ViewHolder
         }
 
+        // 档案编号（文号）
+        viewHolder.tv_archivesCode.text = entity.archivesCode
+        // 档案号
+        viewHolder.tv_archivesNo.text = entity.archivesNo
         // 档案名称
         viewHolder.tv_file_name.text = entity.archivesName
         // 档案状态 待入库0,在库10,借阅审批中50,待借阅100,待归还200,异常9000
@@ -126,6 +132,8 @@ class ZNGInventoryDossierDetailsAdapter(
 
     private class ViewHolder(
         var ll: LinearLayout,
+        var tv_archivesCode: TextView,
+        var tv_archivesNo: TextView,
         var tv_file_name: TextView,
         var tv_status: TextView,
         var tv_epc: TextView,

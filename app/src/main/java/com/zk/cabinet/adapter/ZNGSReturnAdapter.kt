@@ -33,6 +33,8 @@ class ZNGSReturnAdapter(
             view = mLayoutInflater.inflate(R.layout.adapter_zngs_return, null)
             viewHolder = ZNGSReturnAdapter.ViewHolder(
                 view.findViewById(R.id.ll),
+                view.findViewById(R.id.tv_archivesCode),
+                view.findViewById(R.id.tv_archivesNo),
                 view.findViewById(R.id.tv_file_name),
                 view.findViewById(R.id.tv_status),
                 view.findViewById(R.id.tv_epc),
@@ -44,6 +46,10 @@ class ZNGSReturnAdapter(
             viewHolder = view.tag as ViewHolder
         }
 
+        // 档案编号（文号）
+        viewHolder.tv_archivesCode.text = entity.archivesCode
+        // 档案号
+        viewHolder.tv_archivesNo.text = entity.archivesNo
         // 档案名称
         viewHolder.tv_file_name.text = entity.archivesName
         // 档案状态 待入库0,在库10,归还审批中50,待归还100,待归还200,异常9000
@@ -144,6 +150,8 @@ class ZNGSReturnAdapter(
 
     private class ViewHolder(
         var ll: LinearLayout,
+        var tv_archivesCode: TextView,
+        var tv_archivesNo: TextView,
         var tv_file_name: TextView,
         var tv_status: TextView,
         var tv_epc: TextView,

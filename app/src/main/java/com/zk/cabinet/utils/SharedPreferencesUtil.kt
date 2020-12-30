@@ -141,6 +141,8 @@ class SharedPreferencesUtil {
         CanOperateCabinet,  // 登录人员可以操作的柜子
         CanOperateCabinetFloor,  // 登录人员可以操作的柜子+层数数据
 
+        HouseName, // 档案室名称
+
         DeviceIdTemp,
 
         DeviceCode,                //设备编号 String
@@ -162,6 +164,7 @@ class SharedPreferencesUtil {
         CabinetServicePort,        //柜体服务端口 Int
         FaceServicePort,        // 人脸设备服务端口 Int
         EquipmentId,        //  操作屏设备ID/一体机设备ID
+        TdmDeviceId,        //  操作屏设备ID/一体机设备ID
         InventoryDeviceId,        //  当前正在盘点的设备ID
 
         SoundSwitch,               //盘点结束后读出盘点的本数 bool

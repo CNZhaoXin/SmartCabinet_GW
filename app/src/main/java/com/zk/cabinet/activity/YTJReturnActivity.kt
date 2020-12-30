@@ -152,8 +152,8 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                                     }
                                 }
                                 if (curCabinetDossier.size > 0) {
-                                    showWarningToast("档案组架中共有「${curCabinetDossier.size}」份档案需归还")
-                                    speek("档案组架中共有${curCabinetDossier.size}份档案需归还")
+                                    showWarningToast("档案组架中有「${curCabinetDossier.size}」份档案需归还")
+                                    speek("档案组架中有${curCabinetDossier.size}份档案需归还")
                                 } else {
                                     showWarningToast("档案组架中暂无档案需归还")
                                     speek("档案组架中暂无档案需归还")
@@ -320,7 +320,7 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                 if (mList.size == 0) {
                     val message = Message.obtain()
                     message.what = FINISH_ACTIVITY
-                    mHandler.sendMessageDelayed(message, 5000)
+                    mHandler.sendMessageDelayed(message, 8000)
                 }
             }
             LIGHT_UP_ERROR -> {

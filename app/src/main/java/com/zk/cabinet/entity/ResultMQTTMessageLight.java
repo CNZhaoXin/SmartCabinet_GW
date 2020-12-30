@@ -8,12 +8,13 @@ import java.util.List;
 public class ResultMQTTMessageLight {
         /*{
         "msgType": "2",
-            "data": [{
-        "masterid": "1e2126706243406cb1dc02a390a785a9",
+            "data": [
+            {
+                 "masterid": "1e2126706243406cb1dc02a390a785a9",
                 "equipmentId": "20201126",
                 "name": "组架操作屏1(赵)",
                 "cabinetBeanList": [{
-            "equipmentId": "20201126-1",
+                "equipmentId": "20201126-1",
                     "id": "7f1f0af86c044381a23e1d1bdb658f61",
                     "attributeNo": "20201126-1",
                     "attributeName": "组架操作屏1(赵)-档案组架1",
@@ -21,7 +22,7 @@ public class ResultMQTTMessageLight {
                     "rowNum": 5,
                     "lampNum": 24,
                     "dataList": [{
-                "houseCode": null,
+                    "houseCode": null,
                         "houseName": null,
                         "cabinetId": "7f1f0af86c044381a23e1d1bdb658f61",
                         "attributeNo": null,

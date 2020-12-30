@@ -23,8 +23,8 @@ public class LightsSerialPortHelper {
 //    private InputStream mInputStream;
 //    private ReadThread mReadThread;
 
-    // todo 灯控板串口需要配置
-    // 本文档是锁孔主板与工控机通信接口规范说明，数据通信采用485方式通信，串口波特率19200、8位数据位、无校验，1位停止位。
+    // 灯控板串口需要配置
+    // 数据通信采用485方式通信，串口波特率19200、8位数据位、无校验，1位停止位。
     private String sPort = "/dev/ttyS2";
     private int iBaudRate = 19200;
     private OutputStream mOutputStream;
@@ -276,6 +276,50 @@ public class LightsSerialPortHelper {
         data[0] = (byte) 166; // A6 = 166
         data[1] = (byte) 168; // A8 = 168
         data[2] = (byte) deviceId;
+        data[3] = (byte) 0;
+        data[4] = (byte) 0;
+        data[5] = (byte) 9;
+        data[6] = (byte) 0;
+        data[7] = (byte) 1;
+        data[8] = (byte) 0; // status = 0 , 灭灯
+        data[9] = (byte) 0; // lightNum=0,大灯灯号
+        data[10] = calcCheckBit(data); // 计算校验位
+
+        LogUtils.e("档案组架-亮灯发送数据：", "数据长度:" + data.length, "byte数组原数据:", data, "byte数组转16进制数据:" + bytesToHex(data));
+        addSendTask(data);
+    }
+
+    /**
+     * 开档案组架组大灯
+     * 固定灯控板ID: 11
+     */
+    public void openGroupBigLight() {
+        byte[] data = new byte[11];
+        data[0] = (byte) 166; // A6 = 166
+        data[1] = (byte) 168; // A8 = 168
+        data[2] = (byte) 11;
+        data[3] = (byte) 0;
+        data[4] = (byte) 0;
+        data[5] = (byte) 9;
+        data[6] = (byte) 0;
+        data[7] = (byte) 1;
+        data[8] = (byte) 1; // status = 1 , 亮灯
+        data[9] = (byte) 0; // lightNum=0,大灯灯号
+        data[10] = calcCheckBit(data); // 计算校验位
+
+        LogUtils.e("档案组架-亮灯发送数据：", "数据长度:" + data.length, "byte数组原数据:", data, "byte数组转16进制数据:" + bytesToHex(data));
+        addSendTask(data);
+    }
+
+    /**
+     * 灭档案组架组大灯
+     * 固定灯控板ID: 11
+     */
+    public void closeGroupBigLight() {
+        byte[] data = new byte[11];
+        data[0] = (byte) 166; // A6 = 166
+        data[1] = (byte) 168; // A8 = 168
+        data[2] = (byte) 11;
         data[3] = (byte) 0;
         data[4] = (byte) 0;
         data[5] = (byte) 9;

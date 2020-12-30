@@ -106,7 +106,7 @@
             android:paddingTop="140dp"
             android:text="@string/title"
             android:textColor="@color/white"
-            android:textSize="50sp"
+            android:textSize="60sp"
             android:textStyle="bold"
             app:reflectionColor="@color/colorShimmer" />
 

@@ -49,13 +49,16 @@
 
         </LinearLayout>
 
+        <!-- 隐藏温湿度 -->
         <LinearLayout
+            android:id="@+id/ll_wsd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginTop="30dp"
             android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -136,8 +139,9 @@
             android:paddingTop="140dp"
             android:text="@string/title"
             android:textColor="@color/white"
-            android:textSize="50sp"
+            android:textSize="60sp"
             android:textStyle="bold"
+            android:visibility="gone"
             app:reflectionColor="@color/colorShimmer" />
 
         <com.romainpiel.shimmer.ShimmerTextView
@@ -150,14 +154,14 @@
             android:textColor="@color/white"
             android:textSize="28sp"
             android:textStyle="bold"
+            android:visibility="gone"
             app:reflectionColor="@color/colorShimmer" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/guide_cabinet_online_status_rv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/stv_english_title"
-            android:layout_marginTop="80dp"
+            android:layout_below="@id/ll_time"
             android:orientation="vertical"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -185,7 +189,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/stv_english_title"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="100dp" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_search"
@@ -193,7 +197,7 @@
             android:layout_height="60dp"
             android:layout_below="@id/pieChart"
             android:layout_marginLeft="250dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="30dp"
             android:layout_marginRight="250dp"
             android:background="@drawable/draw_conner_20"
             android:drawableLeft="@mipmap/ic_search_search"
@@ -205,6 +209,7 @@
             android:textSize="20sp" />
 
         <LinearLayout
+            android:id="@+id/ll_login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -281,6 +286,39 @@
                 android:layout_width="55dp"
                 android:layout_height="55dp"
                 android:src="@mipmap/ic_setting" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextClock
+                android:id="@+id/tc_hour_tdm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:format12Hour="aa hh : mm : ss"
+                android:format24Hour="HH:mm:ss"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="200sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <TextClock
+                android:id="@+id/tc_day_tdm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:format12Hour="yyyy年MM月dd EEEE"
+                android:format24Hour="yyyy年MM月dd EEEE"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="50sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
         </LinearLayout>
 

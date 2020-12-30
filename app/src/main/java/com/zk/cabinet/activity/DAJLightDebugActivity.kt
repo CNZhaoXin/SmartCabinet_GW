@@ -45,6 +45,16 @@ class DAJLightDebugActivity : TimeOffAppCompatActivity(), View.OnClickListener {
 
     override fun onClick(p0: View?) {
         when (p0?.id) {
+            // 档案组架亮组大灯
+            R.id.btn_open_group_big_light -> {
+                LightsSerialPortHelper.getInstance().openGroupBigLight()
+            }
+
+            // 档案组架灭组大灯
+            R.id.btn_close_group_big_light -> {
+                LightsSerialPortHelper.getInstance().closeGroupBigLight()
+            }
+
             R.id.btn_back -> {
                 finish()
             }

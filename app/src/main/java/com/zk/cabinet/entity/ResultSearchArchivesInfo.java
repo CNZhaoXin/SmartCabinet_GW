@@ -38,7 +38,7 @@ public class ResultSearchArchivesInfo {
 
     public class Data {
         private int total;
-        private ArrayList<FileDetailsData> rows;
+        private ArrayList<SearchDossierDetailsData> rows;
         private int code;
         private String msg;
 
@@ -50,11 +50,11 @@ public class ResultSearchArchivesInfo {
             return total;
         }
 
-        public void setRows(ArrayList<FileDetailsData> rows) {
+        public void setRows(ArrayList<SearchDossierDetailsData> rows) {
             this.rows = rows;
         }
 
-        public List<FileDetailsData> getRows() {
+        public List<SearchDossierDetailsData> getRows() {
             return rows;
         }
 

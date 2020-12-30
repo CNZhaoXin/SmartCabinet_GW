@@ -141,7 +141,7 @@
                 android:gravity="center"
                 android:onClick="@{onClickListener}"
                 android:padding="30dp"
-                android:text="第二步：扫描档案盒二维码"
+                android:text="第二步：扫描库位二维码"
                 android:textColor="@color/white"
                 android:textSize="30sp"
                 android:textStyle="bold" />

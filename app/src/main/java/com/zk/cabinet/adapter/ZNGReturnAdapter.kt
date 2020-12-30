@@ -33,6 +33,8 @@ class ZNGReturnAdapter(
             view = mLayoutInflater.inflate(R.layout.adapter_zng_return, null)
             viewHolder = ZNGReturnAdapter.ViewHolder(
                 view.findViewById(R.id.ll),
+                view.findViewById(R.id.tv_archivesCode),
+                view.findViewById(R.id.tv_archivesNo),
                 view.findViewById(R.id.tv_file_name),
                 view.findViewById(R.id.tv_status),
                 view.findViewById(R.id.tv_epc),
@@ -44,6 +46,10 @@ class ZNGReturnAdapter(
             viewHolder = view.tag as ViewHolder
         }
 
+        // 档案编号（文号）
+        viewHolder.tv_archivesCode.text = entity.archivesCode
+        // 档案号
+        viewHolder.tv_archivesNo.text = entity.archivesNo
         // 档案名称
         viewHolder.tv_file_name.text = entity.archivesName
         // 档案状态 待入库0,在库10,借阅审批中50,待借阅100,待归还200,异常9000
@@ -87,7 +93,8 @@ class ZNGReturnAdapter(
             viewHolder.iv_checked.visibility = View.GONE
             viewHolder.ll.setBackgroundColor(mContext.resources.getColor(R.color.color_list_unable))
             viewHolder.tv_position.setTextColor(mContext.resources.getColor(R.color.red_primary))
-            viewHolder.tv_position.text = "该档案需前往「 ${entity.houseName}-${entity.masterName} 」操作屏登录归还"
+            viewHolder.tv_position.text =
+                "该档案需前往「 ${entity.houseName}-${entity.masterName} 」操作屏登录归还"
         } else if ("3" == cabinetType) {
             // 待归还的档案是档案单柜的档案,且属于当前柜档案,才可以操作
             // 获取档案单柜配置的读写器设备
@@ -108,7 +115,8 @@ class ZNGReturnAdapter(
                 viewHolder.iv_checked.visibility = View.GONE
                 viewHolder.ll.setBackgroundColor(mContext.resources.getColor(R.color.color_list_unable))
                 viewHolder.tv_position.setTextColor(mContext.resources.getColor(R.color.red_primary))
-                viewHolder.tv_position.text = "该档案需前往「 ${entity.houseName}-${entity.cabinetName} 」操作屏登录归还"
+                viewHolder.tv_position.text =
+                    "该档案需前往「 ${entity.houseName}-${entity.cabinetName} 」操作屏登录归还"
             }
         }
 
@@ -135,6 +143,8 @@ class ZNGReturnAdapter(
 
     private class ViewHolder(
         var ll: LinearLayout,
+        var tv_archivesCode: TextView,
+        var tv_archivesNo: TextView,
         var tv_file_name: TextView,
         var tv_status: TextView,
         var tv_epc: TextView,

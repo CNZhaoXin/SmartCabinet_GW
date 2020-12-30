@@ -12,6 +12,7 @@ import com.zk.cabinet.bean.Cabinet;
 import com.zk.cabinet.bean.Device;
 import com.zk.cabinet.bean.Dossier;
 import com.zk.cabinet.bean.DossierOperating;
+import com.zk.cabinet.bean.InventoryPlanRecord;
 import com.zk.cabinet.bean.LightControlRecord;
 import com.zk.cabinet.bean.User;
 
@@ -19,6 +20,7 @@ import com.zk.cabinet.dao.CabinetDao;
 import com.zk.cabinet.dao.DeviceDao;
 import com.zk.cabinet.dao.DossierDao;
 import com.zk.cabinet.dao.DossierOperatingDao;
+import com.zk.cabinet.dao.InventoryPlanRecordDao;
 import com.zk.cabinet.dao.LightControlRecordDao;
 import com.zk.cabinet.dao.UserDao;
 
@@ -35,6 +37,7 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig deviceDaoConfig;
     private final DaoConfig dossierDaoConfig;
     private final DaoConfig dossierOperatingDaoConfig;
+    private final DaoConfig inventoryPlanRecordDaoConfig;
     private final DaoConfig lightControlRecordDaoConfig;
     private final DaoConfig userDaoConfig;
 
@@ -42,6 +45,7 @@ public class DaoSession extends AbstractDaoSession {
     private final DeviceDao deviceDao;
     private final DossierDao dossierDao;
     private final DossierOperatingDao dossierOperatingDao;
+    private final InventoryPlanRecordDao inventoryPlanRecordDao;
     private final LightControlRecordDao lightControlRecordDao;
     private final UserDao userDao;
 
@@ -61,6 +65,9 @@ public class DaoSession extends AbstractDaoSession {
         dossierOperatingDaoConfig = daoConfigMap.get(DossierOperatingDao.class).clone();
         dossierOperatingDaoConfig.initIdentityScope(type);
 
+        inventoryPlanRecordDaoConfig = daoConfigMap.get(InventoryPlanRecordDao.class).clone();
+        inventoryPlanRecordDaoConfig.initIdentityScope(type);
+
         lightControlRecordDaoConfig = daoConfigMap.get(LightControlRecordDao.class).clone();
         lightControlRecordDaoConfig.initIdentityScope(type);
 
@@ -71,6 +78,7 @@ public class DaoSession extends AbstractDaoSession {
         deviceDao = new DeviceDao(deviceDaoConfig, this);
         dossierDao = new DossierDao(dossierDaoConfig, this);
         dossierOperatingDao = new DossierOperatingDao(dossierOperatingDaoConfig, this);
+        inventoryPlanRecordDao = new InventoryPlanRecordDao(inventoryPlanRecordDaoConfig, this);
         lightControlRecordDao = new LightControlRecordDao(lightControlRecordDaoConfig, this);
         userDao = new UserDao(userDaoConfig, this);
 
@@ -78,6 +86,7 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(Device.class, deviceDao);
         registerDao(Dossier.class, dossierDao);
         registerDao(DossierOperating.class, dossierOperatingDao);
+        registerDao(InventoryPlanRecord.class, inventoryPlanRecordDao);
         registerDao(LightControlRecord.class, lightControlRecordDao);
         registerDao(User.class, userDao);
     }
@@ -87,6 +96,7 @@ public class DaoSession extends AbstractDaoSession {
         deviceDaoConfig.clearIdentityScope();
         dossierDaoConfig.clearIdentityScope();
         dossierOperatingDaoConfig.clearIdentityScope();
+        inventoryPlanRecordDaoConfig.clearIdentityScope();
         lightControlRecordDaoConfig.clearIdentityScope();
         userDaoConfig.clearIdentityScope();
     }
@@ -105,6 +115,10 @@ public class DaoSession extends AbstractDaoSession {
 
     public DossierOperatingDao getDossierOperatingDao() {
         return dossierOperatingDao;
+    }
+
+    public InventoryPlanRecordDao getInventoryPlanRecordDao() {
+        return inventoryPlanRecordDao;
     }
 
     public LightControlRecordDao getLightControlRecordDao() {

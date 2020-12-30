@@ -193,6 +193,10 @@
             android:name=".activity.ZNGSReturnActivity"
             android:label="档案组柜-归还"
             android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.DAGLightDebugActivity"
+            android:label="档案组柜-组大灯灯控调试"
+            android:theme="@style/NoActionBarAppTheme" />
         <!-- 档案组架 -->
         <activity
             android:name=".activity.DAJSettingActivity"
@@ -227,6 +231,12 @@
             android:theme="@style/NoActionBarAppTheme" />
 
         <activity
+            android:name=".activity.TDMErrorOutStorageActivity"
+            android:label="通道门/异常档案出库界面"
+            android:launchMode="singleInstance"
+            android:theme="@style/NoActionBarAppTheme" />
+
+        <activity
             android:name=".activity.DeviceSelectActivity"
             android:label="@string/appName"
             android:screenOrientation="portrait"
@@ -237,7 +247,7 @@
 
                 <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.HOME" />
+                <!--                <category android:name="android.intent.category.HOME" />-->
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
@@ -259,8 +269,8 @@
             android:value="1280" />
 
         <!-- Mqtt Service -->
-<!--        android:enabled="true"-->
-<!--        android:exported="true"-->
+        <!--        android:enabled="true"-->
+        <!--        android:exported="true"-->
         <service android:name="org.eclipse.paho.android.service.MqttService" />
 
     </application>

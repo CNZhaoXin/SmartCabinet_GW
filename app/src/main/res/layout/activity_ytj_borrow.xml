@@ -257,7 +257,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="50dp"
-                    android:background="@drawable/selector_menu_blue"
+                    android:background="@drawable/selector_menu_blue_normal"
                     android:drawableLeft="@mipmap/ic_light"
                     android:drawablePadding="20dp"
                     android:gravity="center"

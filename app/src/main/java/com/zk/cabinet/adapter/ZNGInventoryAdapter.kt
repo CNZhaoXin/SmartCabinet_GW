@@ -85,8 +85,29 @@ class ZNGInventoryAdapter(
                 // 有库位数据的正常显示
                 holder.tv_describe.text =
                     "存 ${archivesList.size} 在 ${isInStockedList.size + isNoInStockedList.size}"
-                holder.contentView.setBackgroundDrawable(mContext.resources.getDrawable(R.drawable.shape_line_white))
-                holder.tv_describe.setTextColor(mContext.resources.getColor(R.color.md_teal_A400))
+
+                // 档案都在库位的话显示绿色
+                if (archivesList.size == isInStockedList.size + isNoInStockedList.size) {
+                    holder.contentView.setBackgroundDrawable(mContext.resources.getDrawable(R.drawable.shape_line_green))
+                    holder.tv_describe.setTextColor(mContext.resources.getColor(R.color.white))
+                } else { // 有当前不在库位的档案显示黄色，不在库位的档案状态是异常状态，需显示红色
+                    var isHasYCDossier = false
+                    for (entity in archivesList) {
+                        if (entity.archivesStatus == 9000) {
+                            isHasYCDossier = true
+                            break
+                        }
+                    }
+
+                    if (isHasYCDossier) {
+                        holder.contentView.setBackgroundDrawable(mContext.resources.getDrawable(R.drawable.shape_line_red))
+                        holder.tv_describe.setTextColor(mContext.resources.getColor(R.color.white))
+                    } else {
+                        holder.contentView.setBackgroundDrawable(mContext.resources.getDrawable(R.drawable.shape_line_yellow))
+                        holder.tv_describe.setTextColor(mContext.resources.getColor(R.color.white))
+                    }
+
+                }
             }
 
         } else {

@@ -1,12 +1,14 @@
 <resources>
 
-    <string name="appName">RFID智能档案管理系统</string>
-    <string name="title">欢迎使用RFID智能档案管理系统</string>
-    <string name="titleEng">Welcome to RFID smart file management system</string>
-
-    <!-- 北京智芯微电子科技有限公司RFID智能档案管理系统 -->
+    <!-- <string name="appName">RFID智能档案管理系统</string>-->
+    <!-- <string name="title">欢迎使用RFID智能档案管理系统</string>-->
+    <!-- <string name="titleEng">Welcome to RFID smart file management system</string>-->
     <!-- <string name="title">北京智芯微电子科技有限公司档案室</string> -->
     <!-- <string name="titleEng">Beijing archives intellectual core microelectronics technology co., LTD</string>-->
+
+    <string name="appName">智芯RFID智能档案管理系统</string>
+    <string name="title">智芯RFID智能档案管理系统</string>
+    <string name="titleEng">SMART CHIP ARCHIVES MANAGEMENT SYSTEM</string>
 
     <string name="ERROR_TOAST_NO_NETWORK">没有网络，请检查网络</string>
     <string name="ERROR_TOAST_SEVER_ERROR">服务器请求错误</string>
@@ -49,6 +51,8 @@
     <string name="admin_login">其他方式登录</string>
     <string name="login_by_pwd">密码登录</string>
     <string name="login_by_fingerprint">指纹登录</string>
+
+    <string name="password_admin">请输入管理员密码</string>
 
     <string name="account">账  号：</string>
     <string name="password">密  码：</string>
@@ -171,8 +175,11 @@
     <!--  档案柜配置  -->
     <string name="title_cabinet">档案柜配置</string>
     <string name="number_of_boxes">添加档案柜</string>
+    <string name="light_serial_setting_zg">组大灯灯控串口配置</string>
+    <string name="light_serial_debug_zg">组大灯灯控调试</string>
     <string name="cabinet_service_port">档案柜读写器服务端口配置</string>
     <string name="number_of_boxes_caption_text">档案柜数量：%1$s</string>
+    <string name="open_door">打开柜门</string>
     <!--  一体机配置  -->
     <string name="ytj_serial_setting">读写器串口配置</string>
     <string name="ytj_serial_debug">读写器调试</string>
@@ -187,6 +194,9 @@
     <string name="equipment_id_ytj_setting">一体机设备ID配置</string>
     <string name="equipment_id">操作屏设备ID</string>
     <string name="equipment_id_ytj">一体机设备ID</string>
+    <!-- 通道门设备配置 -->
+    <string name="tdm_device_id_setting">读写器设备ID配置</string>
+    <string name="tdm_device_id">通道门读写器设备ID</string>
 
     <!--柜体参数- start-->
     <string name="title_cabinet_parameters">柜体参数</string>

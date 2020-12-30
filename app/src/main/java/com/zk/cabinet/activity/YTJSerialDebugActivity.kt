@@ -31,7 +31,7 @@ class YTJSerialDebugActivity : TimeOffAppCompatActivity(), AdapterView.OnItemCli
     View.OnClickListener {
     private lateinit var mBinding: ActivityYtjSerialDebugBinding
     private lateinit var mHandler: MyHandler
-    private lateinit var labelInfo: LabelInfo
+    private var labelInfo = LabelInfo()
 
     companion object {
         private const val DEVICE_REGISTERED = 0x01

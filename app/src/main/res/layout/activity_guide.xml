@@ -49,13 +49,16 @@
 
         </LinearLayout>
 
+        <!-- 隐藏温湿度 -->
         <LinearLayout
+            android:id="@+id/ll_wsd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginTop="30dp"
             android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -136,7 +139,7 @@
             android:paddingTop="170dp"
             android:text="@string/title"
             android:textColor="@color/white"
-            android:textSize="58sp"
+            android:textSize="65sp"
             android:textStyle="bold"
             app:reflectionColor="@color/colorShimmer" />
 
@@ -150,6 +153,7 @@
             android:textColor="@color/white"
             android:textSize="34sp"
             android:textStyle="bold"
+            android:visibility="visible"
             app:reflectionColor="@color/colorShimmer" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -161,24 +165,6 @@
             android:orientation="vertical"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_house"
-            android:layout_width="wrap_content"
-            android:layout_height="70dp"
-            android:layout_below="@id/stv_english_title"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/draw_conner_20"
-            android:drawableRight="@mipmap/ic_arrow_right_small"
-            android:drawablePadding="5dp"
-            android:gravity="center_vertical"
-            android:onClick="@{onClickListener}"
-            android:paddingLeft="20dp"
-            android:text=""
-            android:textSize="24sp"
-            android:visibility="gone" />
-
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/pieChart"
             android:layout_width="match_parent"
@@ -188,10 +174,27 @@
             android:layout_marginTop="50dp" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_house"
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:layout_below="@id/pieChart"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/draw_conner_20"
+            android:drawableRight="@mipmap/ic_arrow_right_small"
+            android:drawablePadding="5dp"
+            android:gravity="center_vertical"
+            android:onClick="@{onClickListener}"
+            android:paddingLeft="20dp"
+            android:text="选择档案室"
+            android:textSize="30sp"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_search"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:layout_below="@id/pieChart"
+            android:layout_below="@id/tv_house"
             android:layout_marginLeft="250dp"
             android:layout_marginTop="50dp"
             android:layout_marginRight="250dp"
@@ -205,6 +208,7 @@
             android:textSize="20sp" />
 
         <LinearLayout
+            android:id="@+id/ll_login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -278,6 +282,39 @@
                 android:layout_width="55dp"
                 android:layout_height="55dp"
                 android:src="@mipmap/ic_setting" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextClock
+                android:id="@+id/tc_hour_tdm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:format12Hour="aa hh : mm : ss"
+                android:format24Hour="HH:mm:ss"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="200sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <TextClock
+                android:id="@+id/tc_day_tdm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:format12Hour="yyyy年MM月dd EEEE"
+                android:format24Hour="yyyy年MM月dd EEEE"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="50sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
         </LinearLayout>
 

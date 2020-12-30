@@ -152,8 +152,8 @@ class YTJBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                                     }
                                 }
                                 if (curCabinetDossier.size > 0) {
-                                    showWarningToast("档案组架中共有「${curCabinetDossier.size}」份档案可借阅")
-                                    speek("档案组架中共有${curCabinetDossier.size}份档案可借阅")
+                                    showWarningToast("档案组架中有「${curCabinetDossier.size}」份档案可借阅")
+                                    speek("档案组架中有${curCabinetDossier.size}份档案可借阅")
                                 } else {
                                     showWarningToast("档案组架中暂无档案可借阅")
                                     speek("档案组架中暂无档案可借阅")

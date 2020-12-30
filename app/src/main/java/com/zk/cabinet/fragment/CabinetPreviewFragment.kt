@@ -430,7 +430,7 @@ class CabinetPreviewFragment : BaseFragment(), View.OnClickListener {
                                                 mArchivesList
                                             )
                                         } else {
-                                            showWarningToast("『 ${mCabinetList[position].rowNo}层${mCabinetList[position].numNo} 』号库位暂无档案存入")
+                                            showWarningToast("『 ${mCabinetList[position].rowNo}层${mCabinetList[position].numNo}号 』库位暂无档案存入")
                                             speek("${mCabinetList[position].rowNo}层${mCabinetList[position].numNo}号库位暂无档案存入")
                                         }
                                     }

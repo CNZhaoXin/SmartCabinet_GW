@@ -659,6 +659,22 @@ class ZNGSReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLi
                 val allRecords = LightControlRecordService.getInstance().loadAll()
                 if (allRecords != null && allRecords.size > 0) {
                     LogUtils.e("档案组柜-归还-亮灯记录:", allRecords.size, JSON.toJSONString(allRecords))
+                    // todo 档案组柜亮组大灯，拿第一个组柜进行亮组大灯，因为第一个组柜是接的组大灯
+                    val devices = DeviceService.getInstance().loadAll()
+                    if (devices != null && devices.size > 0) {
+                        val device = devices[0]
+                        // 亮组大灯（发送6层3号灯就是亮组大灯）
+                        val lights = java.util.ArrayList<Int>()
+                        lights.add(3)
+                        UR880Entrance.getInstance().send(
+                            UR880SendInfo.Builder().turnOnLight(device.deviceId, 6, lights)
+                                .build()
+                        )
+                        LogUtils.e(
+                            "档案组柜-归还-亮组大灯-该档案组柜配置的第一个柜子设备ID",
+                            device.deviceId
+                        )
+                    }
                 } else {
                     LogUtils.e("档案组柜-归还-亮灯记录: null")
                 }
@@ -828,6 +844,23 @@ class ZNGSReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLi
                     LightControlRecordService.getInstance().update(lightRecord)
                 }
             }
+
+            // todo 档案组柜灭组大灯，拿第一个组柜进行灭组大灯，因为第一个组柜是接的组大灯
+            val devices = DeviceService.getInstance().loadAll()
+            if (devices != null && devices.size > 0) {
+                val device = devices[0]
+                // 灭组大灯（发送6层2号灯就是全灭当前柜子所有灯）
+                val lights = java.util.ArrayList<Int>()
+                lights.add(2)
+                UR880Entrance.getInstance().send(
+                    UR880SendInfo.Builder().turnOnLight(device.deviceId, 6, lights).build()
+                )
+                LogUtils.e(
+                    "档案组柜-归还-灭组大灯-该档案组柜配置的第一个柜子设备ID",
+                    device.deviceId
+                )
+            }
+
         }
 
         // 亮灯记录打印

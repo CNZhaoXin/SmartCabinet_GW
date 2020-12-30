@@ -35,6 +35,7 @@ class NetworkRequest : VolleyRequest() {
     lateinit var mGetCapital: String
     lateinit var mGetAIOInfoByEquipmentId: String
     lateinit var mGetPosInfoByCabinetEquipmentId: String
+    lateinit var mGetAllCodeType: String
 
     lateinit var mWarehousingList: String
     lateinit var mOutboundList: String
@@ -46,24 +47,49 @@ class NetworkRequest : VolleyRequest() {
 
 
     companion object {
-        // 外网测试服务器地址,设置为默认地址
+        // 阿里云外网测试服务器地址,设置为默认地址
         // http://118.25.102.226:11001/apiLogin
-        // private const val DEFAULT_URL = "127.0.0.1"
-        // private const val DEFAULT_PORT = 7777
-        private const val URL_HEAD = "http://"
-        private const val URL_COLON = ":"
-        private const val DEFAULT_URL = "118.25.102.226"
-        private const val DEFAULT_PORT = 11001
+        /*  private const val URL_HEAD = "http://"
+          private const val URL_COLON = ":"
+          private const val DEFAULT_URL = "118.25.102.226"
+          private const val DEFAULT_PORT = 11001*/
 
         // 外网测试MQTT地址,设置为默认地址
-        // 外网测试MQTT地址:
         // 地址：47.96.95.4  
         // 端口：1883
         // 用户名密码:test/test
         // 主题：pad
         // "tcp://" + "47.96.95.4" + ":1883"
+        /* private const val DEFAULT_MQTT_HEAD = "tcp://"
+         private const val DEFAULT_MQTT_IP = "47.96.95.4"
+         private const val DEFAULT_MQTT_COLON = ":"
+         private const val DEFAULT_MQTT_PORT = 1883
+         */
+
+
+        // 国网智芯内网服务器地址,设置为默认地址
+        // centos:7.6.1810
+        // 10.238.211.2:11001     root ：123!@#qwe
+        // redis密码：wbl20201117
+        // mysql密码：wbl2020@123
+        // 安防ak/sk:
+        // host: 10.238.211.1
+        // appKey: 29019157
+        // appSecret: 5GPKANd87cMqtkWtzKxn
+        // http://10.238.211.2:11001/apiLogin
+        private const val URL_HEAD = "http://"
+        private const val URL_COLON = ":"
+        private const val DEFAULT_URL = "10.238.211.2"
+        private const val DEFAULT_PORT = 11001
+
+        // 国网智芯内网MQTT服务器地址,设置为默认地址
+        // 地址：10.238.211.2
+        // 端口：1883
+        // 用户名密码:test/test
+        // 主题：pad
+        // "tcp://" + "10.238.211.2" + ":1883"
         private const val DEFAULT_MQTT_HEAD = "tcp://"
-        private const val DEFAULT_MQTT_IP = "47.96.95.4"
+        private const val DEFAULT_MQTT_IP = "10.238.211.2"
         private const val DEFAULT_MQTT_COLON = ":"
         private const val DEFAULT_MQTT_PORT = 1883
 
@@ -145,6 +171,9 @@ class NetworkRequest : VolleyRequest() {
 
         // 获取当前版本信息
         private const val getLastInfo = "/busi/otherAppupdate/getLastInfo"
+
+        // 获取档案类型
+        private const val getAllCodeType = "/api/pad/getAllCodeType"
 
         private const val WAREHOUSING = "/cabinet/godown/entry/page"
         private const val OUTBOUND = "/cabinet/delivery/order/page"
@@ -230,8 +259,8 @@ class NetworkRequest : VolleyRequest() {
             URL_HEAD + url + URL_COLON + port + getCabineMasterByEquipmentId
         mGetCapital = URL_HEAD + url + URL_COLON + port + getCapital
         mGetAIOInfoByEquipmentId = URL_HEAD + url + URL_COLON + port + getAIOInfoByEquipmentId
-        mGetPosInfoByCabinetEquipmentId =
-            URL_HEAD + url + URL_COLON + port + getPosInfoByCabinetEquipmentId
+        mGetPosInfoByCabinetEquipmentId = URL_HEAD + url + URL_COLON + port + getPosInfoByCabinetEquipmentId
+        mGetAllCodeType = URL_HEAD + url + URL_COLON + port + getAllCodeType
 
         mWarehousingList = URL_HEAD + url + URL_COLON + port + WAREHOUSING
         mOutboundList = URL_HEAD + url + URL_COLON + port + OUTBOUND

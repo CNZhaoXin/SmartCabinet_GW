@@ -5,13 +5,13 @@ import java.util.List;
 /**
  * 档案详情实体
  */
-public class FileDetailsData {
+public class SearchDossierDetailsData {
 
 /*
         {                                                                  //每条档案信息
             "cabinetId":"1231231231";                                       //档案柜id
             "cabinetName":"档案柜名称";                                      //档案柜名称
-            "archivesId": "123123",                                          // 档案柜id
+            "archivesId": "123123",                                          // 档案id
                 "borrowerDeptName": "XXX部门",                                   //借阅人部门名称
                 "borrowerName": "张三",                                          //借阅人姓名
                 "archivesName": "一颗积合作档案",                                //档案名称
@@ -19,7 +19,10 @@ public class FileDetailsData {
                 "rowNo": 1,                                                      //行号
                 "numNo": 2,                                                      //库位序号
                 "archivesStatus": 0                                             // 档案状态
+                "archivesCode": "                                            // 档案编号
+                "archivesNo": ""                                        // 档案号
             "lampList": []   // 灯位列表
+
         }
 */
 
@@ -42,6 +45,26 @@ public class FileDetailsData {
     private String houseNo;
     // "库房名称"
     private String houseName;
+    // 档案编号（文号）
+    private String archivesCode;
+    // 档案号
+    private String archivesNo;
+
+    public String getArchivesCode() {
+        return archivesCode;
+    }
+
+    public String getArchivesNo() {
+        return archivesNo;
+    }
+
+    public void setArchivesCode(String archivesCode) {
+        this.archivesCode = archivesCode;
+    }
+
+    public void setArchivesNo(String archivesNo) {
+        this.archivesNo = archivesNo;
+    }
 
     public String getHouseCode() {
         return houseCode;

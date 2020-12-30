@@ -8,13 +8,13 @@ android {
     buildToolsVersion "29.0.3"
 
     defaultConfig {
-        // 国网档案室项目
         // 北京智芯微电子科技有限公司RFID智能档案管理系统
         applicationId "com.gw.cabinet"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 6
-        versionName "1.0.6"
+        versionCode 32
+        versionName "1.0.32"
+        // 32_v1.0.32 (2020.12.29)
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

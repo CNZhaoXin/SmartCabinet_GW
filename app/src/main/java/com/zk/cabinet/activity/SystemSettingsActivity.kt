@@ -37,6 +37,8 @@ import com.zk.cabinet.utils.SharedPreferencesUtil.Record
 import com.zk.common.utils.ActivityUtil
 import com.zk.common.utils.AppVersionUtil
 import com.zk.common.utils.LogUtil
+import com.zk.rfid.bean.UR880SendInfo
+import com.zk.rfid.ur880.UR880Entrance
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.collections.ArrayList
@@ -85,6 +87,10 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
     // 操作屏设备ID/一体机设备ID dialog
     private var mEquipmentIdDialog: UniversalEdtDialog? = null
     private lateinit var mEquipmentId: String        // 操作屏设备ID/一体机设备ID
+
+    // 通道门读写器设备ID
+    private var mTdmDeviceIdDialog: UniversalEdtDialog? = null
+    private lateinit var mTdmDeviceId: String
 
     private lateinit var mDAJArrays: Array<String>                     //档案架数量
     private var mDAJNumberSelected by Delegates.notNull<Int>()
@@ -209,6 +215,8 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
 
         // 操作屏设备ID/读写器设备ID
         mEquipmentId = mSpUtil.getString(Key.EquipmentId, "")!!
+        // 通道门读写器设备ID
+        mTdmDeviceId = mSpUtil.getString(Key.TdmDeviceId, "")!!
         // 刷卡设备选择的串口
         mSKQSerialSelected = mSpUtil.getString(Key.SKQSerialSelected, "")!!
         // 读写器配置
@@ -269,6 +277,7 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
         // 自动返回主界面时间
         mCountdownItems = resources.getStringArray(R.array.countdown_array)
         mCountdownItemValues = resources.getIntArray(R.array.countdown_value_array)
+        // 自动返回主界面时间设置，点这里
         mCountdownSelected = mCountdown
         for (indices in mCountdownItemValues.indices) {
             if (mCountdownSelected == mCountdownItemValues[indices].toInt()) {
@@ -306,6 +315,8 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
             mSystemSettingsBinding.cvSkqSetting.visibility = View.GONE
             // 隐藏人脸设备配置
             mSystemSettingsBinding.cvFaceSetting.visibility = View.GONE
+            // 隐藏通道门配置
+            mSystemSettingsBinding.cvTdmSetting.visibility = View.GONE
         }
 
         // 档案组柜 2
@@ -314,6 +325,10 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
             mSystemSettingsBinding.cvYtjSetting.visibility = View.GONE
             // 隐藏档案架配置
             mSystemSettingsBinding.cvDajSetting.visibility = View.GONE
+            // 隐藏刷卡设备配置
+            mSystemSettingsBinding.cvSkqSetting.visibility = View.GONE
+            // 隐藏通道门配置
+            mSystemSettingsBinding.cvTdmSetting.visibility = View.GONE
         }
 
         // 档案单柜 3
@@ -322,6 +337,17 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
             mSystemSettingsBinding.cvYtjSetting.visibility = View.GONE
             // 隐藏档案架配置
             mSystemSettingsBinding.cvDajSetting.visibility = View.GONE
+            // 隐藏刷卡设备配置
+            mSystemSettingsBinding.cvSkqSetting.visibility = View.GONE
+            // 显示打开柜门
+            mSystemSettingsBinding.systemSettingOpenDoor.visibility = View.VISIBLE
+
+            // 隐藏组大灯灯控串口设置 和 灯控调试
+            mSystemSettingsBinding.systemSettingLightSerialZg.visibility = View.GONE
+            mSystemSettingsBinding.systemSettingLightSerialDebugZg.visibility = View.GONE
+
+            // 隐藏通道门配置
+            mSystemSettingsBinding.cvTdmSetting.visibility = View.GONE
         }
 
         // 一体机 4
@@ -334,6 +360,9 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
             mSystemSettingsBinding.cvDagSetting.visibility = View.GONE
             // 隐藏操作屏设备ID配置
             mSystemSettingsBinding.cvEquipmentIdSetting.visibility = View.GONE
+
+            // 隐藏通道门配置
+            mSystemSettingsBinding.cvTdmSetting.visibility = View.GONE
         }
 
         // PDA 5
@@ -354,8 +383,26 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
             mSystemSettingsBinding.cvFaceSetting.visibility = View.GONE
             // 隐藏Android文件管理器
             mSystemSettingsBinding.systemSettingFileManagerSb.visibility = View.GONE
-
+            // 隐藏通道门配置
+            mSystemSettingsBinding.cvTdmSetting.visibility = View.GONE
         }
+
+        // 通道门 6
+        if (SelfComm.DEVICE_NAME[6].equals(deviceName)) {
+            // 隐藏操作屏设备ID配置
+            mSystemSettingsBinding.cvEquipmentIdSetting.visibility = View.GONE
+            // 隐藏一体机配置
+            mSystemSettingsBinding.cvYtjSetting.visibility = View.GONE
+            // 隐藏档案架配置
+            mSystemSettingsBinding.cvDajSetting.visibility = View.GONE
+            // 隐藏档案柜配置
+            mSystemSettingsBinding.cvDagSetting.visibility = View.GONE
+            // 隐藏刷卡设备配置
+            mSystemSettingsBinding.cvSkqSetting.visibility = View.GONE
+            // 隐藏人脸设备配置
+            mSystemSettingsBinding.cvFaceSetting.visibility = View.GONE
+        }
+
         // 所选设备类型
         mSystemSettingsBinding.systemSettingDeviceType.setCaptionText(
             deviceName
@@ -437,6 +484,16 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
             )
         )
 
+        // 通道门读写器设备ID
+        mSystemSettingsBinding.systemSettingTdmDeviceId.setCaptionText(
+            if (TextUtils.isEmpty(mTdmDeviceId)) {
+                "未配置通道门读写器设备ID!"
+            } else String.format(
+                resources.getString(R.string.cabinet_port_caption_text),
+                mTdmDeviceId
+            )
+        )
+
         // 操作屏设备ID
         mSystemSettingsBinding.systemSettingEquipmentId.setCaptionText(
             if (TextUtils.isEmpty(mEquipmentId)) {
@@ -475,12 +532,21 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
             }
         )
 
-        // 灯控串口配置
+        // 档案组架-灯控串口配置
         mSystemSettingsBinding.systemSettingLightSerial.setCaptionText(
             if (!TextUtils.isEmpty(mLightsSerialSelected)) {
                 "灯控串口:$mLightsSerialSelected"
             } else {
                 "未设置灯控串口!"
+            }
+        )
+
+        // 档案组柜-组大灯灯控串口配置
+        mSystemSettingsBinding.systemSettingLightSerialZg.setCaptionText(
+            if (!TextUtils.isEmpty(mLightsSerialSelected)) {
+                "组大灯灯控串口:$mLightsSerialSelected"
+            } else {
+                "未设置组大灯灯控串口!"
             }
         )
 
@@ -741,6 +807,21 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                     .show()
             }
 
+            // 档案单柜-打开柜门
+            R.id.system_setting_open_door -> {
+                val deviceList = DeviceService.getInstance().loadAll()
+                if (deviceList != null && deviceList.size > 0) {
+                    val device = deviceList[0]
+                    if (device != null) {
+                        UR880Entrance.getInstance()
+                            .send(UR880SendInfo.Builder().openDoor(device.deviceId, 0x00).build())
+                        LogUtils.e("读写器设备ID:" + device.deviceId)
+                    }
+                } else {
+                    showWarningToast("请先添加档案柜，保证档案柜读写器已在线")
+                }
+            }
+
             // 本机固定IP配置
             R.id.system_setting_this_machine_ip -> {
                 // 打开系统网络设置
@@ -930,8 +1011,40 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                 mCabinetServicePortDialog!!.show(supportFragmentManager, "CabinetServicePort")
             }
 
+            // 通道门读写器设备ID配置 mTdmDeviceId
+            R.id.system_setting_tdm_device_id -> {
+                if (mTdmDeviceIdDialog == null) {
+                    mTdmDeviceIdDialog =
+                        UniversalEdtDialog(R.string.tdm_device_id,
+                            object : UniversalEdtDialog.InputListener {
+                                override fun onInputComplete(input: String) {
+                                    if (mTdmDeviceId != input.trim()) {
+                                        mTdmDeviceId = input.trim()
+                                        // commit()方法是同步执行,有返回值，apply()方法是异步执行,没有返回值
+                                        mSpUtil.commitValue(
+                                            Record(
+                                                Key.TdmDeviceId,
+                                                mTdmDeviceId
+                                            )
+                                        )
+                                        mSystemSettingsBinding.systemSettingTdmDeviceId.setCaptionText(
+                                            String.format(
+                                                resources.getString(R.string.cabinet_port_caption_text),
+                                                mTdmDeviceId
+                                            )
+                                        )
+                                        restartApp()
+                                    }
+                                }
+                            })
+                    mTdmDeviceIdDialog!!.mInputType = InputType.TYPE_CLASS_TEXT
+                }
+                mTdmDeviceIdDialog!!.mMessage = mTdmDeviceId
+                mTdmDeviceIdDialog!!.show(supportFragmentManager, "TdmDeviceId")
+            }
+
             // 一体机配置
-            // 一体机设备ID配置 mEquipmentId
+            // 一体机设备ID配置/sp字段与操作屏设备ID配置一致 mEquipmentId
             R.id.system_setting_equipment_id_ytj -> {
                 if (mEquipmentIdDialog == null) {
                     mEquipmentIdDialog =
@@ -963,7 +1076,7 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                 mEquipmentIdDialog!!.show(supportFragmentManager, "EquipmentId")
             }
 
-            // 操作屏设备ID配置 mEquipmentId
+            // 操作屏设备ID配置/sp字段与一体机设备ID配置一致 mEquipmentId
             R.id.system_setting_equipment_id -> {
                 if (mEquipmentIdDialog == null) {
                     mEquipmentIdDialog =
@@ -1132,7 +1245,7 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                 }
 
             }
-            // 灯控串口设置
+            // 档案组架-灯控串口设置
             R.id.system_setting_light_serial -> {
                 var serialPortFinder = SerialPortFinder()
                 val allDevices = serialPortFinder.allDevices
@@ -1173,7 +1286,7 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                     .setNegativeButton(getString(R.string.cancel), null)
                     .show()
             }
-            // 灯控调试界面
+            // 档案组架-灯控调试界面
             R.id.system_setting_light_serial_debug -> {
                 // 进入灯控调试界面
                 val deviceList = DeviceService.getInstance().loadAll()
@@ -1214,6 +1327,61 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
                         .show()
                 }
             }
+            // 档案组柜-组大灯灯控串口设置
+            R.id.system_setting_light_serial_zg -> {
+                var serialPortFinder = SerialPortFinder()
+                val allDevices = serialPortFinder.allDevices
+                val allDevicesPath = serialPortFinder.allDevicesPath
+                LogUtils.e("串口列表:", allDevices, allDevicesPath)
+                // [/dev/ttyS8, /dev/ttyS7, /dev/ttyS6, /dev/ttyS5, /dev/ttyS3, /dev/ttyS0, /dev/ttyS2, /dev/ttyS4, /dev/ttyS1]
+
+                // 灯控选择的串口
+                mLightsSerialSelected = mSpUtil.getString(Key.LightsSerialSelected, "")!!
+                var selectLightSerialIndex = -1
+                for ((index, e) in allDevicesPath.withIndex()) {
+                    if (e == mLightsSerialSelected) {
+                        selectLightSerialIndex = index
+                    }
+                }
+
+                AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.light_serial_setting))
+                    .setSingleChoiceItems(
+                        allDevicesPath, selectLightSerialIndex
+                    ) { dialogInterface, i ->
+                        dialogInterface.dismiss()
+                        showSuccessToast("选择的串口:" + allDevicesPath[i])
+                        LogUtils.e("选择的串口:", allDevicesPath[i])
+
+                        // 灯控串口配置
+                        mSystemSettingsBinding.systemSettingLightSerialZg.setCaptionText(
+                            "组大灯灯控串口:" + allDevicesPath[i]
+                        )
+
+                        mSpUtil.applyValue(
+                            Record(
+                                Key.LightsSerialSelected,
+                                allDevicesPath[i]
+                            )
+                        )
+                    }
+                    .setNegativeButton(getString(R.string.cancel), null)
+                    .show()
+            }
+
+            // 档案组柜-组大灯灯控调试界面
+            R.id.system_setting_light_serial_debug_zg -> {
+                // 进入灯控调试界面
+                val mLightsSerialSelected = mSpUtil.getString(Key.LightsSerialSelected, "")!!
+                if (TextUtils.isEmpty(mLightsSerialSelected)) {
+                    showWarningToast("请先配置组大灯灯控串口")
+                    return
+                }
+
+                var intent: Intent = Intent(this, DAGLightDebugActivity::class.java)
+                startActivity(intent)
+            }
+
 
             R.id.system_setting_not_closed_door_alarm_time_sb -> {
                 AlertDialog.Builder(this)
@@ -1508,11 +1676,12 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
 //                    intent.component = cn
 //                }
 
-                // 档案组架1/档案组柜2/档案单柜3/一体机4 - 7.1.2Android系统Well文件管理
+                // 档案组架1/档案组柜2/档案单柜3/一体机4/通道门6 - 7.1.2Android系统Well文件管理
                 if (SelfComm.DEVICE_NAME[1].equals(deviceName)
                     || SelfComm.DEVICE_NAME[2].equals(deviceName)
                     || SelfComm.DEVICE_NAME[3].equals(deviceName)
                     || SelfComm.DEVICE_NAME[4].equals(deviceName)
+                    || SelfComm.DEVICE_NAME[6].equals(deviceName)
                 ) {
                     val cn = ComponentName(
                         "com.fihtdc.filemanager",

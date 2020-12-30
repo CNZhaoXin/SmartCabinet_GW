@@ -151,22 +151,62 @@
 
         </androidx.cardview.widget.CardView>
 
-        <Button
-            android:id="@+id/btn_back"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/selector_menu_red"
-            android:drawableLeft="@mipmap/ic_back"
-            android:drawablePadding="20dp"
-            android:gravity="center"
-            android:onClick="@{onClickListener}"
-            android:padding="20dp"
-            android:text="返 回"
-            android:textColor="@color/white"
-            android:textSize="32sp"
-            android:textStyle="bold" />
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+
+            <Button
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="50dp"
+                android:background="@drawable/selector_menu_red"
+                android:drawableLeft="@mipmap/ic_back"
+                android:drawablePadding="20dp"
+                android:gravity="center"
+                android:onClick="@{onClickListener}"
+                android:padding="20dp"
+                android:text="返 回"
+                android:textColor="@color/white"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_open_group_big_light"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="50dp"
+                android:background="@drawable/selector_menu_orange_normal"
+                android:gravity="center"
+                android:onClick="@{onClickListener}"
+                android:padding="20dp"
+                android:text="亮组大灯"
+                android:textColor="@color/white"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_close_group_big_light"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/selector_menu_red"
+                android:gravity="center"
+                android:onClick="@{onClickListener}"
+                android:padding="20dp"
+                android:text="灭组大灯"
+                android:textColor="@color/white"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+
+        </LinearLayout>
 
     </LinearLayout>
 

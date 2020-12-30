@@ -38,6 +38,7 @@ object SelfComm {
         DEVICE_NAME[3] = "档案单柜"
         DEVICE_NAME[4] = "一体机"
         DEVICE_NAME[5] = "PDA"
+        DEVICE_NAME[6] = "通道门"
 
         FUNCTION_TYPE[0] = 0 // "登出"
         FUNCTION_TYPE[1] = 1 // "PDA-入库"

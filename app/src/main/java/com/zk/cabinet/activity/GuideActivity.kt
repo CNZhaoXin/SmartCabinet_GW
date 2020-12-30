@@ -21,8 +21,7 @@ import android.text.style.StyleSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.OnClickListener
+import android.view.View.*
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -53,7 +52,9 @@ import com.zk.cabinet.bean.Device
 import com.zk.cabinet.constant.SelfComm
 import com.zk.cabinet.databinding.ActivityGuideBinding
 import com.zk.cabinet.databinding.DialogLoginBinding
+import com.zk.cabinet.databinding.DialogSettingBinding
 import com.zk.cabinet.db.DeviceService
+import com.zk.cabinet.db.InventoryPlanRecordService
 import com.zk.cabinet.entity.*
 import com.zk.cabinet.faceServer.FaceRecognitionHttpServer
 import com.zk.cabinet.faceServer.FaceRecognitionListener
@@ -103,6 +104,12 @@ private const val GET_APP_VERSION_MINUTES_TIME = 10L
 // 开始安装app后,延迟重启App的时间,10S,安装时间够了
 private const val DELAY_RESTART_APP_TIME = 8 * 1000L
 
+// 管理员密码
+private const val ADMIN_PASSWORD = "30185435"
+
+// 调试人员密码
+private const val ADMIN_PASSWORD_ADMIN = "wbl123"
+
 class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongClickListener {
     private lateinit var mGuideBinding: ActivityGuideBinding
     private lateinit var mHandler: MainHandler
@@ -123,11 +130,13 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     private var mDialogLoginBinding: DialogLoginBinding? = null
     private var mDialogLogin: AlertDialog? = null
-
     private var mFaceDialogBinding: ViewDataBinding? = null
-    private var mCardDialogBinding: ViewDataBinding? = null
     private var mFaceDialog: AlertDialog? = null
+    private var mCardDialogBinding: ViewDataBinding? = null
     private var mCardDialog: AlertDialog? = null
+    private var mSettingDialogBinding: DialogSettingBinding? = null
+    private var mSettingDialog: AlertDialog? = null
+
     private var deviceName: String = ""
 
     private lateinit var mProgressDialog: ProgressDialog
@@ -148,23 +157,11 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         mProgressDialog = ProgressDialog(this, R.style.mLoadingDialog)
         mProgressDialog.setMessage("正在登录...")
         mProgressDialog.setCancelable(false)
-        // 初始化Title
-        initShimmerTitle()
         // 显示选择的设备类型
         deviceName = mSpUtil.getString(Key.DeviceName, "").toString()
         mGuideBinding.tvSelectDevice.text = deviceName
         // 根据不同设备类型初始化操作
         init(deviceName)
-        // 延迟等渲染好在调用安装科大讯飞语音引擎包3.0
-        installKDXFApkHandler.postDelayed(installKDXFApkRunnable, 2000)
-    }
-
-    private val installKDXFApkHandler = Handler()
-    private val installKDXFApkRunnable = Runnable {
-        run {
-            // 安装科大讯飞语音引擎包3.0
-            installKDXFApk()
-        }
     }
 
     /**
@@ -329,16 +326,17 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                                                     )
 
                                                     // 下载时间要好几分钟,这时候还要加判断是否在主页面,才能安装
-                                                    // 假如此时有人操作了怎么办,那就判断还是不是在主页面
-                                                    // todo 假如此时有自动盘库消息来了怎么办
+                                                    // 假如此时有人操作了怎么办,那就判断还是不是在主页面，因为下载是要时间的，这个时间不能保证没有人在操作大屏
+                                                    // 假如此时有自动盘库消息来了怎么办，如果先静默升级，那么应用进程会被kill掉，是不会去盘库的，
+                                                    // 相当于收到消息会作废，丢失，那就不管了，等升级完成再重新创建盘点计划就好，这两种情况同时碰到的几率非常小
                                                     if (ActivityUtils.getTopActivity().componentName.className == "com.zk.cabinet.activity.GuideActivity") {
                                                         // 下载完成安装应用
-                                                        // 如果是Root环境下,静默安装,否则普通安装
+                                                        // 如果设备Root了,静默安装,否则普通安装
                                                         if (AppUtils.isAppRoot()) {
+                                                            // 档案组架1/档案组柜2/档案单柜3/一体机4-静默安装自动升级,设备已root过
                                                             // 1.静默安装 : 安装完成,设备 DELAY_RESTART_APP_TIME 毫秒后重启APP
                                                             // 用 /storage/emulated/0/Android/data/2_v1.0.2.apk 测试静默安装重启APP
                                                             // suInstallApp("/storage/emulated/0/Android/data/2_v1.0.2.apk", DELAY_RESTART_APP_TIME)
-
                                                             mProgressDialog.setMessage("正在更新应用,更新完成后将重启应用,请稍后...")
                                                             mProgressDialog.show()
 
@@ -352,9 +350,11 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                                                                 }
                                                             }
                                                         } else {
+                                                            // PDA没有root过，所以是手动安装
                                                             // 2.手动点击安装,安装完成会显示系统安装APK完成后的Dialog,完成/打开
                                                             AppUtils.installApp(task.targetFilePath)
                                                         }
+
                                                     } else {
                                                         LogUtils.e(
                                                             "获取最新App版本信息-文件下载完成-不是主页面不安装新应用"
@@ -398,22 +398,20 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                                     // 不是新版本无需更新
                                     LogUtils.e("获取最新App版本信息-当前已是最新版本-无需下载APK文件进行更新")
                                 }
-
                             } else {
-                                speek("获取最新App版本信息-数据为空")
-                                showErrorToast("获取最新App版本信息-数据为空")
+                                LogUtils.e("获取最新App版本信息-数据为空")
                             }
                         } else {
-                            speek("获取最新App版本信息-请求失败")
+                            speek("获取最新版本信息-请求失败")
                             showErrorToast(response.getString("msg"))
                         }
                     } else {
-                        speek("获取最新App版本信息-请求失败")
+                        speek("获取最新版本信息-请求失败")
                         showErrorToast("获取最新App版本信息-请求失败")
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
-                    speek("获取最新App版本信息-请求失败")
+                    speek("获取最新版本信息-请求失败")
                     showErrorToast("获取最新App版本信息-请求失败")
                 }
             },
@@ -427,7 +425,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                     else {
                         "errorCode: -1 VolleyError: 未知"
                     }
-                speek("获取最新App版本信息-请求失败")
+                speek("获取最新版本信息-请求失败")
                 showErrorToast(msg)
             })
 
@@ -445,6 +443,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         // SelfComm.DEVICE_NAME[3] = "档案单柜"
         // SelfComm.DEVICE_NAME[4] = "一体机"
         // SelfComm.DEVICE_NAME[5] = "PDA"
+        // SelfComm.DEVICE_NAME[6] = "通道门"
 
         // 档案组架 1
         if (SelfComm.DEVICE_NAME[1].equals(deviceName)) {
@@ -476,10 +475,9 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
             // 初始化MQTT
             initMQTT()
-            // 档案组架隐藏密码登录和人脸登录和刷卡登录
+            // 档案组架隐藏人脸登录和刷卡登录
             mGuideBinding.lavFaceLogin.visibility = GONE
             mGuideBinding.lavCardLogin.visibility = GONE
-
             // 开启定时检查更新APP-TimerTask
             timerTaskGetAppVersion()
         }
@@ -509,7 +507,8 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             initMQTT()
             // 配置柜子/连接柜子(TcpIp通信)
             initUR800ByTcpIp()
-
+            // 档案组架隐藏刷卡登录
+            mGuideBinding.lavCardLogin.visibility = GONE
             // 开启定时检查更新APP-TimerTask
             timerTaskGetAppVersion()
         }
@@ -539,7 +538,8 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             initMQTT()
             // 配置柜子/连接柜子(TcpIp通信)
             initUR800ByTcpIp()
-
+            // 档案组架隐藏刷卡登录
+            mGuideBinding.lavCardLogin.visibility = GONE
             // 开启定时检查更新APP-TimerTask
             timerTaskGetAppVersion()
         }
@@ -567,23 +567,238 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
             // 初始化读写器(串口需要配置)
             initUR800BySerialPort()
-
             // 开启定时检查更新APP-TimerTask
             timerTaskGetAppVersion()
         }
 
         // PDA 5
         if (SelfComm.DEVICE_NAME[5].equals(deviceName)) {
+            // 初始化title
+            initShimmerTitlePDA()
             // 获取库房信息
             getHouseList()
-
             // PDA隐藏人脸登录和刷卡登录
             mGuideBinding.lavFaceLogin.visibility = GONE
             mGuideBinding.lavCardLogin.visibility = GONE
+            // PDA开启定时检查更新APP-TimerTask，手动安装
+            timerTaskGetAppVersion()
         }
 
-        // PDA暂时不开启定时检查更新APP-TimerTask
-        // timerTaskGetAppVersion()
+        // 通道门 6
+        if (SelfComm.DEVICE_NAME[6].equals(deviceName)) {
+            // 通道门显示时间
+            mGuideBinding.tcDayTdm.visibility = VISIBLE
+            mGuideBinding.tcHourTdm.visibility = VISIBLE
+            // 初始化MQTT
+            initMQTT()
+            // 开启定时检查更新APP-TimerTask
+            timerTaskGetAppVersion()
+
+            // 隐藏3种登录选项
+            mGuideBinding.llLogin.visibility = GONE
+            // 隐藏搜索框
+            mGuideBinding.tvSearch.visibility = GONE
+            // 隐藏库存饼图
+            mGuideBinding.pieChart.visibility = GONE
+            // 隐藏title
+            mGuideBinding.stvChineseTitle.visibility = GONE
+            mGuideBinding.stvEnglishTitle.visibility = GONE
+            // 隐藏左上角时间
+            mGuideBinding.llTime.visibility = GONE
+            // 隐藏温湿度
+            mGuideBinding.llWsd.visibility = GONE
+        }
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 档案组架1-档案组柜2-打开灯控串口
+        if (SelfComm.DEVICE_NAME[1].equals(deviceName)
+            || SelfComm.DEVICE_NAME[2].equals(deviceName)
+        ) {
+            openLightSerialPort()
+        }
+
+        // 档案组柜/档案单柜/一体机-开启人脸识别Http服务器
+        if (SelfComm.DEVICE_NAME[2].equals(deviceName)
+            || SelfComm.DEVICE_NAME[3].equals(deviceName)
+            || SelfComm.DEVICE_NAME[4].equals(deviceName)
+        ) {
+            startFaceServer()
+        }
+
+        // 档案组柜/档案单柜-进入或者回到首页 查询是否有盘库计划，有的话需要执行计划
+        if (SelfComm.DEVICE_NAME[2].equals(deviceName)
+            || SelfComm.DEVICE_NAME[3].equals(deviceName)
+        ) {
+            val inventoryPlanList = InventoryPlanRecordService.getInstance().loadAll()
+            if (inventoryPlanList != null && inventoryPlanList.size > 0) {
+                LogUtils.e(
+                    "自动盘库-当前是主页/或回到首页-保存的待盘库计划列表"
+                    , JSON.toJSONString(inventoryPlanList)
+                )
+                val inventoryPlan = inventoryPlanList[0]
+                // 打开档案柜自动盘点界面,传递自动盘库所需数据
+                val intent = Intent(this, ZNGAutoInventoryActivity::class.java)
+                intent.putExtra(ZNGAutoInventoryActivity.PLAN_ID, inventoryPlan.planID)
+                intent.putExtra(ZNGAutoInventoryActivity.HOUSE_CODE, inventoryPlan.houseCode)
+                intent.putExtra(
+                    ZNGAutoInventoryActivity.EQUIPMENT_ID_LIST,
+                    inventoryPlan.deviceList
+                )
+                ActivityUtils.startActivity(intent)
+                // 去执行该条计划后，清除表中该盘库计划，无需关心是否盘库成功提交成功，只要去打开界面执行了就算是做了这个操作
+                InventoryPlanRecordService.getInstance().delete(inventoryPlan)
+                LogUtils.e(
+                    "自动盘库-当前是主页/或回到首页-打开自动盘库界面进行盘库,然后删除该计划"
+                    , JSON.toJSONString(inventoryPlan)
+                )
+                // 打印删除后的盘库计划列表
+                LogUtils.e(
+                    "自动盘库-当前是主页/或回到首页-保存的待盘库计划列表,删除后的"
+                    , JSON.toJSONString(InventoryPlanRecordService.getInstance().loadAll())
+                )
+            } else {
+                LogUtils.e(
+                    "自动盘库-当前是主页/或回到首页-暂无保存的待盘库计划"
+                )
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // 档案组柜/档案单柜/一体机
+        if (SelfComm.DEVICE_NAME[2].equals(deviceName)
+            || SelfComm.DEVICE_NAME[3].equals(deviceName)
+            || SelfComm.DEVICE_NAME[4].equals(deviceName)
+        ) {
+            // 关闭人脸识别Http服务器, 不用的时候关闭
+            if (mFaceRecognitionHttpServer.isAlive) {
+                mFaceRecognitionHttpServer.stop()
+                LogUtils.e("关闭人脸识别服务")
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+//        SelfComm.DEVICE_NAME[1] = "档案组架"
+//        SelfComm.DEVICE_NAME[2] = "档案组柜"
+//        SelfComm.DEVICE_NAME[3] = "档案单柜"
+//        SelfComm.DEVICE_NAME[4] = "一体机"
+//        SelfComm.DEVICE_NAME[5] = "PDA"
+//        SelfComm.DEVICE_NAME[6] = "通道门"
+
+        // 1档案组架 17寸屏 竖屏
+        if (SelfComm.DEVICE_NAME[1].equals(deviceName)) {
+            // 关闭定时获取库存的线程
+            if (mScheduledExecutorService != null) {
+                mScheduledExecutorService.shutdownNow()
+                LogUtils.e("关闭定时获取库存的线程")
+            }
+            // 关闭定时获取版本号的线程
+            if (mScheduledExecutorServiceGetAppVersion != null) {
+                mScheduledExecutorServiceGetAppVersion.shutdownNow()
+                LogUtils.e("关闭定时获取版本号的线程")
+            }
+
+            // 关闭灯控串口
+            LightsSerialPortHelper.getInstance().close()
+            // 关闭MQTT
+            MQTTHelper.getInstance().closeMQTT()
+        }
+
+        // 2档案组柜 17寸屏 竖屏
+        if (SelfComm.DEVICE_NAME[2].equals(deviceName)) {
+            // 关闭定时获取库存的线程
+            if (mScheduledExecutorService != null) {
+                mScheduledExecutorService.shutdownNow()
+                LogUtils.e("关闭定时获取库存的线程")
+            }
+            // 关闭定时获取版本号的线程
+            if (mScheduledExecutorServiceGetAppVersion != null) {
+                mScheduledExecutorServiceGetAppVersion.shutdownNow()
+                LogUtils.e("关闭定时获取版本号的线程")
+            }
+
+            val deviceList = DeviceService.getInstance().loadAll()
+            if (deviceList != null && deviceList.size > 0) {
+                UR880Entrance.getInstance()
+                    .removeDeviceInformationListener(mDeviceInformationListener)
+            }
+
+            // 关闭灯控串口
+            LightsSerialPortHelper.getInstance().close()
+            // 关闭MQTT
+            MQTTHelper.getInstance().closeMQTT()
+        }
+
+        // 3档案单柜 15寸屏 竖屏
+        if (SelfComm.DEVICE_NAME[3].equals(deviceName)) {
+            // 关闭定时获取库存的线程
+            if (mScheduledExecutorService != null) {
+                mScheduledExecutorService.shutdownNow()
+                LogUtils.e("关闭定时获取库存的线程")
+            }
+            // 关闭定时获取版本号的线程
+            if (mScheduledExecutorServiceGetAppVersion != null) {
+                mScheduledExecutorServiceGetAppVersion.shutdownNow()
+                LogUtils.e("关闭定时获取版本号的线程")
+            }
+
+            val deviceList = DeviceService.getInstance().loadAll()
+            if (deviceList != null && deviceList.size > 0) {
+                UR880Entrance.getInstance()
+                    .removeDeviceInformationListener(mDeviceInformationListener)
+                UR880Entrance.getInstance().disConnect()
+            }
+
+            // 关闭MQTT
+            MQTTHelper.getInstance().closeMQTT()
+        }
+
+        // 4一体机 17寸屏 横屏
+        if (SelfComm.DEVICE_NAME[4].equals(deviceName)) {
+            // 关闭定时获取库存的线程
+            if (mScheduledExecutorService != null) {
+                mScheduledExecutorService.shutdownNow()
+                LogUtils.e("关闭定时获取库存的线程")
+            }
+            // 关闭定时获取版本号的线程
+            if (mScheduledExecutorServiceGetAppVersion != null) {
+                mScheduledExecutorServiceGetAppVersion.shutdownNow()
+                LogUtils.e("关闭定时获取版本号的线程")
+            }
+
+            val port = mSpUtil.getString(SharedPreferencesUtil.Key.YTJDxqSerialSelected, "")
+            if (!TextUtils.isEmpty(port)) {
+                UR880Entrance.getInstance()
+                    .removeDeviceInformationListener(mDeviceInformationListener)
+                UR880Entrance.getInstance().disConnect()
+            }
+        }
+
+        // PDA 5
+        if (SelfComm.DEVICE_NAME[5].equals(deviceName)) {
+            // 关闭定时获取版本号的线程
+            if (mScheduledExecutorServiceGetAppVersion != null) {
+                mScheduledExecutorServiceGetAppVersion.shutdownNow()
+                LogUtils.e("关闭定时获取版本号的线程")
+            }
+        }
+
+        // 通道门 6
+        if (SelfComm.DEVICE_NAME[6].equals(deviceName)) {
+            // 关闭定时获取版本号的线程
+            if (mScheduledExecutorServiceGetAppVersion != null) {
+                mScheduledExecutorServiceGetAppVersion.shutdownNow()
+                LogUtils.e("关闭定时获取版本号的线程")
+            }
+            // 关闭MQTT
+            MQTTHelper.getInstance().closeMQTT()
+        }
     }
 
     /**
@@ -618,6 +833,15 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                                     getCapital(data.houseCode, data.houseName, "")
                                     // 根据HouseCode获取温湿度数据
                                     getHumitureByHouseId(data.houseCode)
+                                    // 初始化Title
+                                    initShimmerTitle("${data.houseName}")
+                                    // 保存档案室名称
+                                    mSpUtil.applyValue(
+                                        Record(
+                                            Key.HouseName,
+                                            "${data.houseName}"
+                                        )
+                                    )
                                 }
                             } else {
                                 showWarningToast("根据一体机设备id获取一体机信息-为空")
@@ -656,6 +880,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
     /**
      * 14.根据操作屏设备id获取操作屏及其档案柜信息
      * 接口地址：get /api/pad/getCabineMasterByEquipmentId
+     * // 档案组架/档案组柜/档案单柜 调用
      */
     private fun getCabineMasterByEquipmentId(equipmentId: String) {
         val requestUrl =
@@ -684,6 +909,16 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                                     getCapital(data.houseCode, data.name, equipmentId)
                                     // 根据HouseCode获取温湿度数据
                                     getHumitureByHouseId(data.houseCode)
+                                    // 显示档案室名称
+                                    // 初始化Title
+                                    initShimmerTitle("${data.houseName}")
+                                    // 保存档案室名称
+                                    mSpUtil.applyValue(
+                                        Record(
+                                            Key.HouseName,
+                                            "${data.houseName}"
+                                        )
+                                    )
                                 }
                             } else {
                                 showWarningToast("根据操作屏设备id获取操作屏及其档案柜信息-为空")
@@ -787,7 +1022,6 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         NetworkRequest.instance.add(jsonObjectRequest)
     }
 
-
     /**
      * 获取所有库房,PDA要通过选择库房来查看当前库房的库存情况
      */
@@ -825,7 +1059,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                                 // 根据HouseCode获取温湿度数据
                                 getHumitureByHouseId(houseCode)
                             } else {
-                                showWarningToast("暂无库房")
+                                showWarningToast("暂无档案室可选择")
                                 finish()
                             }
 
@@ -833,11 +1067,11 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                             showWarningToast(response.getString("msg"))
                         }
                     } else {
-                        showWarningToast("暂无库房")
+                        showWarningToast("暂无档案室可选择")
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
-                    showErrorToast("暂无库房")
+                    showErrorToast("暂无档案室可选择")
                 }
             },
             { error ->
@@ -881,24 +1115,26 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         }.setOptionsSelectChangeListener { options1, options2, options3 -> }
             .setSubmitText("确定") //确定按钮文字
             .setCancelText("取消") //取消按钮文字
-            .setTitleText("库房选择") //标题
-            .setSubCalSize(32) //确定和取消文字大小
-            .setTitleSize(36) //标题文字大小
-            .setContentTextSize(32) //滚轮文字大小
-            //                .setTitleColor(Color.BLACK)//标题文字颜色
-            //                .setSubmitColor(Color.BLUE)//确定按钮文字颜色
-            //                .setCancelColor(Color.BLUE)//取消按钮文字颜色
-            //                .setTitleBgColor(0xFF333333)//标题背景颜色 Night mode
-            //                .setBgColor(0xFF000000)//滚轮背景颜色 Night mode
-            //                .setLinkage(false)//设置是否联动，默认true
-            //                 .setLabels("省", "市", "区")//设置选择的三级单位
-            //                .isCenterLabel(false) //是否只显示中间选中项的label文字，false则每项item全部都带有label。
-            //                .setCyclic(false, false, false)// 循环与否
-            //                .setSelectOptions(0,0,0)  //设置默认选中项
-            //                .setOutSideCancelable(true)//点击外部dismiss default true
-            //                .isDialog(true)//是否显示为对话框样式
-            //                .isRestoreItem(true) // 切换时是否还原，设置默认选中第一项。
+            .setTitleText("选择库房") //标题
+            .setSubCalSize(38) //确定和取消文字大小
+            .setTitleSize(40) //标题文字大小
+            .setContentTextSize(38) //滚轮文字大小
+            .setTitleColor(resources.getColor(R.color.gray_deep))//标题文字颜色
+            .setSubmitColor(resources.getColor(R.color.md_teal_A400))//确定按钮文字颜色
+            .setCancelColor(resources.getColor(R.color.colorDGH))//取消按钮文字颜色
+            .setCyclic(false, false, false)// 循环与否
+            .setLineSpacingMultiplier(2.5f) // 可通过调整条目的比例，从而影响调整弹窗高度
+            // .setTitleBgColor(0xFF333333)//标题背景颜色 Night mode
+            // .setBgColor(0xFF000000)//滚轮背景颜色 Night mode
+            // .setLinkage(false)//设置是否联动，默认true
+            // .setLabels("省", "市", "区")//设置选择的三级单位
+            // .isCenterLabel(false) //是否只显示中间选中项的label文字，false则每项item全部都带有label。
+            // .setSelectOptions(0,0,0)  // 设置默认选中项
+            // .setOutSideCancelable(true)// 点击外部dismiss default true
+            // .isDialog(true)// 是否显示为对话框样式
+            // .isRestoreItem(true) // 切换时是否还原，设置默认选中第一项。
             .build<Any>()
+
         val options1ItemsString = java.util.ArrayList<String>()
         for (i in ds.indices) {
             val dataBean = ds[i]
@@ -944,7 +1180,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                                  * 一体机:显示 库房已存量,库房剩余量
                                  * 档案组架/档案组柜/档案单柜: 显示当前档案组架/组柜/单柜的 已存量,剩余量
                                  */
-                                // 初始化库存圆饼图( PDA-900 / 其他-550)
+                                // 初始化库存圆饼图( PDA-900 / 其他-650)
 
                                 // mGuideBinding.pieChart.centerText =
                                 // generateCenterSpannableText("库房名称", "库房已存", yc, "库房剩余", sy)
@@ -952,7 +1188,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                                 if (SelfComm.DEVICE_NAME[1].equals(deviceName)) {
                                     // 显示操作屏库存
                                     createPieChart(
-                                        550,
+                                        650,
                                         name, // 操作屏名称
                                         "本组架已存",
                                         data.cabinetUsed,
@@ -964,7 +1200,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                                 if (SelfComm.DEVICE_NAME[2].equals(deviceName)) {
                                     // 显示操作屏库存
                                     createPieChart(
-                                        550,
+                                        650,
                                         name, // 操作屏名称
                                         "本组柜已存",
                                         data.cabinetUsed,
@@ -972,11 +1208,11 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                                         data.cabinetFree
                                     )
                                 }
-                                // 档案单柜3 15寸屏
+                                // 档案单柜3 10.1寸屏
                                 if (SelfComm.DEVICE_NAME[3].equals(deviceName)) {
                                     // 显示操作屏库存
                                     createPieChart(
-                                        600,
+                                        650,
                                         name, // 操作屏名称
                                         "本柜已存",
                                         data.cabinetUsed,
@@ -989,11 +1225,11 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                                 if (SelfComm.DEVICE_NAME[4].equals(deviceName)) {
                                     // 显示一体机所属的库房库存
                                     createPieChart(
-                                        550,
+                                        700,
                                         name, // 库房名称
-                                        "库房已存",
+                                        "档案室已存",
                                         data.houseCapacity - data.houseFree,
-                                        "库房剩余",
+                                        "档案室剩余",
                                         data.houseFree,
                                     )
                                 }
@@ -1004,9 +1240,9 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                                     createPieChart(
                                         900,
                                         name, // 库房名称
-                                        "库房已存",
+                                        "档案室已存",
                                         data.houseCapacity - data.houseFree,
-                                        "库房剩余",
+                                        "档案室剩余",
                                         data.houseFree,
                                     )
                                 }
@@ -1047,9 +1283,9 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     /**
      * 创建圆饼图
-     *  // 库房总容量
+     *  // 档案室总容量
     data.houseCapacity
-    // 库房剩余量
+    // 档案室剩余量
     data.houseFree
     // 当前柜已存
     data.cabinetUsed
@@ -1144,9 +1380,17 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         val s = SpannableString(storageName + "\n" + t1 + "\n" + v1 + "\n" + t2 + "\n" + v2)
 
         // Typeface.ITALIC 斜体
-
         // 第1个参数-库房名称
-        s.setSpan(RelativeSizeSpan(2.0f), 0, storageName.length, 0)
+        if (SelfComm.DEVICE_NAME[1].equals(deviceName) || SelfComm.DEVICE_NAME[2].equals(deviceName)) { // 档案组架1/档案组柜2
+            s.setSpan(RelativeSizeSpan(4.5f), 0, storageName.length, 0)
+        } else if (SelfComm.DEVICE_NAME[3].equals(deviceName)) { // 档案单柜3
+            s.setSpan(RelativeSizeSpan(5.0f), 0, storageName.length, 0)
+        } else if (SelfComm.DEVICE_NAME[4].equals(deviceName)) { // 一体机4
+            s.setSpan(RelativeSizeSpan(3.0f), 0, storageName.length, 0)
+        } else if (SelfComm.DEVICE_NAME[5].equals(deviceName)) { // PDA5
+            s.setSpan(RelativeSizeSpan(5.0f), 0, storageName.length, 0)
+        }
+
         s.setSpan(StyleSpan(Typeface.BOLD), 0, storageName.length, 0)
         s.setSpan(
             ForegroundColorSpan(resources.getColor(R.color.color_white_zt_gray)),
@@ -1157,7 +1401,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
         // 第2个参数-库房已存/本柜已存
         s.setSpan(
-            RelativeSizeSpan(1.3f),
+            RelativeSizeSpan(1.5f),
             storageName.length,
             storageName.length + t1.length + 1,
             0
@@ -1177,7 +1421,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
         // 第3个参数-已存值
         s.setSpan(
-            RelativeSizeSpan(2.0f),
+            RelativeSizeSpan(3.0f),
             storageName.length + t1.length + 1,
             storageName.length + t1.length + v1.length + 2,
             0
@@ -1197,7 +1441,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
         // 第4个参数-库房剩余/本柜剩余
         s.setSpan(
-            RelativeSizeSpan(1.3f),
+            RelativeSizeSpan(1.5f),
             storageName.length + t1.length + v1.length + 2,
             storageName.length + t1.length + v1.length + t2.length + 3,
             0
@@ -1366,8 +1610,8 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
             LOGIN_BY_PWD_SUCCESS -> {
                 mProgressDialog.dismiss()
-                showSuccessToast("登录成功，欢迎：${msg.obj}")
-                speek("登录成功，欢迎：${msg.obj}")
+                showSuccessToast("登录成功，${msg.obj}")
+                speek("登录成功，${msg.obj}")
                 intentActivity(MainMenuActivity.newIntent(this))
             }
             LOGIN_BY_PWD_ERROR -> {
@@ -1376,8 +1620,8 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             }
             CARD_LOGIN_SUCCESS -> {
                 mProgressDialog.dismiss()
-                showSuccessToast("登录成功，欢迎：${msg.obj}")
-                speek("登录成功，欢迎：${msg.obj}")
+                showSuccessToast("登录成功，${msg.obj}")
+                speek("登录成功，${msg.obj}")
                 intentActivity(MainMenuActivity.newIntent(this))
             }
             CARD_LOGIN_ERROR -> {
@@ -1388,8 +1632,8 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                 isFaceHandle = false
 
                 mProgressDialog.dismiss()
-                showSuccessToast("登录成功，欢迎：${msg.obj}")
-                speek("登录成功，欢迎：${msg.obj}")
+                showSuccessToast("登录成功，${msg.obj}")
+                speek("登录成功，${msg.obj}")
                 intentActivity(MainMenuActivity.newIntent(this))
             }
             LOGIN_BY_FACE_ERROR -> {
@@ -1433,9 +1677,13 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         }
     }
 
-    private fun initShimmerTitle() {
+    private fun initShimmerTitle(houseName: String) {
+        // 隐藏英文显示
+        mGuideBinding.stvEnglishTitle.visibility = View.GONE
         // 设置字体
         val tf = Typeface.createFromAsset(assets, "fonts/OpenSans-ExtraBold.ttf")
+        mGuideBinding.stvChineseTitle.text = houseName
+
         mGuideBinding.stvChineseTitle.typeface = tf
         mGuideBinding.stvEnglishTitle.typeface = tf
         // 开启动效
@@ -1446,36 +1694,17 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         shimmer.start<ShimmerTextView>(mGuideBinding.stvEnglishTitle)
     }
 
-
-    override fun onResume() {
-        super.onResume()
-        // 档案组架1-打开灯控串口
-        if (SelfComm.DEVICE_NAME[1].equals(deviceName)) {
-            openLightSerialPort()
-        }
-
-        // 档案组柜/档案单柜/一体机-开启人脸识别Http服务器
-        if (SelfComm.DEVICE_NAME[2].equals(deviceName)
-            || SelfComm.DEVICE_NAME[3].equals(deviceName)
-            || SelfComm.DEVICE_NAME[4].equals(deviceName)
-        ) {
-            startFaceServer()
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        // 档案组柜/档案单柜/一体机
-        if (SelfComm.DEVICE_NAME[2].equals(deviceName)
-            || SelfComm.DEVICE_NAME[3].equals(deviceName)
-            || SelfComm.DEVICE_NAME[4].equals(deviceName)
-        ) {
-            // 关闭人脸识别Http服务器, 不用的时候关闭
-            if (mFaceRecognitionHttpServer.isAlive) {
-                mFaceRecognitionHttpServer.stop()
-                LogUtils.e("关闭人脸识别服务")
-            }
-        }
+    private fun initShimmerTitlePDA() {
+        // 设置字体
+        val tf = Typeface.createFromAsset(assets, "fonts/OpenSans-ExtraBold.ttf")
+        mGuideBinding.stvChineseTitle.typeface = tf
+        mGuideBinding.stvEnglishTitle.typeface = tf
+        // 开启动效
+        val shimmer = Shimmer()
+        shimmer.duration = 5000
+        shimmer.direction = Shimmer.ANIMATION_DIRECTION_LTR
+        shimmer.start<ShimmerTextView>(mGuideBinding.stvChineseTitle)
+        shimmer.start<ShimmerTextView>(mGuideBinding.stvEnglishTitle)
     }
 
     /**
@@ -1489,7 +1718,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             LightsSerialPortHelper.getInstance().open(port)
             LogUtils.e("打开灯控串口:$port")
             // showSuccessToast("打开灯控串口:$port")
-            // 测试亮大灯
+            // 测试档案架亮大灯
             // LightsSerialPortHelper.getInstance().openBigLight(1)
         } else {
             showErrorToast("灯控串口未配置")
@@ -1559,7 +1788,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     /**
      * 打开刷卡设备串口
-     * /dev/ttyS1
+     * /dev/ttyS1 串口需要配置和调试，才能找到是哪个串口
      */
     private fun openCardSerialPort() {
         val port = mSpUtil.getString(SharedPreferencesUtil.Key.SKQSerialSelected, "")
@@ -1628,10 +1857,6 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                 showCardDialog()
             }
 
-            //登录弹窗的取消按钮
-            R.id.dialog_other_login_dismiss_btn -> {
-                dismissLoginDialog()
-            }
             //登录弹窗的确认按钮
             R.id.dialog_other_login_sure_btn -> {
                 val userCode =
@@ -1643,20 +1868,86 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                     showWarningToast(resources.getString(R.string.fill_complete))
                 }
             }
-
-            // 库房选择
-            R.id.tv_house -> {
-                optionsHousePickerView!!.show()
+            //登录弹窗的取消按钮
+            R.id.dialog_other_login_dismiss_btn -> {
+                dismissLoginDialog()
             }
 
             // 设置
             R.id.ll_setting -> {
-                intentActivity(SystemSettingsActivity.newIntent(this))
+                showSettingDialog()
             }
+
+            // 设置输入管理员密码弹窗的确认按钮
+            R.id.dialog_setting_confirm -> {
+                val adminPassword =
+                    mSettingDialogBinding!!.eidtAdminPassword.text.toString().trim()
+                if (!TextUtils.isEmpty(adminPassword)) {
+                    if (adminPassword == ADMIN_PASSWORD || adminPassword == ADMIN_PASSWORD_ADMIN) {
+                        dismissSettingDialog()
+                        intentActivity(SystemSettingsActivity.newIntent(this))
+                    } else {
+                        showErrorToast("管理员密码错误，请重新输入")
+                    }
+                } else {
+                    showWarningToast("请输入管理员密码")
+                }
+            }
+            // 设置输入管理员密码弹窗的取消按钮
+            R.id.dialog_setting_dismiss -> {
+                dismissSettingDialog()
+            }
+
             // 档案查询
             R.id.tv_search -> {
                 intentActivity(SearchActivity.newIntent(this))
             }
+
+            // PDA-选择档案室
+            R.id.tv_house -> {
+                if (optionsHousePickerView == null) {
+                    showWarningToast("暂无档案室可选择")
+                } else {
+                    optionsHousePickerView!!.show()
+                }
+            }
+
+        }
+    }
+
+    // 进入设置的管理员密码弹窗
+    private fun showSettingDialog() {
+        if (mSettingDialog == null) {
+            mSettingDialog = AlertDialog.Builder(this).create()
+            mSettingDialogBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(this),
+                R.layout.dialog_setting,
+                null,
+                false
+            )
+            mSettingDialogBinding!!.onClickListener = this
+            mSettingDialog!!.setView(mSettingDialogBinding!!.root)
+            mSettingDialog!!.setCancelable(true)
+        }
+        mSettingDialogBinding!!.eidtAdminPassword.text = null
+        mSettingDialogBinding!!.eidtAdminPassword.isFocusable = true
+        mSettingDialogBinding!!.eidtAdminPassword.isFocusableInTouchMode = true
+        mSettingDialogBinding!!.eidtAdminPassword.requestFocus()
+        mSettingDialog!!.show()
+
+        val window = mSettingDialog!!.window
+        window!!.setBackgroundDrawable(ColorDrawable(0))
+        // 一体机4 横屏显示需要适配
+        if (SelfComm.DEVICE_NAME[4].equals(deviceName)) {
+            window!!.setLayout(
+                resources.displayMetrics.widthPixels * 3 / 5,
+                resources.displayMetrics.heightPixels * 3 / 5
+            )
+        } else {
+            window!!.setLayout(
+                resources.displayMetrics.widthPixels * 2 / 3,
+                resources.displayMetrics.heightPixels * 2 / 5
+            )
         }
     }
 
@@ -1682,106 +1973,6 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             mainWeakReference.get()!!.handleMessage(msg)
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-//        SelfComm.DEVICE_NAME[1] = "档案组架"
-//        SelfComm.DEVICE_NAME[2] = "档案组柜"
-//        SelfComm.DEVICE_NAME[3] = "档案单柜"
-//        SelfComm.DEVICE_NAME[4] = "一体机"
-//        SelfComm.DEVICE_NAME[5] = "PDA"
-        // 1档案组架 17寸屏 竖屏
-        if (SelfComm.DEVICE_NAME[1].equals(deviceName)) {
-            // 关闭定时获取库存的线程
-            if (mScheduledExecutorService != null) {
-                mScheduledExecutorService.shutdownNow()
-                LogUtils.e("关闭定时获取库存的线程")
-            }
-            // 关闭定时获取版本号的线程
-            if (mScheduledExecutorServiceGetAppVersion != null) {
-                mScheduledExecutorServiceGetAppVersion.shutdownNow()
-                LogUtils.e("关闭定时获取版本号的线程")
-            }
-
-            // 关闭灯控串口
-            LightsSerialPortHelper.getInstance().close()
-            // 关闭MQTT
-            MQTTHelper.getInstance().closeMQTT()
-        }
-
-        // 2档案组柜 17寸屏 竖屏
-        if (SelfComm.DEVICE_NAME[2].equals(deviceName)) {
-            // 关闭定时获取库存的线程
-            if (mScheduledExecutorService != null) {
-                mScheduledExecutorService.shutdownNow()
-                LogUtils.e("关闭定时获取库存的线程")
-            }
-            // 关闭定时获取版本号的线程
-            if (mScheduledExecutorServiceGetAppVersion != null) {
-                mScheduledExecutorServiceGetAppVersion.shutdownNow()
-                LogUtils.e("关闭定时获取版本号的线程")
-            }
-
-            val deviceList = DeviceService.getInstance().loadAll()
-            if (deviceList != null && deviceList.size > 0) {
-                UR880Entrance.getInstance()
-                    .removeDeviceInformationListener(mDeviceInformationListener)
-            }
-
-            // 关闭MQTT
-            MQTTHelper.getInstance().closeMQTT()
-        }
-
-        // 3档案单柜 15寸屏 竖屏
-        if (SelfComm.DEVICE_NAME[3].equals(deviceName)) {
-            // 关闭定时获取库存的线程
-            if (mScheduledExecutorService != null) {
-                mScheduledExecutorService.shutdownNow()
-                LogUtils.e("关闭定时获取库存的线程")
-            }
-            // 关闭定时获取版本号的线程
-            if (mScheduledExecutorServiceGetAppVersion != null) {
-                mScheduledExecutorServiceGetAppVersion.shutdownNow()
-                LogUtils.e("关闭定时获取版本号的线程")
-            }
-
-            val deviceList = DeviceService.getInstance().loadAll()
-            if (deviceList != null && deviceList.size > 0) {
-                UR880Entrance.getInstance()
-                    .removeDeviceInformationListener(mDeviceInformationListener)
-                UR880Entrance.getInstance().disConnect()
-            }
-
-            // 关闭MQTT
-            MQTTHelper.getInstance().closeMQTT()
-        }
-
-        // 4一体机 17寸屏 横屏
-        if (SelfComm.DEVICE_NAME[4].equals(deviceName)) {
-            // 关闭定时获取库存的线程
-            if (mScheduledExecutorService != null) {
-                mScheduledExecutorService.shutdownNow()
-                LogUtils.e("关闭定时获取库存的线程")
-            }
-            // 关闭定时获取版本号的线程
-            if (mScheduledExecutorServiceGetAppVersion != null) {
-                mScheduledExecutorServiceGetAppVersion.shutdownNow()
-                LogUtils.e("关闭定时获取版本号的线程")
-            }
-
-            val port = mSpUtil.getString(SharedPreferencesUtil.Key.YTJDxqSerialSelected, "")
-            if (!TextUtils.isEmpty(port)) {
-                UR880Entrance.getInstance()
-                    .removeDeviceInformationListener(mDeviceInformationListener)
-                UR880Entrance.getInstance().disConnect()
-            }
-        }
-
-        // todo PDA 5
-        if (SelfComm.DEVICE_NAME[5].equals(deviceName)) {
-
         }
     }
 
@@ -1931,7 +2122,8 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                 "人脸识别服务本机服务器-开启成功-IP:" + NetworkUtils.getIPAddress(true) + ",port=" + faceServerPort
             )
         } catch (e: Exception) {
-            mFaceRecognitionHttpServer.stop()
+            if (mFaceRecognitionHttpServer.isAlive)
+                mFaceRecognitionHttpServer.stop()
             LogUtils.e("人脸识别服务", "人脸识别服务本机服务器-开启失败. e = $e")
             showErrorToast("人脸识别服务本机服务器-开启失败. e = $e")
         }
@@ -1975,9 +2167,14 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         }
     }
 
-    //关闭登录弹窗
+    // 关闭登录弹窗
     private fun dismissLoginDialog() {
         if (mDialogLogin != null && mDialogLogin!!.isShowing) mDialogLogin!!.dismiss()
+    }
+
+    // 关闭设置弹窗
+    private fun dismissSettingDialog() {
+        if (mSettingDialog != null && mSettingDialog!!.isShowing) mSettingDialog!!.dismiss()
     }
 
     /**
@@ -2295,6 +2492,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             // 当在进行新版本安装时,这句会把程序kill掉,所以在这句之后的逻辑不会继续往下执行，所以重启的操作要放到process.waitFor();之前
             val value = process.waitFor()
             LogUtils.e("获取最新App版本信息-静默安装-结果返回值：$value")
+
             return value == 0
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
@@ -2305,74 +2503,5 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
         return false
     }
 
-    /**
-     * 静默安装 科大讯飞语音引擎包3.0.apk
-     */
-    private fun installKDXFApk() {
-        // 1.判断 科大讯飞语音引擎包3.0.apk 是否已经安装
-        if (AppUtils.isAppInstalled("com.iflytek.speechcloud")) {
-            LogUtils.e("安装科大讯飞语音引擎包3.0-语音包已安装")
-        } else {
-            // 未安装的话,复制安装包,并静默安装
-            val filePath = PathUtils.getExternalAppDownloadPath() + "/科大讯飞语音引擎包3.0.apk"
-            val result = ResourceUtils.copyFileFromAssets("kdxf.apk", filePath)
-            // /storage/emulated/0/Android/data/com.gw.cabinet/files/Download/科大讯飞语音引擎包3.0.apk
-            LogUtils.e("安装科大讯飞语音引擎包3.0-将Assets目录下kdxf.apk文件复制到$filePath")
-
-            if (result) {
-                // 复制成功
-                LogUtils.e("安装科大讯飞语音引擎包3.0-文件复制成功")
-                // 静默安装方式
-                val installResult = suInstallApp(filePath)
-                if (installResult) {
-                    showSuccessToast("语音引擎包安装成功")
-                    // 跳转到文字转语音设置界面
-                    val intent = Intent()
-                    intent.action = "com.android.settings.TTS_SETTINGS"
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intent)
-                } else {
-                    showSuccessToast("语音引擎包安装失败")
-                }
-                // 手动安装方式
-                // AppUtils.installApp(filePath)
-            } else {
-                showSuccessToast("语音引擎包复制失败")
-                LogUtils.e("安装科大讯飞语音引擎包3.0-文件复制失败")
-            }
-        }
-    }
-
-    /**
-     * 静默安装Apk
-     * 设备必须已破解(获得ROOT权限)
-     */
-    private fun suInstallApp(apkPath: String): Boolean {
-        LogUtils.e("安装科大讯飞语音引擎包3.0-静默安装-发送安装指令:apkPath", apkPath)
-
-        var printWriter: PrintWriter? = null
-        var process: Process? = null
-        try {
-            process = Runtime.getRuntime().exec("su")
-            printWriter = PrintWriter(process.outputStream)
-            printWriter.println("chmod 777 $apkPath")
-            printWriter.println("export LD_LIBRARY_PATH=/vendor/lib:/system/lib")
-            printWriter.println("pm install -r $apkPath")
-            // printWriter.println("exit");
-            printWriter.flush()
-            printWriter.close()
-
-            // 当在进行新版本安装时,这句会把程序卡住/如是覆盖安装会把程序kill掉,所以在这句之后的逻辑不会继续往下执行，所以重启的操作要放到process.waitFor();之前
-            val value = process.waitFor()
-            LogUtils.e("安装科大讯飞语音引擎包3.0-静默安装-结果：${value == 0}")
-            return value == 0
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-            LogUtils.e("安装科大讯飞语音引擎包3.0-静默安装-安装Apk出现异常", e.message)
-        } finally {
-            process?.destroy()
-        }
-        return false
-    }
 }
 

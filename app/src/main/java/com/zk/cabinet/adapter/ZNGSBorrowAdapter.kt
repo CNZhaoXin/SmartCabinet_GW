@@ -31,6 +31,8 @@ class ZNGSBorrowAdapter(
             view = mLayoutInflater.inflate(R.layout.adapter_zngs_borrow, null)
             viewHolder = ZNGSBorrowAdapter.ViewHolder(
                 view.findViewById(R.id.ll),
+                view.findViewById(R.id.tv_archivesCode),
+                view.findViewById(R.id.tv_archivesNo),
                 view.findViewById(R.id.tv_file_name),
                 view.findViewById(R.id.tv_status),
                 view.findViewById(R.id.tv_epc),
@@ -42,6 +44,10 @@ class ZNGSBorrowAdapter(
             viewHolder = view.tag as ViewHolder
         }
 
+        // 档案编号（文号）
+        viewHolder.tv_archivesCode.text = entity.archivesCode
+        // 档案号
+        viewHolder.tv_archivesNo.text = entity.archivesNo
         // 档案名称
         viewHolder.tv_file_name.text = entity.archivesName
         // 档案状态 待入库0,在库10,借阅审批中50,待借阅100,待归还200,异常9000
@@ -106,7 +112,8 @@ class ZNGSBorrowAdapter(
                 viewHolder.iv_checked.visibility = View.GONE
                 viewHolder.ll.setBackgroundColor(mContext.resources.getColor(R.color.color_list_unable))
                 viewHolder.tv_position.setTextColor(mContext.resources.getColor(R.color.red_primary))
-                viewHolder.tv_position.text = "该档案需前往「 ${entity.houseName}-${entity.masterName} 」操作屏登录借阅"
+                viewHolder.tv_position.text =
+                    "该档案需前往「 ${entity.houseName}-${entity.masterName} 」操作屏登录借阅"
             }
 
         } else if ("3" == cabinetType) {
@@ -114,7 +121,8 @@ class ZNGSBorrowAdapter(
             viewHolder.iv_checked.visibility = View.GONE
             viewHolder.ll.setBackgroundColor(mContext.resources.getColor(R.color.color_list_unable))
             viewHolder.tv_position.setTextColor(mContext.resources.getColor(R.color.red_primary))
-            viewHolder.tv_position.text = "该档案需前往「 ${entity.houseName}-${entity.cabinetName} 」操作屏登录借阅"
+            viewHolder.tv_position.text =
+                "该档案需前往「 ${entity.houseName}-${entity.cabinetName} 」操作屏登录借阅"
         }
 
         if (entity.isSelect) {
@@ -140,6 +148,8 @@ class ZNGSBorrowAdapter(
 
     private class ViewHolder(
         var ll: LinearLayout,
+        var tv_archivesCode: TextView,
+        var tv_archivesNo: TextView,
         var tv_file_name: TextView,
         var tv_status: TextView,
         var tv_epc: TextView,

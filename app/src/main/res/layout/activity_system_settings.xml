@@ -231,8 +231,24 @@
                             app:settingTitle="@string/device_type"
                             app:settingTitleColor="@color/colorSysFontMain" />
 
+                        <!-- 档案单柜-打开柜门 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_open_door"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            android:visibility="gone"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_number_of_boxes"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/open_door"
+                            app:settingTitleColor="@color/colorSysFontMain" />
 
                     </LinearLayout>
+
                 </androidx.cardview.widget.CardView>
 
                 <!-- 网络配置 -->
@@ -460,6 +476,52 @@
 
                 </androidx.cardview.widget.CardView>
 
+                <!-- 通道门配置 -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_tdm_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/card_spacing"
+                    android:clickable="false"
+                    android:foreground="@drawable/ripple"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:cardElevation="@dimen/card_elevation">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="@dimen/medium_spacing"
+                            android:paddingTop="@dimen/medium_spacing"
+                            android:text="通道门配置"
+                            android:textColor="@color/md_blue_grey_900"
+                            android:textSize="@dimen/medium_text"
+                            android:textStyle="bold"
+                            tools:ignore="RtlSymmetry" />
+
+                        <!-- 通道门读写器设备ID配置 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_tdm_device_id"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@mipmap/ic_screen"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/tdm_device_id_setting"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
                 <!-- 档案架配置 -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cv_daj_setting"
@@ -577,6 +639,7 @@
                             app:settingTitle="@string/number_of_boxes"
                             app:settingTitleColor="@color/colorSysFontMain" />
 
+
                         <com.zk.common.view.setting.SettingBasic
                             android:id="@+id/system_setting_cabinet_service_port_sb"
                             android:layout_width="match_parent"
@@ -590,6 +653,37 @@
                             app:settingIconColor="@color/colorSysFontMain"
                             app:settingTitle="@string/cabinet_service_port"
                             app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <!-- 档案组柜灯控串口设置 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_light_serial_zg"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@drawable/sys_cabinet_service_port"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/light_serial_setting_zg"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
+                        <!-- 档案组柜灯控调试 -->
+                        <com.zk.common.view.setting.SettingBasic
+                            android:id="@+id/system_setting_light_serial_debug_zg"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{onClickListener}"
+                            app:settingCaption="@string/air"
+                            app:settingCaptionColor="@color/colorSysFontMain"
+                            app:settingIcon="@mipmap/ic_light"
+                            app:settingIconColor="@color/colorSysFontMain"
+                            app:settingTitle="@string/light_serial_debug_zg"
+                            app:settingTitleColor="@color/colorSysFontMain" />
+
 
                         <com.zk.common.view.setting.SettingBasic
                             android:id="@+id/system_setting_not_closed_door_alarm_time_sb"

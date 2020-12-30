@@ -74,6 +74,26 @@ public class ResultGetToReturnList {
         private String houseNo;
         // "库房名称"
         private String houseName;
+        // 档案编号（文号）
+        private String archivesCode;
+        // 档案号
+        private String archivesNo;
+
+        public String getArchivesCode() {
+            return archivesCode;
+        }
+
+        public String getArchivesNo() {
+            return archivesNo;
+        }
+
+        public void setArchivesCode(String archivesCode) {
+            this.archivesCode = archivesCode;
+        }
+
+        public void setArchivesNo(String archivesNo) {
+            this.archivesNo = archivesNo;
+        }
 
         public String getHouseCode() {
             return houseCode;

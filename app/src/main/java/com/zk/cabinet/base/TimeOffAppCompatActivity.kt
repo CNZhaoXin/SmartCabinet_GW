@@ -38,7 +38,7 @@ open class TimeOffAppCompatActivity : AppCompatActivity(), TextToSpeech.OnInitLi
             textToSpeech!!.setSpeechRate(1.0f) // 设定语速，1.0正常语速
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 if (AppUtils.isAppInstalled("com.iflytek.speechcloud")) {
-                    showErrorToast("语音引擎包未设置")
+                    showErrorToast("语音引擎包未设置，请到设置-无障碍-文字转语音中设置")
                 } else {
                     showErrorToast("语音引擎包未安装")
                 }
@@ -77,8 +77,9 @@ open class TimeOffAppCompatActivity : AppCompatActivity(), TextToSpeech.OnInitLi
         }
     }
 
+    // 自动返回主界面时间设置 5分钟 300秒
     private fun setAutoFinish() {
-        val mCountdownTemp = mSpUtil.getInt(Key.Countdown, 600)
+        val mCountdownTemp = mSpUtil.getInt(Key.Countdown, 300)
         if (mCountdownTemp != mCountdown) {
             mCountdown = mCountdownTemp
             initTime()
@@ -101,7 +102,8 @@ open class TimeOffAppCompatActivity : AppCompatActivity(), TextToSpeech.OnInitLi
                 countDownTimerOnTick(temp)
                 LogUtil.instance.d("无人操作，倒计时 -------------------- $temp")
                 if (temp <= 10) {
-                    showWarningToast("已经${mCountdown - temp}秒无人操作,${temp}秒后返回主界面")
+                    // showWarningToast("已经${mCountdown - temp}秒无人操作,${temp}秒后返回主界面")
+                    showWarningToast("${temp}秒后返回主界面")
                 }
             }
 

@@ -9,7 +9,7 @@ public class ResultGetArchivesInfoByRFID {
 
     private String msg;
     private int code;
-    private List<FileDetailsData> data;
+    private List<SearchDossierDetailsData> data;
 
     public void setMsg(String msg) {
         this.msg = msg;
@@ -27,11 +27,11 @@ public class ResultGetArchivesInfoByRFID {
         return code;
     }
 
-    public void setData(List<FileDetailsData> data) {
+    public void setData(List<SearchDossierDetailsData> data) {
         this.data = data;
     }
 
-    public List<FileDetailsData> getData() {
+    public List<SearchDossierDetailsData> getData() {
         return data;
     }
 

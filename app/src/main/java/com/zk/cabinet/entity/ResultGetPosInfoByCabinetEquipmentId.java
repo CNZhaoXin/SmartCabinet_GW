@@ -140,7 +140,6 @@ public class ResultGetPosInfoByCabinetEquipmentId {
             private String borrowerDeptName;
             private String borrowerName;
             private String archivesName;
-            private String archivesCode;
             private String secrecyLevel;
             private String rfid;
             private int rowNo;
@@ -159,6 +158,18 @@ public class ResultGetPosInfoByCabinetEquipmentId {
             private String houseNo;
             // "库房名称"
             private String houseName;
+            // 档案编号（文号）
+            private String archivesCode;
+            // 档案号
+            private String archivesNo;
+
+            public String getArchivesNo() {
+                return archivesNo;
+            }
+
+            public void setArchivesNo(String archivesNo) {
+                this.archivesNo = archivesNo;
+            }
 
             public String getHouseCode() {
                 return houseCode;
