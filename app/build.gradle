@@ -12,11 +12,11 @@ android {
         applicationId "com.gw.cabinet"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 34
-        versionName "1.0.34"
+        versionCode 35
+        versionName "1.0.35"
         // 32_v1.0.32 (2020.12.29)
         // 33_v1.0.33 (2020.12.30)
-        // 34_v1.0.34 (2020.1.5)
+        // 35_v1.0.35 (2020.1.5)
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -171,6 +171,9 @@ dependencies {
     implementation files('libs/SenterOpenApi_IoT_1.2.3.95_Function_KeyManager.jar')
     implementation files('libs/SenterOpenApi_IoT_1.2.3.95_Function_UltraHighFrequency_Compat_Support.jar')
     implementation files('libs/SenterOpenApi_IoT_1.2.3.95_Function_UltraHighFrequency_ModelD2.jar')
+
+    // 屏幕的系统SDK(只适用于广州透晶技术公司的屏幕)
+    implementation files('libs/sdkapi.jar')
 
     // 未混淆处理,usb通信,可串口转usb再通信,usb-serial-for-android (https://github.com/mik3y/usb-serial-for-android 目前最新：检查日期 2020.10.15)
     // implementation 'com.github.mik3y:usb-serial-for-android:3.2.0'

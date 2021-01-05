@@ -24,6 +24,7 @@ import android_serialport_api.SerialPortFinder
 import androidx.databinding.DataBindingUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.NetworkUtils
+import com.lztek.toolkit.Lztek
 import com.zk.cabinet.R
 import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.constant.SelfComm
@@ -1755,9 +1756,17 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
 
     override fun onResume() {
         super.onResume()
-        //警告：别TM瞎改这句话，神TM知道这块破板子（双网口7.1.2的固件）只在onResume中设置生效
-//        SmdtUtil.instance.setGesturesStatusBar(false)
-//        SmdtUtil.instance.setStatusBar(this, false)
+
+        val deviceName = mSpUtil.getString(Key.DeviceName, "").toString()
+        if (SelfComm.DEVICE_NAME[1].equals(deviceName)
+            || SelfComm.DEVICE_NAME[2].equals(deviceName)
+            || SelfComm.DEVICE_NAME[3].equals(deviceName)
+            || SelfComm.DEVICE_NAME[4].equals(deviceName)
+            || SelfComm.DEVICE_NAME[6].equals(deviceName)
+        ) {
+            // 显示导航栏(只适用于广州透晶技术公司的屏幕)
+            Lztek.create(this).showNavigationBar()
+        }
 
         // 本机固定IP配置
         mSystemSettingsBinding.systemSettingThisMachineIp.setCaptionText(
@@ -1814,4 +1823,5 @@ class SystemSettingsActivity : TimeOffAppCompatActivity(), View.OnClickListener 
         startActivity(intent)
         Process.killProcess(Process.myPid())
     }
+
 }

@@ -43,6 +43,7 @@ import com.github.mikephil.charting.utils.MPPointF
 import com.liulishuo.filedownloader.BaseDownloadTask
 import com.liulishuo.filedownloader.FileDownloadListener
 import com.liulishuo.filedownloader.FileDownloader
+import com.lztek.toolkit.Lztek
 import com.romainpiel.shimmer.Shimmer
 import com.romainpiel.shimmer.ShimmerTextView
 import com.zk.cabinet.R
@@ -104,7 +105,7 @@ private const val GET_APP_VERSION_MINUTES_TIME = 10L
 // 开始安装app后,延迟重启App的时间,10S,安装时间够了
 private const val DELAY_RESTART_APP_TIME = 8 * 1000L
 
-// 管理员密码
+// 管理员密码,刘强的员工号
 private const val ADMIN_PASSWORD = "30185435"
 
 // 调试人员密码
@@ -613,6 +614,17 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
 
     override fun onResume() {
         super.onResume()
+        if (SelfComm.DEVICE_NAME[1].equals(deviceName)
+            || SelfComm.DEVICE_NAME[2].equals(deviceName)
+            || SelfComm.DEVICE_NAME[3].equals(deviceName)
+            || SelfComm.DEVICE_NAME[4].equals(deviceName)
+            || SelfComm.DEVICE_NAME[6].equals(deviceName)
+        ) {
+            // 隐藏导航栏(只适用于广州透晶技术公司的屏幕)
+            Lztek.create(this).hideNavigationBar()
+        }
+
+
         // 档案组架1-档案组柜2-打开灯控串口
         if (SelfComm.DEVICE_NAME[1].equals(deviceName)
             || SelfComm.DEVICE_NAME[2].equals(deviceName)
@@ -635,8 +647,7 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
             val inventoryPlanList = InventoryPlanRecordService.getInstance().loadAll()
             if (inventoryPlanList != null && inventoryPlanList.size > 0) {
                 LogUtils.e(
-                    "自动盘库-当前是主页/或回到首页-保存的待盘库计划列表"
-                    , JSON.toJSONString(inventoryPlanList)
+                    "自动盘库-当前是主页/或回到首页-保存的待盘库计划列表", JSON.toJSONString(inventoryPlanList)
                 )
                 val inventoryPlan = inventoryPlanList[0]
                 // 打开档案柜自动盘点界面,传递自动盘库所需数据
@@ -651,13 +662,12 @@ class GuideActivity : TimeOffAppCompatActivity(), OnClickListener, View.OnLongCl
                 // 去执行该条计划后，清除表中该盘库计划，无需关心是否盘库成功提交成功，只要去打开界面执行了就算是做了这个操作
                 InventoryPlanRecordService.getInstance().delete(inventoryPlan)
                 LogUtils.e(
-                    "自动盘库-当前是主页/或回到首页-打开自动盘库界面进行盘库,然后删除该计划"
-                    , JSON.toJSONString(inventoryPlan)
+                    "自动盘库-当前是主页/或回到首页-打开自动盘库界面进行盘库,然后删除该计划", JSON.toJSONString(inventoryPlan)
                 )
                 // 打印删除后的盘库计划列表
                 LogUtils.e(
-                    "自动盘库-当前是主页/或回到首页-保存的待盘库计划列表,删除后的"
-                    , JSON.toJSONString(InventoryPlanRecordService.getInstance().loadAll())
+                    "自动盘库-当前是主页/或回到首页-保存的待盘库计划列表,删除后的",
+                    JSON.toJSONString(InventoryPlanRecordService.getInstance().loadAll())
                 )
             } else {
                 LogUtils.e(
