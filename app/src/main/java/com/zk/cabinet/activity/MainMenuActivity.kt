@@ -281,7 +281,7 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
 
             // PDA-入库
             SelfComm.FUNCTION_TYPE[1] -> {
-                intentActivity(PDAInventoryActivity.newIntent(this))
+                intentActivity(PDAInStorageActivity.newIntent(this))
             }
             // PDA-移库
             SelfComm.FUNCTION_TYPE[2] -> {

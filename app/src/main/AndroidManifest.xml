@@ -143,12 +143,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBarAppTheme" />
         <activity
-            android:name=".activity.InStoragePDAActivity"
+            android:name=".activity.PDAInStorageActivity"
             android:label="PDA-入库"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBarAppTheme" />
         <activity
-            android:name=".activity.MoveStoragePDAActivity"
+            android:name=".activity.PDAMoveStorageActivity"
             android:label="PDA-移库"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBarAppTheme" />
