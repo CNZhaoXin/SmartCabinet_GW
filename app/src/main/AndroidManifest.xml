@@ -138,6 +138,11 @@
             android:theme="@style/NoActionBarAppTheme" />
         <!-- PDA -->
         <activity
+            android:name=".activity.PDADossierMenuActivity"
+            android:label="PDA-档案管理"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
             android:name=".activity.CustomCaptureActivity"
             android:label="PDA-扫二维码/条形码"
             android:screenOrientation="portrait"
@@ -162,6 +167,28 @@
             android:label="PDA-盘库-操作"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBarAppTheme" />
+
+        <activity
+            android:name=".activity.PDADossierBoxMenuActivity"
+            android:label="PDA-档案盒管理"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.PDABindBoxActivity"
+            android:label="PDA-档案盒管理-绑定"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.PDAUnBindBoxActivity"
+            android:label="PDA-档案盒管理-解绑"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.PDAQueryStorageActivity"
+            android:label="PDA-档案盒管理-查询"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarAppTheme" />
+
         <!-- 一体机 -->
         <activity
             android:name=".activity.YTJBorrowActivity"

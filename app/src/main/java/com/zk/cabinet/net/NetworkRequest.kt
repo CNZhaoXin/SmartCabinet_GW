@@ -18,6 +18,9 @@ class NetworkRequest : VolleyRequest() {
     lateinit var mLightUp: String
     lateinit var mGetHouseList: String
     lateinit var mGetArchivesInfoByRFID: String
+    lateinit var mGetBoxListByPosCode: String
+    lateinit var mBind: String
+    lateinit var mUnBind: String
     lateinit var mPosBind: String
     lateinit var mGetNoStartInventoryPlan: String
     lateinit var mSubmitInventoryResult: String
@@ -35,10 +38,10 @@ class NetworkRequest : VolleyRequest() {
     lateinit var mGetAllCodeType: String
 
     companion object {
-        // 阿里云外网测试服务器地址,设置为默认地址
+        // todo 阿里云外网测试服务器地址
         // http://118.25.102.226:11001/apiLogin
 
-        // 外网测试MQTT地址,设置为默认地址
+        // todo 外网测试MQTT地址
         // 地址：47.96.95.4  
         // 端口：1883
         // 用户名密码:test/test
@@ -66,7 +69,7 @@ class NetworkRequest : VolleyRequest() {
         // appSecret: 5GPKANd87cMqtkWtzKxn
         // http://10.238.211.2:11001/apiLogin
 
-        // 国网智芯内网MQTT服务器地址,设置为默认地址
+        // todo 国网智芯内网MQTT服务器地址,设置为默认地址
         // 地址：10.238.211.2
         // 端口：1883
         // 用户名密码:test/test
@@ -164,6 +167,19 @@ class NetworkRequest : VolleyRequest() {
         // 获取档案类型
         private const val getAllCodeType = "/api/pad/getAllCodeType"
 
+        // 29.根据库位编号获取绑定的档案盒信息
+        // 接口地址：  get   /api/pad/getBoxListByPosCode
+        // 获取档案类型
+        private const val getBoxListByPosCode = "/api/pad/getBoxListByPosCode"
+
+        // 27.档案盒绑定库位
+        // 接口地址：  post   /busi/baseArchivesBox/bind
+        private const val bind = "/busi/baseArchivesBox/bind"
+
+        // 28.档案盒解绑库位
+        // 接口地址：  post   /busi/baseArchivesBox/unBind
+        private const val unBind = "/busi/baseArchivesBox/unBind"
+
         val instance: NetworkRequest by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
             NetworkRequest()
         }
@@ -243,6 +259,9 @@ class NetworkRequest : VolleyRequest() {
         mGetPosInfoByCabinetEquipmentId =
             URL_HEAD + url + URL_COLON + port + getPosInfoByCabinetEquipmentId
         mGetAllCodeType = URL_HEAD + url + URL_COLON + port + getAllCodeType
+        mGetBoxListByPosCode = URL_HEAD + url + URL_COLON + port + getBoxListByPosCode
+        mBind = URL_HEAD + url + URL_COLON + port + bind
+        mUnBind = URL_HEAD + url + URL_COLON + port + unBind
     }
 
     fun configModifyMQTT(mqttIP: String, mqttPort: Int) {

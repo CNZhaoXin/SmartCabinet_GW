@@ -85,30 +85,30 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
         // 根据不同设备类型初始化操作
 
         val deviceName = mSpUtil.getString(SharedPreferencesUtil.Key.DeviceName, "")
-        // PDA
+
         if (deviceName.equals(SelfComm.DEVICE_NAME[5])) {
             // PDA5
             mMenuList.add(
                 MainMenuInfo(
                     SelfComm.FUNCTION_TYPE[1],
-                    R.mipmap.ic_return,
-                    "入 库",
+                    R.mipmap.ic_menu_dossier,
+                    "档 案",
                     R.drawable.selector_menu_blue_normal
                 )
             )
             mMenuList.add(
                 MainMenuInfo(
                     SelfComm.FUNCTION_TYPE[2],
-                    R.mipmap.ic_yiku,
-                    "移 库",
+                    R.mipmap.ic_menu_dossier_box,
+                    "档案盒",
                     R.drawable.selector_menu_green_normal
                 )
             )
             mMenuList.add(
                 MainMenuInfo(
                     SelfComm.FUNCTION_TYPE[3],
-                    R.mipmap.ic_inventory,
-                    "盘 库",
+                    R.mipmap.ic_menu_querry,
+                    "查 询",
                     R.drawable.selector_menu_orange_normal
                 )
             )
@@ -279,17 +279,17 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
                 finish()
             }
 
-            // PDA-入库
+            // PDA-档案管理
             SelfComm.FUNCTION_TYPE[1] -> {
-                intentActivity(PDAInStorageActivity.newIntent(this))
+                intentActivity(PDADossierMenuActivity.newIntent(this))
             }
-            // PDA-移库
+            // PDA-档案盒管理
             SelfComm.FUNCTION_TYPE[2] -> {
-                intentActivity(PDAMoveStorageActivity.newIntent(this))
+                intentActivity(PDADossierBoxMenuActivity.newIntent(this))
             }
-            // PDA-盘库
+            // PDA-档案盒管理-查询
             SelfComm.FUNCTION_TYPE[3] -> {
-                intentActivity(PDAInventoryActivity.newIntent(this))
+                intentActivity(PDAQueryStorageActivity.newIntent(this))
             }
 
             // 一体机-借阅
@@ -323,6 +323,7 @@ class MainMenuActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickList
             SelfComm.FUNCTION_TYPE[10] -> {
                 intentActivity(CabinetPreviewActivity.newIntent(this))
             }
+
         }
     }
 }

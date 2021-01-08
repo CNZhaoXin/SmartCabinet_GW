@@ -22,6 +22,7 @@ object SelfComm {
 
     // 设备名称
     val DEVICE_NAME = HashMap<Int, String>()
+
     // 主页功能选项类型
     val FUNCTION_TYPE = HashMap<Int, Int>()
 
@@ -41,9 +42,18 @@ object SelfComm {
         DEVICE_NAME[6] = "通道门"
 
         FUNCTION_TYPE[0] = 0 // "登出"
-        FUNCTION_TYPE[1] = 1 // "PDA-入库"
-        FUNCTION_TYPE[2] = 2 // "PDA-移库"
-        FUNCTION_TYPE[3] = 3 // "PDA-盘库"
+
+        FUNCTION_TYPE[1] = 1 // "PDA-档案管理"
+        FUNCTION_TYPE[11] = 11 // "PDA-档案-档案入库"
+        FUNCTION_TYPE[12] = 12 // "PDA-档案-档案移库"
+        FUNCTION_TYPE[13] = 13 // "PDA-档案-档案盘库"
+
+        FUNCTION_TYPE[2] = 2 // "PDA-档案盒管理"
+        FUNCTION_TYPE[21] = 21 // "PDA-档案盒-绑定库位"
+        FUNCTION_TYPE[22] = 22 // "PDA-档案盒-解绑库位"
+
+        FUNCTION_TYPE[3] = 3 // "PDA-档案盒-查询库位"
+
         FUNCTION_TYPE[4] = 4 // "一体机-借阅"
         FUNCTION_TYPE[5] = 5 // "一体机-归还"
         FUNCTION_TYPE[6] = 6 // "档案单柜-借阅"
