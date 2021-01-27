@@ -188,6 +188,11 @@
             android:label="PDA-档案盒管理-查询"
             android:screenOrientation="portrait"
             android:theme="@style/NoActionBarAppTheme" />
+        <activity
+            android:name=".activity.PDAInventoryDifferenceDetailsActivity"
+            android:label="PDA-盘库差异详情"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionBarAppTheme" />
 
         <!-- 一体机 -->
         <activity

@@ -334,6 +334,39 @@ public class LightsSerialPortHelper {
     }
 
     /**
+     * 一次性全灭单个档案组架所有层灯(不包括大灯)
+     */
+    public void closeSingleCabinetAllLight(int deviceId) {
+        byte[] data = new byte[21];
+        data[0] = (byte) 166; // A6 = 166
+        data[1] = (byte) 168; // A8 = 168
+        data[2] = (byte) deviceId;
+        data[3] = (byte) 0;
+        data[4] = (byte) 0;
+        data[5] = (byte) 19; // 帧长度(除帧头外的所有数据长度和)
+        data[6] = (byte) 0;
+        data[7] = (byte) 2;
+
+        data[8] = (byte) 0;
+        data[9] = (byte) 0;
+        data[10] = (byte) 0;
+        data[11] = (byte) 0;
+        data[12] = (byte) 0;
+        data[13] = (byte) 0;
+        data[14] = (byte) 0;
+        data[15] = (byte) 0;
+        data[16] = (byte) 0;
+        data[17] = (byte) 0;
+        data[18] = (byte) 0;
+        data[19] = (byte) 0;
+
+        data[20] = calcCheckBit(data); // 计算校验位
+
+        LogUtils.e("档案组架-一次性灭所有灯(不包括大灯)：", "数据长度:" + data.length, "byte数组原数据:", data, "byte数组转16进制数据:" + bytesToHex(data));
+        addSendTask(data);
+    }
+
+    /**
      * 计算校验位
      * 亮灯的这个协议的校验位计算规则是:校验位前的数据的总加和
      *

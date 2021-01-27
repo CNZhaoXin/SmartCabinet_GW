@@ -15,6 +15,9 @@ import com.alibaba.fastjson.JSON
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.blankj.utilcode.util.LogUtils
+import com.scwang.smart.refresh.header.ClassicsHeader
+import com.scwang.smart.refresh.layout.api.RefreshLayout
+import com.scwang.smart.refresh.layout.listener.OnRefreshListener
 import com.zk.cabinet.R
 import com.zk.cabinet.activity.PDAInventoryOperatorActivity
 import com.zk.cabinet.adapter.PDAInventoryNoStartPlanAdapter
@@ -52,6 +55,20 @@ class PDANoInventoryPlanFragment : BaseFragment(), View.OnClickListener,
         // 初始化Dialog
         mProgressDialog = ProgressDialog(activity, R.style.mLoadingDialog)
         mProgressDialog.setCancelable(false)
+
+        // 初始化 下拉刷新
+        val classicsHeader = ClassicsHeader(requireActivity())
+        classicsHeader.setTextSizeTitle(26f)
+        classicsHeader.setTextSizeTime(26f)
+        classicsHeader.setDrawableSize(22f)
+        classicsHeader.setAccentColorId(R.color.white)
+        mBinding.refreshLayout.setRefreshHeader(classicsHeader)
+
+        mBinding.refreshLayout.setOnRefreshListener(object : OnRefreshListener {
+            override fun onRefresh(refreshlayout: RefreshLayout) {
+                getNoStartInventoryPlan()
+            }
+        })
 
         // 正在获取盘库计划列表
         mProgressDialog.setMessage("正在获取盘库计划列表...")
@@ -102,28 +119,38 @@ class PDANoInventoryPlanFragment : BaseFragment(), View.OnClickListener,
                             if (dataList != null && dataList.size > 0) {
                                 mList =
                                     dataList as ArrayList<ResultGetNoStartInventoryPlan.DataBean>
-                                mAdapter.setList(dataList)
+                                mAdapter.setList(mList)
                                 mAdapter.notifyDataSetChanged()
                                 mBinding.llNoData.visibility = GONE
                                 mProgressDialog.dismiss()
+
+                                mBinding.refreshLayout.finishRefresh(1000 /*,false*/) // 传入false表示刷新失败
                             } else {
                                 // 这里要设置一张无数据的空图片
                                 showWarningToast("暂无盘库计划信息")
                                 mBinding.llNoData.visibility = VISIBLE
                                 mProgressDialog.dismiss()
+
+                                mBinding.refreshLayout.finishRefresh(1000 /*,false*/) // 传入false表示刷新失败
                             }
                         } else {
                             showWarningToast(response.getString("msg"))
                             mProgressDialog.dismiss()
+
+                            mBinding.refreshLayout.finishRefresh(false) // 传入false表示刷新失败
                         }
                     } else {
                         showWarningToast("获取未盘库的盘库计划信息-请求失败")
                         mProgressDialog.dismiss()
+
+                        mBinding.refreshLayout.finishRefresh(false) // 传入false表示刷新失败
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
                     showErrorToast("获取未盘库的盘库计划信息-请求失败")
                     mProgressDialog.dismiss()
+
+                    mBinding.refreshLayout.finishRefresh(false) // 传入false表示刷新失败
                 }
             },
             { error ->
@@ -138,6 +165,8 @@ class PDANoInventoryPlanFragment : BaseFragment(), View.OnClickListener,
                     }
                 showErrorToast(msg)
                 mProgressDialog.dismiss()
+
+                mBinding.refreshLayout.finishRefresh(false) // 传入false表示刷新失败
             })
 
         jsonObjectRequest.retryPolicy = DefaultRetryPolicy(

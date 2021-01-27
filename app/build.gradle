@@ -12,12 +12,13 @@ android {
         applicationId "com.gw.cabinet"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 37
-        versionName "1.0.37"
+        versionCode 38
+        versionName "1.1.0"
         // 32_v1.0.32 (2020.12.29)
         // 33_v1.0.33 (2020.12.30)
         // 36_v1.0.36 (2020.1.5)
         // 37_v1.0.37 (2020.1.8)
+        // 38_v1.1.0 (2020.1.27)
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -189,4 +190,9 @@ dependencies {
 
     // FileDownloader(https://github.com/lingochamp/FileDownloader/blob/master/README-zh.md 目前最新：检查日期 2020.12.16)
     implementation 'com.liulishuo.filedownloader:library:1.7.7'
+
+    // SmartRefreshLayout (https://github.com/scwang90/SmartRefreshLayout 目前最新：检查日期 2021.1.25)
+    implementation 'com.scwang.smart:refresh-layout-kernel:2.0.3'      //核心必须依赖
+    implementation 'com.scwang.smart:refresh-header-classics:2.0.3'    //经典刷新头
+    implementation 'com.scwang.smart:refresh-footer-classics:2.0.3'    //经典加载
 }

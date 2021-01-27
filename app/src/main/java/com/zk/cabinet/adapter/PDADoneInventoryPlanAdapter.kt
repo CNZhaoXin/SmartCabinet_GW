@@ -46,12 +46,12 @@ class PDADoneInventoryPlanAdapter(
         when (entity.inventoryType) {
             "1" -> {
                 viewHolder.tv_inventoryType.text = "自动盘库"
-                viewHolder.iv_arrow.visibility = View.GONE
+                viewHolder.iv_arrow.visibility = View.VISIBLE
                 viewHolder.cardView.setCardBackgroundColor(mContext.resources.getColor(R.color.gray_light))
             }
             "2" -> {
                 viewHolder.tv_inventoryType.text = "PDA盘库"
-                viewHolder.iv_arrow.visibility = View.GONE
+                viewHolder.iv_arrow.visibility = View.VISIBLE
                 viewHolder.cardView.setCardBackgroundColor(mContext.resources.getColor(R.color.white))
             }
         }
@@ -81,7 +81,7 @@ class PDADoneInventoryPlanAdapter(
         var tv_archivesNumOriginal: TextView,
         var tv_archivesNumNow: TextView,
         var tv_errNum: TextView,
-        var iv_arrow: ImageView,
+        var iv_arrow: ImageView
     )
 
     override fun getItem(position: Int): Any {

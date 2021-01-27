@@ -1,7 +1,9 @@
 package com.zk.cabinet.activity
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AccelerateInterpolator
@@ -9,6 +11,7 @@ import android.view.animation.DecelerateInterpolator
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.alibaba.fastjson.JSON
 import com.blankj.utilcode.util.LogUtils
 import com.zk.cabinet.R
@@ -16,6 +19,7 @@ import com.zk.cabinet.base.TimeOffAppCompatActivity
 import com.zk.cabinet.databinding.ActivityPdaInventoryOperatorBinding
 import com.zk.cabinet.entity.ResultGetNoStartInventoryPlan
 import com.zk.cabinet.fragment.PDAInventoryFragment
+import com.zk.cabinet.pdauhf.PDAUhfHelper
 import com.zk.cabinet.view.titleView.ScaleTransitionPagerTitleView
 import net.lucode.hackware.magicindicator.ViewPagerHelper
 import net.lucode.hackware.magicindicator.buildins.UIUtil
@@ -37,24 +41,53 @@ class PDAInventoryOperatorActivity : TimeOffAppCompatActivity(), View.OnClickLis
         }
     }
 
+    lateinit var mBroadcastManager: LocalBroadcastManager
+    lateinit var mReceiver: BroadcastReceiver
+
     private lateinit var data: ResultGetNoStartInventoryPlan.DataBean
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_pda_inventory_operator)
         mBinding.onClickListener = this
-        // 关闭自动倒计时
-        isAutoFinish = false
+        // 开启自动倒计时
+        isAutoFinish = true
+        timerStart()
 
         // 收到的数据
         data = intent.getSerializableExtra("entity") as ResultGetNoStartInventoryPlan.DataBean
         LogUtils.e("收到的数据：" + JSON.toJSONString(data))
-        val cabineBeanList = data.cabineBeanList
-        initViewPager(cabineBeanList)
+        val cabinetBeanList = data.cabineBeanList
+        initViewPager(cabinetBeanList)
+
+        // 初始化广播
+        mBroadcastManager = LocalBroadcastManager.getInstance(this)
+
+        val intentFilter = IntentFilter()
+        intentFilter.addAction("android.intent.action.STOP_INVENTORY")
+        intentFilter.addAction("android.intent.action.START_INVENTORY")
+
+        mReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent!!.action == "android.intent.action.STOP_INVENTORY") {
+                    isAutoFinish = false
+                    timerCancel()
+                } else if (intent!!.action == "android.intent.action.START_INVENTORY") {
+                    isAutoFinish = true
+                    timerStart()
+                }
+            }
+        }
+        mBroadcastManager.registerReceiver(mReceiver, intentFilter)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mBroadcastManager.unregisterReceiver(mReceiver)
     }
 
     private fun initViewPager(dataList: List<ResultGetNoStartInventoryPlan.DataBean.CabineBeanListBean>) {
         val fragmentList: java.util.ArrayList<Fragment> = java.util.ArrayList<Fragment>()
-        var titleList = ArrayList<String>()
+        val titleList = ArrayList<String>()
 
         for (entity in dataList) {
             titleList.add(entity.attributeName)
@@ -84,7 +117,7 @@ class PDAInventoryOperatorActivity : TimeOffAppCompatActivity(), View.OnClickLis
         mBinding.magicIndicator.setBackgroundColor(resources.getColor(R.color.white))
 
         val commonNavigator = CommonNavigator(this)
-        commonNavigator.isAdjustMode = true // true,占满整条,false,wrapContent
+        commonNavigator.isAdjustMode = false // true,占满整条,false,wrapContent
         commonNavigator.adapter = object : CommonNavigatorAdapter() {
             override fun getCount(): Int {
                 return titleList.size
@@ -129,6 +162,7 @@ class PDAInventoryOperatorActivity : TimeOffAppCompatActivity(), View.OnClickLis
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btn_back -> {
+                PDAUhfHelper.getInstance().release()
                 finish()
             }
         }

@@ -31,9 +31,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
                     android:gravity="center"
-                    android:text="「 盘库计划ID 」"
+                    android:text="「   盘库计划ID   」"
                     android:textColor="@color/black"
                     android:textSize="18sp" />
 
@@ -60,9 +59,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
                     android:gravity="center"
-                    android:text="「 盘库类型 」"
+                    android:text="「     盘库类型     」"
                     android:textColor="@color/black"
                     android:textSize="18sp" />
 
@@ -90,7 +88,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="「 盘库库房 」"
+                    android:text="「     盘库库房     」"
                     android:textColor="@color/black"
                     android:textSize="18sp" />
 
@@ -141,7 +139,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="center"
-            android:layout_marginLeft="30dp"
+            android:layout_marginLeft="20dp"
             android:layout_marginRight="10dp"
             android:src="@mipmap/ic_arrow_right" />
 

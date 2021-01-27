@@ -36,29 +36,28 @@ class NetworkRequest : VolleyRequest() {
     lateinit var mGetAIOInfoByEquipmentId: String
     lateinit var mGetPosInfoByCabinetEquipmentId: String
     lateinit var mGetAllCodeType: String
+    lateinit var mGetInventoryDifferenceByPlanId: String
 
     companion object {
-        // todo 阿里云外网测试服务器地址
+        // 阿里云外网测试服务器地址
         // http://118.25.102.226:11001/apiLogin
-
-        // todo 外网测试MQTT地址
+        // 外网测试MQTT地址
         // 地址：47.96.95.4  
         // 端口：1883
         // 用户名密码:test/test
         // 主题：pad
         // "tcp://" + "47.96.95.4" + ":1883"
-
+        // todo 外网测试环境
 /*        private const val URL_HEAD = "http://"
         private const val URL_COLON = ":"
         private const val DEFAULT_URL = "118.25.102.226"
         private const val DEFAULT_PORT = 11001
-
         private const val DEFAULT_MQTT_HEAD = "tcp://"
         private const val DEFAULT_MQTT_IP = "47.96.95.4"
         private const val DEFAULT_MQTT_COLON = ":"
         private const val DEFAULT_MQTT_PORT = 1883*/
 
-        // todo 国网智芯内网服务器地址,设置为默认地址
+        // 国网智芯内网服务器地址,设置为默认地址
         // centos:7.6.1810
         // 10.238.211.2:11001     root ：123!@#qwe
         // redis密码：wbl20201117
@@ -68,19 +67,17 @@ class NetworkRequest : VolleyRequest() {
         // appKey: 29019157
         // appSecret: 5GPKANd87cMqtkWtzKxn
         // http://10.238.211.2:11001/apiLogin
-
-        // todo 国网智芯内网MQTT服务器地址,设置为默认地址
+        // 国网智芯内网MQTT服务器地址,设置为默认地址
         // 地址：10.238.211.2
         // 端口：1883
         // 用户名密码:test/test
         // 主题：pad
         // "tcp://" + "10.238.211.2" + ":1883"
-
+        // todo 国网智芯内网环境
         private const val URL_HEAD = "http://"
         private const val URL_COLON = ":"
         private const val DEFAULT_URL = "10.238.211.2"
         private const val DEFAULT_PORT = 11001
-
         private const val DEFAULT_MQTT_HEAD = "tcp://"
         private const val DEFAULT_MQTT_IP = "10.238.211.2"
         private const val DEFAULT_MQTT_COLON = ":"
@@ -180,6 +177,10 @@ class NetworkRequest : VolleyRequest() {
         // 接口地址：  post   /busi/baseArchivesBox/unBind
         private const val unBind = "/busi/baseArchivesBox/unBind"
 
+        // 18. 根据盘库计划id获取盘库差异信息
+        // 接口地址：  get /api/pad/getInventoryDifferenceByPlanId
+        private const val getInventoryDifferenceByPlanId = "/api/pad/getInventoryDifferenceByPlanId"
+
         val instance: NetworkRequest by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
             NetworkRequest()
         }
@@ -262,6 +263,8 @@ class NetworkRequest : VolleyRequest() {
         mGetBoxListByPosCode = URL_HEAD + url + URL_COLON + port + getBoxListByPosCode
         mBind = URL_HEAD + url + URL_COLON + port + bind
         mUnBind = URL_HEAD + url + URL_COLON + port + unBind
+        mGetInventoryDifferenceByPlanId =
+            URL_HEAD + url + URL_COLON + port + getInventoryDifferenceByPlanId
     }
 
     fun configModifyMQTT(mqttIP: String, mqttPort: Int) {
