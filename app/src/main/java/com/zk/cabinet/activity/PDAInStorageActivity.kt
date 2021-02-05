@@ -149,9 +149,9 @@ class PDAInStorageActivity : TimeOffAppCompatActivity(), View.OnClickListener {
      * rfid string 档案rfid
      */
     private fun postBind() {
-        val posRFID = mBinding.tvBarcode.text.trim().toString()
+        val posRFID = mBinding.etBarcode.text.toString().trim()
         if (TextUtils.isEmpty(posRFID)) {
-            showWarningToast("请先扫描库位二维码")
+            showWarningToast("请先扫描库位二维码或手动输入库位号")
             return
         } else if (queryFileList.size == 0) {
             showWarningToast("请先扫描待入库/异常出库档案")
@@ -190,7 +190,7 @@ class PDAInStorageActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                             sendDelayMessage(BIND_SUCCESS, "入库绑定成功")
                             queryFileList.clear()
                             mAdapter.notifyDataSetChanged()
-                            mBinding.tvBarcode.text = ""
+                            mBinding.etBarcode.setText("")
                         } else {
                             sendDelayMessage(BIND_ERROR, response.getString("msg"))
                         }
@@ -358,7 +358,7 @@ class PDAInStorageActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                 REQUEST_CODE_SCAN -> {
                     // 扫描二维码/条码回传 数据
                     val result = data.getStringExtra(Intents.Scan.RESULT)
-                    mBinding.tvBarcode.text = result
+                    mBinding.etBarcode.setText(result)
                 }
             }
         }

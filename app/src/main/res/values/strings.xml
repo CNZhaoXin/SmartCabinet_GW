@@ -54,6 +54,9 @@
 
     <string name="password_admin">请输入管理员密码</string>
 
+    <string name="barcode_hint">手动输入库位号</string>
+    <string name="barcode_ruler">（库位号规则:库房编号-第几排-第几列A/B面-第几层-第几号，示例:1-1-1A-1-1）</string>
+
     <string name="account">账  号：</string>
     <string name="password">密  码：</string>
     <string name="account_hint">请输入您的账号</string>

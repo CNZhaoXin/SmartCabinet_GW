@@ -125,24 +125,44 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="20dp"
-                android:layout_marginBottom="30dp"
-                android:orientation="horizontal">
+                android:layout_marginBottom="20dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="库位号："
+                        android:textColor="@color/white"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <com.zk.cabinet.view.ClearEditText
+                        android:id="@+id/et_barcode"
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:background="@drawable/shape_edit_text_bg"
+                        android:digits="AB-0123456789"
+                        android:hint="@string/barcode_hint"
+                        android:maxLength="14"
+                        android:paddingLeft="30dp"
+                        android:textColor="@color/gray_deep"
+                        android:textColorHint="@color/gray_deep"
+                        android:textSize="26sp" />
+
+                </LinearLayout>
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="库位号："
+                    android:layout_marginTop="20dp"
+                    android:text="@string/barcode_ruler"
                     android:textColor="@color/white"
-                    android:textSize="30sp"
-                    android:textStyle="bold" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tv_posCode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textColor="@color/white"
-                    android:textSize="36sp"
+                    android:textSize="24sp"
                     android:textStyle="bold" />
 
             </LinearLayout>

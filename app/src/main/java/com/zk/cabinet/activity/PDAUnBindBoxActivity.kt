@@ -264,7 +264,7 @@ class PDAUnBindBoxActivity : TimeOffAppCompatActivity(), View.OnClickListener {
      * dataValue string 档案盒ID
      */
     private fun unBind() {
-        val posCode = mBinding.tvPosCode.text.trim().toString()
+        val posCode = mBinding.etBarcode.text.toString().trim()
         val boxId = mBinding.tvBoxId.text.trim().toString()
         if (TextUtils.isEmpty(posCode)) {
             showWarningToast("请先扫描库位二维码")
@@ -335,7 +335,7 @@ class PDAUnBindBoxActivity : TimeOffAppCompatActivity(), View.OnClickListener {
                 REQUEST_CODE_SCAN_POS_CODE -> { // 扫描 库位二维码 返回结果
                     // 扫描二维码/条码回传 数据
                     scanResult = data.getStringExtra(Intents.Scan.RESULT)
-                    mBinding.tvPosCode.text = scanResult
+                    mBinding.etBarcode.setText(scanResult)
 
                     mProgressDialog.setMessage("正在查询...")
                     mProgressDialog.show()
