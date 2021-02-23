@@ -131,11 +131,12 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
+                <!--                android:text="❶ 点击亮灯 ➠ "-->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="❶ 点击亮灯 ➠ "
+                    android:text="❶ 自动亮灯 ➠ "
                     android:textColor="@color/white"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -149,11 +150,12 @@
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
+                <!--                android:text="❸ 取回档案点击扫描确认待借阅档案 ➠ "-->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="❸ 取回档案点击扫描确认待借阅档案 ➠ "
+                    android:text="❸ 取回档案自动扫描确认待借阅档案 ➠ "
                     android:textColor="@color/white"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -266,7 +268,8 @@
                     android:text="亮 灯"
                     android:textColor="@color/white"
                     android:textSize="32sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
                 <Button
                     android:id="@+id/btn_scan"
@@ -279,6 +282,7 @@
                     android:gravity="center"
                     android:onClick="@{onClickListener}"
                     android:padding="20dp"
+                    android:visibility="gone"
                     android:text="扫 描"
                     android:textColor="@color/white"
                     android:textSize="32sp"

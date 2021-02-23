@@ -131,11 +131,12 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
+                <!--     android:text="❶ 点击扫描确认待归还档案 ➠ "-->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="❶ 点击扫描确认待归还档案 ➠ "
+                    android:text="❶ 自动扫描确认待归还档案 ➠ "
                     android:textColor="@color/white"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -266,7 +267,8 @@
                     android:text="扫 描"
                     android:textColor="@color/white"
                     android:textSize="32sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
                 <Button
                     android:id="@+id/btn_commit"

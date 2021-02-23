@@ -67,6 +67,9 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
 
         private const val FINISH_ACTIVITY = 0x10
 
+        private const val AUTO_START_INVENTORY = 0x11
+        private const val AUTO_CANCEL_INVENTORY = 0x12
+
         fun newIntent(packageContext: Context?): Intent {
             return Intent(packageContext, YTJReturnActivity::class.java)
         }
@@ -154,6 +157,10 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                                 if (curCabinetDossier.size > 0) {
                                     showWarningToast("档案组架中有「${curCabinetDossier.size}」份档案需归还")
                                     speek("档案组架中有${curCabinetDossier.size}份档案需归还")
+
+                                    val message = Message.obtain()
+                                    message.what = AUTO_START_INVENTORY
+                                    mHandler.sendMessage(message)
                                 } else {
                                     showWarningToast("档案组架中暂无档案需归还")
                                     speek("档案组架中暂无档案需归还")
@@ -218,15 +225,20 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
         NetworkRequest.instance.add(jsonObjectRequest)
     }
 
+    private val epcSets = HashSet<String>()
+
     private fun handleMessage(msg: Message) {
         when (msg.what) {
             START_INVENTORY -> { // 开始盘点
-                mProgressDialog.setMessage("正在扫描,请稍后...")
-                mProgressDialog.show()
+//                mProgressDialog.setMessage("正在扫描,请稍后...")
+//                mProgressDialog.show()
             }
             INVENTORY_VALUE -> {
                 val labelInfo = msg.obj as LabelInfo
-                labelInfoList.add(labelInfo)
+                if (!epcSets.contains(labelInfo.epc)) {
+                    labelInfoList.add(labelInfo)
+                    epcSets.add(labelInfo.epc)
+                }
                 Log.e("一体机待归还-", "labelInfo.deviceID: ${labelInfo.deviceID}")
                 Log.e("一体机待归还-", "labelInfo.antennaNumber: ${labelInfo.antennaNumber}")
                 Log.e("一体机待归还-", "labelInfo.fastID: ${labelInfo.fastID}")
@@ -236,10 +248,10 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                 Log.e("一体机待归还-", "labelInfo.epc: ${labelInfo.epc}")
                 Log.e("一体机待归还-", "labelInfo.tid: ${labelInfo.tid}")
                 Log.e("一体机待归还-", "labelInfo.inventoryNumber: ${labelInfo.inventoryNumber}")
+
             }
             CANCEL_INVENTORY -> { // 停止盘点
-            }
-            END_INVENTORY -> { // 盘点结束
+                // 因为在时时盘点,所以要时时处理
                 // 扫描结束后EPC编码与数据列表中数据EPC比对
                 val selectedList = ArrayList<ResultGetToReturnList.DataBean>()
                 for (entity in mList) {
@@ -256,13 +268,13 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
 
                 if (selectedList.size > 0) {
                     showWarningToast("扫描到【${selectedList.size}】份待归还档案")
-                    speek("扫描到${selectedList.size}份待归还档案")
+                    // speek("扫描到${selectedList.size}份待归还档案")
                     mBinding.btnCommit.background =
                         resources.getDrawable(R.drawable.selector_menu_green_normal)
                     mBinding.btnCommit.isEnabled = true
                 } else {
                     showWarningToast("未扫描到待归还档案")
-                    speek("未扫描到待归还档案")
+                    // speek("未扫描到待归还档案")
                     mBinding.btnCommit.background =
                         resources.getDrawable(R.drawable.shape_btn_un_enable)
                     mBinding.btnCommit.isEnabled = false
@@ -271,13 +283,17 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                 Log.e("一体机待归还-盘点到的标签数据-", JSON.toJSONString(labelInfoList))
                 mProgressDialog.dismiss()
                 mAdapter.notifyDataSetChanged()
+                epcSets.clear()
                 labelInfoList.clear()
+            }
+            END_INVENTORY -> { // 盘点结束
             }
             SUBMIT_SUCCESS -> { // 归还成功
                 // mProgressDialog.dismiss()
-                showWarningToast("【${msg.obj}】份档案归还成功")
-                speek("${msg.obj}份档案归还成功")
+                showWarningToast("【${msg.obj}】份档案归还成功已自动亮灯")
+                speek("${msg.obj}份档案归还成功已自动亮灯")
 
+                // 提交成功后自动亮灯
                 val message = Message.obtain()
                 message.what = LIGHT_UP_PRE
                 mHandler.sendMessageDelayed(message, 2500)
@@ -285,6 +301,11 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
             SUBMIT_ERROR -> {
                 mProgressDialog.dismiss()
                 showErrorToast("${msg.obj}")
+
+                // 提交成功后重新开启连续盘点
+                val message1 = Message.obtain()
+                message1.what = AUTO_START_INVENTORY
+                mHandler.sendMessage(message1)
             }
 
             LIGHT_UP_PRE -> { // 自动亮灯之前的准备
@@ -309,7 +330,20 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                     resources.getDrawable(R.drawable.shape_btn_un_enable)
                 mBinding.btnCommit.isEnabled = false
 
-                mAdapter.notifyDataSetChanged()
+                // 归还成功,且没有任何待归还条目了就主动关闭掉界面
+                if (mList.size == 0) {
+                    mAdapter.notifyDataSetChanged()
+                    val message = Message.obtain()
+                    message.what = FINISH_ACTIVITY
+                    mHandler.sendMessageDelayed(message, 5000)
+                } else {
+                    // 提交成功后又亮灯后且还有待归还的档案就重新开启连续盘点
+                    val message1 = Message.obtain()
+                    message1.what = AUTO_START_INVENTORY
+                    mHandler.sendMessage(message1)
+
+                    mAdapter.notifyDataSetChanged()
+                }
             }
             LIGHT_UP_SUCCESS -> { // 亮灯成功
                 mProgressDialog.dismiss()
@@ -331,6 +365,39 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
             FINISH_ACTIVITY -> { // 关闭界面
                 mProgressDialog.dismiss()
                 finish()
+            }
+
+            // 连续盘点
+            AUTO_START_INVENTORY -> {
+                // 开启连续盘点
+                /*
+                 * ID : 读写器ID，注册回调里有这个ID
+                 * fastId : 0x01 启用FastID功能 0x00 不启用FastID功能（该功能目前未启用，传个0就好了）
+                 * antennaNumber: 天线号 (0-3)，一共4根天线 (接一根天线就是0)
+                 * inventoryType ; 0x00 非连续盘点 0x01 连续盘点
+                 */
+                LogUtils.e("读写器设备ID:" + mDevice!!.deviceId)
+                UR880Entrance.getInstance().send(
+                    UR880SendInfo.Builder()
+                        .inventory(mDevice!!.deviceId, 0x00, 0x00, 0x01).build()
+                )
+
+                val message = Message.obtain()
+                message.what = AUTO_CANCEL_INVENTORY
+                // 连续盘点时长
+                mHandler.sendMessageDelayed(message, 2500)
+            }
+            // 取消连续盘点
+            AUTO_CANCEL_INVENTORY -> {
+                // 取消连续盘点
+                LogUtils.e("读写器设备ID:" + mDevice!!.deviceId)
+                UR880Entrance.getInstance()
+                    .send(UR880SendInfo.Builder().cancel(mDevice!!.deviceId).build())
+
+                val message = Message.obtain()
+                message.what = AUTO_START_INVENTORY
+                // 连续盘点下次盘点前的等待时间
+                mHandler.sendMessageDelayed(message, 800)
             }
         }
     }
@@ -357,10 +424,10 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                  * antennaNumber: 天线号 (0-3)，一共4根天线 (接一根天线就是0)
                  * inventoryType ; 0x00 非连续盘点 0x01 连续盘点
                  */
-                LogUtils.e("读写器设备ID:" + mDevice!!.deviceId)
-                UR880Entrance.getInstance().send(
-                    UR880SendInfo.Builder().inventory(mDevice!!.deviceId, 0x00, 0x00, 0x00).build()
-                )
+//                LogUtils.e("读写器设备ID:" + mDevice!!.deviceId)
+//                UR880Entrance.getInstance().send(
+//                    UR880SendInfo.Builder().inventory(mDevice!!.deviceId, 0x00, 0x00, 0x00).build()
+//                )
             }
             // 归还提交
             R.id.btn_commit -> {
@@ -493,7 +560,7 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                 else {
                     "errorCode: -1 VolleyError: 未知"
                 }
-                showErrorToast(msg)
+                sendDelayMessage(LIGHT_UP_ERROR, msg)
             })
 
         jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
@@ -509,6 +576,9 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
      * 接口地址：Post /api/pad/archivesReturn
      */
     private fun returnSubmission(equipmentId: String) {
+        mHandler.removeMessages(AUTO_START_INVENTORY)
+        mHandler.removeMessages(AUTO_CANCEL_INVENTORY)
+
         mProgressDialog.setMessage("正在提交...")
         mProgressDialog.show()
 
@@ -562,7 +632,7 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                 else {
                     "errorCode: -1 VolleyError: 未知"
                 }
-                showErrorToast(msg)
+                sendDelayMessage(SUBMIT_ERROR, msg)
             })
 
         jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
@@ -615,6 +685,12 @@ class YTJReturnActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
     }
 
     override fun onDestroy() {
+        mHandler.removeMessages(AUTO_START_INVENTORY)
+        mHandler.removeMessages(AUTO_CANCEL_INVENTORY)
+        LogUtils.e("读写器设备ID:" + mDevice!!.deviceId)
+        // 取消连续盘点
+        UR880Entrance.getInstance().send(UR880SendInfo.Builder().cancel(mDevice!!.deviceId).build())
+
         UR880Entrance.getInstance().removeInventoryListener(mInventoryListener)
         super.onDestroy()
     }

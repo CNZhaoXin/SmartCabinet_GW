@@ -66,6 +66,9 @@ class YTJBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
 
         private const val FINISH_ACTIVITY = 0x10
 
+        private const val AUTO_START_INVENTORY = 0x11
+        private const val AUTO_CANCEL_INVENTORY = 0x12
+
         fun newIntent(packageContext: Context?): Intent {
             return Intent(packageContext, YTJBorrowActivity::class.java)
         }
@@ -145,18 +148,26 @@ class YTJBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                                 mBinding.llNoData.visibility = View.GONE
 
                                 // 过滤出属于一体机可操作的档案组架的档案
-                                val curCabinetDossier = ArrayList<ResultGetToBorrowList.DataBean>()
+                                mListDAJ.clear()
                                 for (entity in mList) {
                                     if (entity.cabinetType == "1") {
-                                        curCabinetDossier.add(entity)
+                                        mListDAJ.add(entity)
                                     }
                                 }
-                                if (curCabinetDossier.size > 0) {
-                                    showWarningToast("档案组架中有「${curCabinetDossier.size}」份档案可借阅")
-                                    speek("档案组架中有${curCabinetDossier.size}份档案可借阅")
+                                if (mListDAJ.size > 0) {
+                                    // 自动亮所有的灯,既然要借阅那就亮所有好了
+                                    lightUp(mListDAJ)
+//                                    showWarningToast("档案组架中有「${mListDAJ.size}」份档案可借阅")
+                                    speek("档案组架中有${mListDAJ.size}份档案可借阅且已亮灯")
+
+                                    val message = Message.obtain()
+                                    message.what = AUTO_START_INVENTORY
+                                    mHandler.sendMessage(message)
                                 } else {
                                     showWarningToast("档案组架中暂无档案可借阅")
                                     speek("档案组架中暂无档案可借阅")
+//                                    showWarningToast("暂无可亮灯的档案组架档案")
+//                                    speek("暂无可亮灯的档案组架档案")
                                 }
 
                             } else {
@@ -219,15 +230,21 @@ class YTJBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
         NetworkRequest.instance.add(jsonObjectRequest)
     }
 
+    private val epcSets = HashSet<String>()
+
     private fun handleMessage(msg: Message) {
         when (msg.what) {
             START_INVENTORY -> { // 开始盘点
-                mProgressDialog.setMessage("正在扫描,请稍后...")
-                mProgressDialog.show()
+//                mProgressDialog.setMessage("正在扫描,请稍后...")
+//                mProgressDialog.show()
             }
             INVENTORY_VALUE -> {
                 val labelInfo = msg.obj as LabelInfo
-                labelInfoList.add(labelInfo)
+                if (!epcSets.contains(labelInfo.epc)) {
+                    labelInfoList.add(labelInfo)
+                    epcSets.add(labelInfo.epc)
+                }
+
                 Log.e("一体机待借阅", "labelInfo.deviceID: ${labelInfo.deviceID}")
                 Log.e("一体机待借阅", "labelInfo.antennaNumber: ${labelInfo.antennaNumber}")
                 Log.e("一体机待借阅", "labelInfo.fastID: ${labelInfo.fastID}")
@@ -239,8 +256,7 @@ class YTJBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                 Log.e("一体机待借阅", "labelInfo.inventoryNumber: ${labelInfo.inventoryNumber}")
             }
             CANCEL_INVENTORY -> { // 停止盘点
-            }
-            END_INVENTORY -> { // 盘点结束
+                // 因为在时时盘点,所以要时时处理
                 // 扫描结束后EPC编码与数据列表中数据EPC比对
                 val selectedList = ArrayList<ResultGetToBorrowList.DataBean>()
                 for (entity in mList) {
@@ -257,29 +273,32 @@ class YTJBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
 
                 if (selectedList.size > 0) {
                     showWarningToast("扫描到【${selectedList.size}】份待借阅档案")
-                    speek("扫描到${selectedList.size}份待借阅档案")
+                    // speek("扫描到${selectedList.size}份待借阅档案")
                     mBinding.btnCommit.background =
                         resources.getDrawable(R.drawable.selector_menu_green_normal)
                     mBinding.btnCommit.isEnabled = true
                 } else {
                     showWarningToast("未扫描到待借阅档案")
-                    speek("未扫描到待借阅档案")
+                    // speek("未扫描到待借阅档案")
                     mBinding.btnCommit.background =
                         resources.getDrawable(R.drawable.shape_btn_un_enable)
                     mBinding.btnCommit.isEnabled = false
                 }
 
                 Log.e("一体机待借阅-盘点到的标签数据-", JSON.toJSONString(labelInfoList))
-                mProgressDialog.dismiss()
+                // mProgressDialog.dismiss()
                 mAdapter.notifyDataSetChanged()
+                epcSets.clear()
                 labelInfoList.clear()
+            }
+            END_INVENTORY -> { // 盘点结束
             }
             SUBMIT_SUCCESS -> {
                 mProgressDialog.dismiss()
                 showWarningToast("【${msg.obj}】份档案借阅成功")
                 speek("${msg.obj}份档案借阅成功")
 
-                // 清出掉列表中借阅成功的档案
+                // 清除掉列表中借阅成功的档案
                 val iterator = mList.iterator()
                 while (iterator.hasNext()) {
                     if (iterator.next().isSelect)
@@ -298,27 +317,69 @@ class YTJBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                     mHandler.sendMessageDelayed(message, 5000)
                 } else {
                     mAdapter.notifyDataSetChanged()
+
+                    val message = Message.obtain()
+                    message.what = AUTO_START_INVENTORY
+                    mHandler.sendMessage(message)
                 }
             }
             SUBMIT_ERROR -> {
                 mProgressDialog.dismiss()
                 showErrorToast("${msg.obj}")
+
+                val message = Message.obtain()
+                message.what = AUTO_START_INVENTORY
+                mHandler.sendMessage(message)
             }
 
             LIGHT_UP_SUCCESS -> {
                 mProgressDialog.dismiss()
                 showWarningToast("【${msg.obj}】份待借阅档案,亮灯成功")
-                speek("${msg.obj}份待借阅档案,亮灯成功,请尽快前往亮灯档案架取档,取回档案后扫描确认,并点击借阅")
+                speek("${msg.obj}份待借阅档案,亮灯成功,请尽快前往亮灯档案架取档,取回档案后自动扫描确认,并点击借阅")
 
                 // 亮灯成功后,亮灯按钮就不能再使用
-                mBinding.btnOpenLight.background =
-                    resources.getDrawable(R.drawable.shape_btn_un_enable)
-                mBinding.btnOpenLight.isEnabled = false
+                // 更新版本:版本号:41, 版本名称:v1.1.3
+//                mBinding.btnOpenLight.background =
+//                    resources.getDrawable(R.drawable.shape_btn_un_enable)
+//                mBinding.btnOpenLight.isEnabled = false
 
             }
             LIGHT_UP_ERROR -> {
                 mProgressDialog.dismiss()
                 showErrorToast("${msg.obj}")
+            }
+
+            // 连续盘点
+            AUTO_START_INVENTORY -> {
+                // 开启连续盘点
+                /*
+                 * ID : 读写器ID，注册回调里有这个ID
+                 * fastId : 0x01 启用FastID功能 0x00 不启用FastID功能（该功能目前未启用，传个0就好了）
+                 * antennaNumber: 天线号 (0-3)，一共4根天线 (接一根天线就是0)
+                 * inventoryType ; 0x00 非连续盘点 0x01 连续盘点
+                 */
+                LogUtils.e("读写器设备ID:-开启连续盘点" + mDevice!!.deviceId)
+                UR880Entrance.getInstance().send(
+                    UR880SendInfo.Builder()
+                        .inventory(mDevice!!.deviceId, 0x00, 0x00, 0x01).build()
+                )
+
+                val message = Message.obtain()
+                message.what = AUTO_CANCEL_INVENTORY
+                // 连续盘点时长
+                mHandler.sendMessageDelayed(message, 2500)
+            }
+            // 取消连续盘点
+            AUTO_CANCEL_INVENTORY -> {
+                // 取消连续盘点
+                LogUtils.e("读写器设备ID:-取消连续盘点" + mDevice!!.deviceId)
+                UR880Entrance.getInstance()
+                    .send(UR880SendInfo.Builder().cancel(mDevice!!.deviceId).build())
+
+                val message = Message.obtain()
+                message.what = AUTO_START_INVENTORY
+                // 连续盘点下次盘点前的等待时间
+                mHandler.sendMessageDelayed(message, 800)
             }
 
             FINISH_ACTIVITY -> { // 关闭界面
@@ -344,21 +405,22 @@ class YTJBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
             }
             // 亮灯
             R.id.btn_open_light -> {
-                // (此版本不做)亮灯dialog,可选档案亮灯,或者显示要确定亮灯的所有档案
-                mListDAJ.clear()
-                for (entity in mList) {
-                    // 档案组架的档案
-                    if (entity.cabinetType == "1") {
-                        mListDAJ.add(entity)
-                    }
-                }
-                if (mListDAJ.size > 0) {
-                    // 亮所有的灯,既然要借阅那就亮所有好了
-                    lightUp(mListDAJ)
-                } else {
-                    showWarningToast("暂无可亮灯的档案组架档案")
-                    speek("暂无可亮灯的档案组架档案")
-                }
+                // 更新版本:版本号:41, 版本名称:v1.1.3
+//                // (此版本不做)亮灯dialog,可选档案亮灯,或者显示要确定亮灯的所有档案
+//                mListDAJ.clear()
+//                for (entity in mList) {
+//                    // 档案组架的档案
+//                    if (entity.cabinetType == "1") {
+//                        mListDAJ.add(entity)
+//                    }
+//                }
+//                if (mListDAJ.size > 0) {
+//                    // 亮所有的灯,既然要借阅那就亮所有好了
+//                    lightUp(mListDAJ)
+//                } else {
+//                    showWarningToast("暂无可亮灯的档案组架档案")
+//                    speek("暂无可亮灯的档案组架档案")
+//                }
             }
 
             // 开启单次扫描
@@ -369,10 +431,10 @@ class YTJBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                  * antennaNumber: 天线号 (0-3)，一共4根天线 (接一根天线就是0)
                  * inventoryType ; 0x00 非连续盘点 0x01 连续盘点
                  */
-                LogUtils.e("读写器设备ID:" + mDevice!!.deviceId)
-                UR880Entrance.getInstance().send(
-                    UR880SendInfo.Builder().inventory(mDevice!!.deviceId, 0x00, 0x00, 0x00).build()
-                )
+//                LogUtils.e("读写器设备ID:" + mDevice!!.deviceId)
+//                UR880Entrance.getInstance().send(
+//                    UR880SendInfo.Builder().inventory(mDevice!!.deviceId, 0x00, 0x00, 0x00).build()
+//                )
             }
 
             // 借阅提交
@@ -503,7 +565,7 @@ class YTJBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                 else {
                     "errorCode: -1 VolleyError: 未知"
                 }
-                showErrorToast(msg)
+                sendDelayMessage(LIGHT_UP_ERROR, msg)
             })
 
         jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
@@ -519,6 +581,9 @@ class YTJBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
     接口地址：  Post /api/pad/archivesBorrow
      */
     private fun borrowSubmission(equipmentId: String) {
+        mHandler.removeMessages(AUTO_START_INVENTORY)
+        mHandler.removeMessages(AUTO_CANCEL_INVENTORY)
+
         mProgressDialog.setMessage("正在提交...")
         mProgressDialog.show()
 
@@ -573,7 +638,7 @@ class YTJBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
                 else {
                     "errorCode: -1 VolleyError: 未知"
                 }
-                showErrorToast(msg)
+                sendDelayMessage(SUBMIT_ERROR, msg)
             })
 
         jsonObjectRequest.retryPolicy = DefaultRetryPolicy(
@@ -626,6 +691,12 @@ class YTJBorrowActivity : TimeOffAppCompatActivity(), AdapterView.OnItemClickLis
     }
 
     override fun onDestroy() {
+        mHandler.removeMessages(AUTO_START_INVENTORY)
+        mHandler.removeMessages(AUTO_CANCEL_INVENTORY)
+        LogUtils.e("读写器设备ID:onDestroy取消连续盘点" + mDevice!!.deviceId)
+        // 取消连续盘点
+        UR880Entrance.getInstance().send(UR880SendInfo.Builder().cancel(mDevice!!.deviceId).build())
+
         UR880Entrance.getInstance().removeInventoryListener(mInventoryListener)
         super.onDestroy()
     }

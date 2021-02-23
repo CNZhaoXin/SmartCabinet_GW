@@ -12,11 +12,12 @@ android {
         applicationId "com.gw.cabinet"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 40
-        versionName "1.1.2"
+        versionCode 41
+        versionName "1.1.3"
         // 32_v1.0.32 (2020.12.29)
         // 39_v1.1.1 (2020.1.28)
         // 40_v1.1.2 (2021.2.5)
+        // 41_v1.1.3 (2021.2.23)
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
