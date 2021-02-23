@@ -1,6 +1,7 @@
 package com.zk.cabinet.application
 
 import android.app.Application
+import android.os.Handler
 import android.text.TextUtils
 import android.view.Gravity
 import com.blankj.utilcode.util.LogUtils
@@ -54,6 +55,22 @@ class App : Application() {
         DBHelper.getInstance().init(this)
         // 应用重启/断电重启 清空灯控记录表
         LightControlRecordService.getInstance().deleteAll()
+        // 应用重启/断电重启 延迟灭灯
+        rebootCloseLightHandler.postDelayed(rebootCloseLightRunnable, 5000)
+
+    }
+
+    private val rebootCloseLightHandler = Handler()
+    private val rebootCloseLightRunnable = Runnable {
+        run {
+            rebootCloseLight()
+        }
+    }
+
+    /**
+     * 断电重启灭灯
+     */
+    private fun rebootCloseLight() {
         // 应用重启/断电重启 关闭档案组架 组大灯,单架大灯,单架层灯 ;  关闭档案组柜 组大灯
         val deviceName = spUtil.getString(Key.DeviceName, "").toString()
         if (SelfComm.DEVICE_NAME[1].equals(deviceName)) {   // 档案组架 1
@@ -81,7 +98,6 @@ class App : Application() {
             LightsSerialPortHelper.getInstance().closeGroupBigLight()
             LogUtils.d("应用重启/断电重启 关闭档案组柜 组大灯")
         }
-
     }
 
     /**
